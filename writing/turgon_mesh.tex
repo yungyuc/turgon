@@ -1,0 +1,453 @@
+\documentclass[11pt,dvips]{article}
+%\documentclass[12pt,dvips]{article}
+%\documentclass[preprint,dvips,numbers,sort&compress]{elsarticle}
+%\documentclass[12pt,review,dvips,numbers,sort&compress]{elsarticle}
+% Geometry.
+\usepackage{geometry}
+\geometry{a4paper,
+left=2cm,
+right=2cm,
+top=2cm,
+bottom=2cm,
+}
+% Global functionalities.
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{hyperref}
+% encoding.
+\usepackage[utf8]{inputenc}
+% Mathematics.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{arydshln}
+% Authoring.
+%\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{color}
+\usepackage{paralist}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{setspace}
+%\usepackage{lmodern}
+
+%\doublespacing
+
+\graphicspath{{turgon_eps/}}
+
+\renewcommand{\figurename}{Fig.}
+\newcommand{\topcaption}{%
+\setlength{\abovecaptionskip}{0pt}%
+\setlength{\belowcaptionskip}{10pt}%
+\caption}
+\numberwithin{equation}{section}
+
+\newcommand{\defeq}{\ensuremath{\buildrel {\text{def}}\over{=}}}
+
+\title{
+%
+Unstructured Meshes for the Conservation Element and Solution Element Method
+%
+}
+
+\author{
+%
+Yung-Yu Chen
+%
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+%
+Describe how the unstructured meshes work for the conservation element and
+solution element (CESE) method and SOLVCON.
+%
+\end{abstract}
+
+\section{Unstructured Meshes Concepts}
+%
+\label{s:concept}
+
+The conservation element and solution element (CESE) method is developed
+against the set-up of unstructured meshes in multi-dimensional
+space\cite{mavriplis_unstructured_1997, wang_2d_1999}.  In contrast to
+structured meshes, unstructured meshes allow flexible connectivity and simplex
+elements.  The implementation, i.e., the data structures and the computer code
+for their algorithms, of unstructured meshes dictate how simulation software
+operates.  It serves two purposes: numerical methods for simulation and mesh
+generation.  SOLVCON already includes code for the former and starts to plan
+for the latter.
+
+The library for unstructured meshes offers three functionalities:
+%
+\begin{enumerate}
+%
+\item Resource management: allocation, deallocation, and tracking.
+%
+\item Geometrical entity creation, read, update, and deletion (CRUD).
+%
+\item Spatial indexing.
+%
+\end{enumerate}
+
+\clearpage
+%
+\section{Data Store}
+%
+\label{s:storage}
+
+Most operations on meshes done by the simulation are reading.  The mesh is
+usually assumed to be constant.  Numerical methods may use moving meshes, but
+it is an advanced topic that should be treated separately.
+
+SOLVCON uses a set of lookup tables to store the unstructured mesh.  The
+technique is commonly seen in unstructured-mesh solvers for the efficient
+memory use.  The CESE method is finite-volume-based and associates variables
+with volume centers.  The data store optimizes for easily reading values for
+discrete volume, and thus defines \textit{cell}, \textit{face}, and
+\textit{node}.  Cells are the discrete volume for the space of interest.  Faces
+are the interface between two cells.  Nodes represent the coordinates in space.
+A mesh is also a Voronoi diagram, and the ``cell'' is a \textit{Voronoi
+cell}\cite{berg_computational_2010}.  At this point, it's not straight-forward
+why the three concepts are fundamental to the CESE method.  It may be revealed
+in detail discussions later.
+
+SOLVCON allows mixing elements of different shapes.  The mesh definition data
+are are listed in Table~\ref{t:elm:meta}, \ref{t:subent1d}, \ref{t:subent2d},
+\ref{t:subent3d} and Figure~\ref{f:elm2d}, \ref{f:elm3d}.  The code for
+unstructured meshes in SOLVCON has been organized to a C++ library
+\href{https://github.com/solvcon/solvcon/tree/master/libmarch}{\texttt{libmarch}}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{table}[h]
+\centering
+
+\topcaption{
+%
+Meta data of the unstructured-mesh elements.
+%
+}
+
+\label{t:elm:meta}
+\begin{tabular}{lrrrrr}
+\toprule
+Name          & Type & Dimension & Number of & Number of & Number of \\
+              &      &           &    Points &     Lines &  Surfaces \\
+\midrule
+Point         & 0    & 0         & 1         & (n/a) 0   & (n/a) 0   \\
+Line          & 1    & 1         & 2         & (n/a) 0   & (n/a) 0   \\
+Quadrilateral & 2    & 2         & 4         & 4         & (n/a) 0   \\
+Triangle      & 3    & 2         & 3         & 3         & (n/a) 0   \\
+Hexahedron    & 4    & 3         & 8         & 12        & 6         \\
+Tetrahedron   & 5    & 3         & 4         & 6         & 4         \\
+Prism         & 6    & 3         & 6         & 9         & 5         \\
+Pyramid       & 7    & 3         & 5         & 8         & 5         \\
+\bottomrule
+\end{tabular}
+\end{table}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{table}[h]
+\centering
+
+\topcaption{
+%
+The relation between a one-dimensional element and its sub-entities.
+%
+}
+
+\label{t:subent1d}
+\begin{tabular}{lll}
+\toprule
+Shape (type) & Face & = Node \\
+\midrule
+Line (1)     & 0    & 0      \\
+             & 1    & 1      \\
+\bottomrule
+\end{tabular}
+\end{table}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{table}[h]
+\centering
+
+\topcaption{
+%
+The relations between two-dimensional elements and their sub-entities.  Both of
+two-dimensional elements are enclosed by straight lines.  Node orientation of
+two-dimensional elements is defined in Fig.~\ref{f:elm2d}.
+%
+}
+
+\label{t:subent2d}
+\begin{tabular}{lll}
+\toprule
+Shape (type)      & Face & = Line formed by nodes \\
+\midrule
+Quadrilateral (2) & 0    & $\diagup$ 0 1          \\
+                  & 1    & $\diagup$ 1 2          \\
+                  & 2    & $\diagup$ 2 3          \\
+                  & 3    & $\diagup$ 3 0          \\
+\midrule
+Triangles (3)     & 0    & $\diagup$ 0 1          \\
+                  & 1    & $\diagup$ 1 2          \\
+                  & 2    & $\diagup$ 2 0          \\
+\bottomrule
+\end{tabular}
+\end{table}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{table}[h]
+\centering
+
+\topcaption{
+%
+The relations between three-dimensional elements and their sub-entities.
+Three-dimensional elements are enclosed by triangles or quadrilaterals, or a
+combination of them.  $\square$ in the third column denotes quadrilaterals,
+while $\triangle$ triangles.  Nodes in the third column are ordered so that the
+normal vector of a surface points outward from the volume by following
+right-hand rule.  Node orientation of three-dimensional elements is defined in
+Fig.~\ref{f:elm3d}.
+%
+}
+
+\label{t:subent3d}
+\begin{tabular}{lll}
+\toprule
+Shape (type)    & Face & = Surface formed by nodes \\
+\midrule
+Hexahedron (4)  & 0    & $\square$ 0 3 2 1         \\
+                & 1    & $\square$ 1 2 6 5         \\
+                & 2    & $\square$ 4 5 6 7         \\
+                & 3    & $\square$ 0 4 7 3         \\
+                & 4    & $\square$ 0 1 5 4         \\
+                & 5    & $\square$ 2 3 7 6         \\
+\midrule
+Tetrahedron (5) & 0    & $\triangle$ 0 2 1         \\
+                & 1    & $\triangle$ 0 1 3         \\
+                & 2    & $\triangle$ 0 3 2         \\
+                & 3    & $\triangle$ 1 2 3         \\
+\midrule
+Prism (6)       & 0    & $\triangle$ 0 1 2         \\
+                & 1    & $\triangle$ 3 5 4         \\
+                & 2    & $\square$ 0 3 4 1         \\
+                & 3    & $\square$ 0 2 5 3         \\
+                & 4    & $\square$ 1 4 5 2         \\
+\midrule
+Pyramid (7)     & 0    & $\triangle$ 0 4 3         \\
+                & 1    & $\triangle$ 1 4 0         \\
+                & 2    & $\triangle$ 2 4 1         \\
+                & 3    & $\triangle$ 3 4 2         \\
+                & 4    & $\square$ 0 3 2 1         \\
+\bottomrule
+\end{tabular}
+\end{table}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{figure}[h]
+\centering
+\subfigure[]{
+  \includegraphics{elm_ln.eps}
+  \label{f:elm2d:ln}
+}
+\subfigure[]{
+  \includegraphics{elm_quad.eps}
+  \label{f:elm2d:quad}
+}
+\subfigure[]{
+  \includegraphics{elm_tri.eps}
+  \label{f:elm2d:tri}
+}
+
+\caption{
+%
+Node definition of one- and two-dimensional mesh elements in SOLVCON:
+%
+\subref{f:elm2d:ln} Line (type number 1).
+%
+\subref{f:elm2d:quad} Quadrilateral (type number 2).
+%
+\subref{f:elm2d:tri} Triangle (type number 3).
+%
+}
+
+\label{f:elm2d}
+\end{figure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{figure}[h]
+\centering
+\subfigure[]{
+  \includegraphics{elm_hex.eps}
+  \label{f:elm3d:hex}
+}
+\subfigure[]{
+  \includegraphics{elm_tet.eps}
+  \label{f:elm3d:tet}
+}
+\subfigure[]{
+  \includegraphics{elm_psm.eps}
+  \label{f:elm3d:psm}
+}
+\subfigure[]{
+  \includegraphics{elm_pym.eps}
+  \label{f:elm3d:pym}
+}
+
+\caption{
+%
+Node definitions of three-dimensional mesh elements in SOLVCON:
+%
+\subref{f:elm3d:hex} Hexahedron (type number 4).
+%
+\subref{f:elm3d:tet} Tetrahedron (type number 5).
+%
+\subref{f:elm3d:psm} Prism (type number 6).
+%
+\subref{f:elm3d:pym} Pyramid (type number 7).
+%
+}
+
+\label{f:elm3d}
+\end{figure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+\section{The CESE Method Dual Mesh}
+\label{s:cese_dual}
+
+Figure~\ref{f:mesh_2d_tri} exhibits 6 triangles as an example of mesh elements
+for the CESE method.  The CESE method evaluates the solutions at the centroids
+of conservation elements (CEs).  The centroids are the solution points and are
+used to construct the solution elements (SEs).  The element centers and the
+mesh vertices consist of the conservation elements.  The conservation element
+is the space-time dual mesh defined on the unstructured mesh for the CESE
+method.  See Figure~\ref{f:mesh_2d_ce}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{figure}[h]
+\centering
+\includegraphics{mesh_2d_tri.eps}
+\caption{Triangular mesh in two-dimensional space.}
+\label{f:mesh_2d_tri}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics{mesh_2d_ce.eps}
+\caption{Conservation elements of triangular meshes.}
+\label{f:mesh_2d_ce}
+\end{figure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+
+The CESE method $c$-scheme composes of evaluations of conservation and
+gradients.  The first part assumes the gradients of the previous half time step
+as known to calculate the primary variables.  The second part calculates the
+first-order derivative.  To calculate the first-order derivative, we define
+\textit{gradient elements} (GEs)\cite{chen_multi-physics_2011}.  There are two
+types of GEs: \textit{fundamental GE} (FGE) and \textit{generalized GE} (GGE).
+A FGE is an simplex in $\mathbb{E}^N$ space.  It always has $N+1$ vertices.  A
+GGE is a convex element composes of multiple non-overlapping FGEs that are
+separated by the GGE centroid.
+
+In a FGE, the gradient of a scalar function $\phi(\mathbf{x})$ is assumed to be
+constant, and denoted by
+\begin{align}
+  \mathbf{g} \defeq \nabla\phi \label{e:fge:grad}
+\end{align}
+Let $\mathbf{x}^{(i)}$, $i = 0, 1, \ldots, N$ be the coordinates of the
+vertices of a FGE.  The coordinates define $N$ \textit{displacement vectors}
+\begin{align}
+  \mathbf{d}^{(i)} \defeq \mathbf{x}^{(i)} - \mathbf{x}^{(0)},
+  \quad i = 1, \ldots, N \label{e:fge:dis_vec}
+\end{align}
+Combine all the displacement vectors to write the \textit{displacement matrix}
+\begin{align}
+  D \defeq \left(\begin{array}{ccc}
+    d^{(1)}_1 & \hdots & d^{(1)}_N \\
+    \vdots & \ddots & \vdots \\
+    d^{(N)}_1 & \hdots & d^{(N)}_N
+  \end{array}\right) \label{e:fge:dis_mat}
+\end{align}
+Define
+\begin{align}
+  \mathbf{q} \defeq \left(\begin{array}{c}
+    \phi(\mathbf{x}^{(1)}) - \phi(\mathbf{x}^{(0)}) \\
+    \vdots \\
+    \phi(\mathbf{x}^{(N)}) - \phi(\mathbf{x}^{(0)})
+  \end{array}\right) \label{e:fge:dif_vec}
+\end{align}
+and call it the \textit{difference vector}.  The system equation $\mathbf{q} =
+\mathrm{D}\mathbf{g}$ can be written.  $\mathbf{q}$ and $\mathrm{D}$ are known
+and $\mathbf{g}$ is unknown.  Write
+\begin{align}
+  \mathbf{g} = \mathrm{D}^{-1}\mathbf{q} \label{e:fge:solve_grad}
+\end{align}
+The gradient $\mathbf{g}$ defined in Eq.~(\ref{e:fge:grad}) is determined by
+Eqs~(\ref{e:fge:dis_vec}), (\ref{e:fge:dis_mat}), (\ref{e:fge:dif_vec}), and
+(\ref{e:fge:solve_grad}).
+
+The gradient of a GGE is approximated by the average gradient at its centroid
+\begin{align}
+  \mathbf{g}^c \defeq \frac{1}{M} \sum_{i=0}^{M-1} \mathbf{g}^{(i)}
+  \label{e:gge:grad:centroid}
+\end{align}
+where $\mathbf{g}^{(0)}, \mathbf{g}^{(1)}, \ldots, \mathbf{g}^{(M-1)}$ are the
+gradient of its FGEs.  If the GGE is a simplex, i.e., $M = N+1$, it can be
+shown that $\mathbf{g}^c$ is equal to the gradient calculated by treating the
+GGE as a FGE and applying Eq.~\ref{e:fge:solve_grad}.
+
+Equation \ref{e:gge:grad:centroid} leads to more interesting weighting
+functions for approximating GGE gradient for treating discontinuity.  The W-1
+scheme uses
+\begin{align}
+  \mathbf{g}^{c} \approx \dfrac{
+    \sum\limits_{i=0}^{M-1}\left(\rho^{(i)}\right)^{\alpha}\mathbf{g}^{(i)}
+  }{
+    \sum\limits_{i=0}^{M-1}\left(\rho^{(i)}\right)^{\alpha}
+  }
+\end{align}
+where the weighting coefficients
+\begin{align}
+  \rho^{(i)} \defeq \prod_{k=0; k\neq i}^{M-1}
+                    \left\vert\mathbf{g}^{(k)}\right\vert,
+  \quad i = 0, \ldots, M-1
+\end{align}
+and $\alpha$ an adjustable parameter, usually a natural number.
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{Bibliography}
+%\bibliographystyle{myunsrtnat} % no sort (order in appearance)
+\bibliographystyle{myplainnat} % sort by author
+\bibliography{turgon_main}
+
+\end{document}
+
+% vim: set ai et sw=2 ts=2 tw=79:

@@ -1,0 +1,87 @@
+\documentclass[11pt,dvips]{article}
+%\documentclass[12pt,dvips]{article}
+%\documentclass[preprint,dvips,numbers,sort&compress]{elsarticle}
+%\documentclass[12pt,review,dvips,numbers,sort&compress]{elsarticle}
+% Geometry.
+\usepackage{geometry}
+\geometry{a4paper,
+left=2cm,
+right=2cm,
+top=2cm,
+bottom=2cm,
+}
+% Global functionalities.
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{hyperref}
+% encoding.
+\usepackage[utf8]{inputenc}
+% Mathematics.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{arydshln}
+% Authoring.
+%\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{color}
+\usepackage{paralist}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{setspace}
+%\usepackage{lmodern}
+
+%\doublespacing
+
+\graphicspath{{turgon_eps/}}
+
+\renewcommand{\figurename}{Fig.}
+\newcommand{\topcaption}{%
+\setlength{\abovecaptionskip}{0pt}%
+\setlength{\belowcaptionskip}{10pt}%
+\caption}
+\numberwithin{equation}{section}
+
+\newcommand{\defeq}{\ensuremath{\buildrel {\text{def}}\over{=}}}
+
+\title{
+%
+The Space-Time Conservation Element and Solution Method Schemes
+%
+}
+
+\author{
+%
+Yung-Yu Chen
+%
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+%
+Summarize the schemes of the space-time conservation element and solution
+element (CESE) method.
+%
+\end{abstract}
+
+\section{Conservation Laws}
+%
+\label{s:conlaw}
+
+The space-time conservation element and solution element (CESE) method solves
+the conservation laws\cite{lax_hyperbolic_1973}.
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{Bibliography}
+%\bibliographystyle{myunsrtnat} % no sort (order in appearance)
+\bibliographystyle{myplainnat} % sort by author
+\bibliography{turgon_main}
+
+\end{document}
+
+% vim: set ai et sw=2 ts=2 tw=79:
