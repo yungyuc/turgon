@@ -23,6 +23,8 @@ bottom=2cm,
 \usepackage{arydshln}
 % Authoring.
 %\usepackage{authblk}
+\usepackage[printwatermark]{xwatermark}
+\usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{color}
@@ -31,6 +33,9 @@ bottom=2cm,
 \usepackage{booktabs}
 \usepackage{setspace}
 %\usepackage{lmodern}
+
+\newwatermark[allpages,color=black!30,angle=45,scale=3,xpos=0,ypos=0]%
+{DRAFT NOTE}
 
 %\doublespacing
 
@@ -47,7 +52,7 @@ bottom=2cm,
 
 \title{
 %
-The Space-Time Conservation Element and Solution Method Schemes
+(Drafting) the Space-Time Conservation Element and Solution Method Schemes
 %
 }
 
@@ -74,6 +79,22 @@ element (CESE) method.
 
 The space-time conservation element and solution element (CESE) method solves
 the conservation laws\cite{lax_hyperbolic_1973}.
+
+Writing outline:
+%
+\begin{enumerate}
+%
+\item $a$ scheme
+%
+\item $a$-$\mu$ scheme
+%
+\item CFL-insensitive c-$\tau$ scheme
+%
+\item stability, dissipation and dispersion
+%
+\item error analysis
+%
+\end{enumerate}
 
 \clearpage
 
