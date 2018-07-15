@@ -1,18 +1,13 @@
 SHELL = /bin/bash
 NUM ?= 3 # For LaTeX to correctly cross-reference.  To save time, use 1.
 VERBOSE ?= 0
-CIVERBOSE ?= 0
 DOEPS ?= 1
 ifeq ($(VERBOSE),0)
 	CMDLOG_DIR_REDIRECT := > /dev/null
-	PSTAKE := ./pstake.py -q
 else
 	CMDLOG_DIR_REDIRECT := >&1
-	PSTAKE := ./pstake.py
 endif
-ifneq ($(CIVERBOSE),0)
-	PSTAKE := ./pstake.py # Override VERBOSE
-endif
+PSTAKE := ./pstake.py
 
 # tool binaries
 LATEX := latex
@@ -51,8 +46,7 @@ default: note mesh
 ho: note_ho mesh_ho
 
 $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex $(MAKEFILES) pstake.py
-	mkdir -p $(LOG_DIR)
-	$(DO_PSTAKE) 2>&1 | tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
+	mkdir -p $(LOG_DIR) ; $(DO_PSTAKE) 2>&1 | tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
 .PHONY: note
 note: $(TRUNK)_note.pdf

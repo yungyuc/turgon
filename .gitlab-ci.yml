@@ -6,7 +6,7 @@ before_script:
 pdf_build:
   script:
   - cd ${CI_PROJECT_DIR}/writing
-  - make CIVERBOSE=1
+  - make
   artifacts:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
