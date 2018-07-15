@@ -1,0 +1,16 @@
+image: yungyuc/turgon:latest
+
+before_script:
+- which python; python --version
+
+pdf_build:
+  script:
+  - cd ${CI_PROJECT_DIR}/writing
+  - make CIVERBOSE=1
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+    - ${CI_PROJECT_DIR}/writing/turgon_note.pdf
+    - ${CI_PROJECT_DIR}/writing/turgon_mesh.pdf
+    - ${CI_PROJECT_DIR}/writing/log/
+    expire_in: 1 week
