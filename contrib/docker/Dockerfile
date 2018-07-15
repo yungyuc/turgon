@@ -4,15 +4,15 @@
 # To build the image locally, run:
 #
 # ```
-# docker build  .
+# docker build . [-t registry.gitlab.com/yungyuc/turgon:latest]
 # ```
 #
 # The public repository for this image is at:
-# https://hub.docker.com/r/yungyuc/turgon/ .  You can pull it down
+# https://gitlab.com/yungyuc/turgon/container_registry .  You can pull it
 # using:
 #
 # ```
-# docker pull yungyuc/turgon
+# docker pull registry.gitlab.com/yungyuc/turgon
 # ```
 
 

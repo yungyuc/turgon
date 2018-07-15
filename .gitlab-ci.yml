@@ -1,4 +1,4 @@
-image: yungyuc/turgon:latest
+image: registry.gitlab.com/yungyuc/turgon:latest
 
 before_script:
 - which python; python --version
