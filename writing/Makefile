@@ -45,7 +45,10 @@ default: note mesh
 .PHONY: ho
 ho: note_ho mesh_ho
 
-$(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex $(MAKEFILES) pstake.py
+.PHONY: eps
+eps: $(ALL_EPS)
+
+$(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
 	mkdir -p $(LOG_DIR) ; $(DO_PSTAKE) 2>&1 | tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
 .PHONY: note
@@ -61,7 +64,7 @@ $(TRUNK)_note.dvi: $(TRUNK)_note.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
 	mkdir -p $(LOG_DIR)
 	@echo "Having EPS files: $(ALL_EPS)"
 	num=1 ; while [ $$num -le $(NUM) ] ; do \
-		$(LATEX) $< 2>&1 | tee $(LOG_DIR)/$@.latex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
+		$(LATEX) $< 2>&1 | tee $(LOG_DIR)/$@.latex.$$num.log $(CMDLOG_DIR_REDIRECT) ; echo "latex #$$num" ; \
 		$(BIBTEX) $(basename $<) 2>&1 | tee $(LOG_DIR)/$@.bibtex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
 	(( num = num + 1 )) ; done
 
@@ -86,7 +89,7 @@ $(TRUNK)_mesh.dvi: $(TRUNK)_mesh.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
 	mkdir -p $(LOG_DIR)
 	@echo "Having EPS files: $(ALL_EPS)"
 	num=1 ; while [ $$num -le $(NUM) ] ; do \
-		$(LATEX) $< 2>&1 | tee $(LOG_DIR)/$@.latex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
+		$(LATEX) $< 2>&1 | tee $(LOG_DIR)/$@.latex.$$num.log $(CMDLOG_DIR_REDIRECT) ; echo "latex #$$num" ; \
 		$(BIBTEX) $(basename $<) 2>&1 | tee $(LOG_DIR)/$@.bibtex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
 	(( num = num + 1 )) ; done
 

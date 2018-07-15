@@ -1,0 +1,53 @@
+\psset{unit=3cm}
+\begin{pspicture}(-2.5,-.5)(2.5,1.5)
+  \psset{linewidth=1pt}
+  \psset{linecolor=black}
+  \footnotesize
+  \psframe(-2,0)(2,1)
+  \psline[linestyle=dashed](0,0)(0,1)
+  \psdots[dotstyle=*](0,1)(-1,1)(-1.4,1)(-2,1)(-2,0)(0,0)(2,0)(2,1)(1.4,1)(1,1)(0,1)
+  \uput{0.1}[u](0,1){A}
+  \uput{0.1}[u](0,1.2){$(j,n)$}
+  \uput{0.1}[u](-1,1){$\mathrm{M}_-$}
+  \uput{0.1}[u](-1.4,1){$\mathrm{P}_-$}
+  \uput{0.1}[u](-2,1){B}
+  \uput{0.1}[u](-2,1.2){$(j-\frac{1}{2},n)$}
+  \uput{0.1}[d](-2,0){C}
+  \uput{0.1}[d](-2,-.2){$(j-\frac{1}{2},n-\frac{1}{2})$}
+  \uput{0.1}[d](0,0){D}
+  \uput{0.1}[d](2,0){E}
+  \uput{0.1}[d](2,-.2){$(j+\frac{1}{2},n-\frac{1}{2})$}
+  \uput{0.1}[u](2,1){F}
+  \uput{0.1}[u](2,1.2){$(j+\frac{1}{2},n)$}
+  \uput{0.1}[u](1.4,1){$\mathrm{P}_+$}
+  \uput{0.1}[u](1,1){$\mathrm{M}_+$}
+  \psline[linestyle=dashed](0,0)(0,1)
+
+  \scriptsize
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](-1,1)(-1,.3)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](-1.4,1)(-1.4,.3)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](1,1)(1,.3)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](1.4,1)(1.4,.3)
+  % Left marks.
+  \psline[linewidth=.5pt]{<->}(-2,.2)(0,.2)
+  \rput(-1,.2){\psframebox*{$\frac{\Delta x}{2}$}}
+  \psline[linewidth=.5pt]{<->}(-2,.4)(-1,.4)
+  \rput(-1.5,.4){\psframebox*{$\frac{\Delta x}{4}$}}
+  \psline[linewidth=.5pt]{<->}(-1,.4)(0,.4)
+  \rput(-.5,.4){\psframebox*{$\frac{\Delta x}{4}$}}
+  \psline[linewidth=.5pt]{<->}(-1.4,.6)(-2,.6)
+  \rput(-1.7,.75){\psframebox*{$(1-\tau)\frac{\Delta x}{4}$}}
+  \psline[linewidth=.5pt]{<->}(-1.4,.6)(0,.6)
+  \rput(-.8,.75){\psframebox*{$(1+\tau)\frac{\Delta x}{4}$}}
+  % Right marks.
+  \psline[linewidth=.5pt]{<->}(2,.2)(0,.2)
+  \rput(1,.2){\psframebox*{$\frac{\Delta x}{2}$}}
+  \psline[linewidth=.5pt]{<->}(2,.4)(1,.4)
+  \rput(1.5,.4){\psframebox*{$\frac{\Delta x}{4}$}}
+  \psline[linewidth=.5pt]{<->}(1,.4)(0,.4)
+  \rput(.5,.4){\psframebox*{$\frac{\Delta x}{4}$}}
+  \psline[linewidth=.5pt]{<->}(1.4,.6)(2,.6)
+  \rput(1.7,.75){\psframebox*{$(1-\tau)\frac{\Delta x}{4}$}}
+  \psline[linewidth=.5pt]{<->}(1.4,.6)(0,.6)
+  \rput(.8,.75){\psframebox*{$(1+\tau)\frac{\Delta x}{4}$}}
+\end{pspicture}

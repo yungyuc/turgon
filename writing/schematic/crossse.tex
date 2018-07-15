@@ -1,0 +1,33 @@
+\psset{unit=1.5cm}
+\begin{pspicture}(-1,-.5)(5,3.5)
+  \psset{linewidth=1pt}
+  \psset{linecolor=black}
+  \psgrid[subgriddiv=1,gridlabels=0](0,0)(4,3)
+  \uput[d](0,0){$j-1$}
+  \uput[d](1,0){$j-\frac{1}{2}$}
+  \uput[d](2,0){$j$}
+  \uput[d](3,0){$j+\frac{1}{2}$}
+  \uput[d](4,0){$j+1$}
+  \uput[r](4,0){$n-1$}
+  \uput[r](4,1){$n-\frac{1}{2}$}
+  \uput[r](4,2){$n$}
+  \uput[r](4,3){$n+\frac{1}{2}$}
+  \def\PstSE{{%
+    \psset{linewidth=1pt,linestyle=dotted,dotsep=1pt}
+    \psdot(0,0)
+    \psline[linestyle=dotted](.05,.05)(.05,.9)
+    \psarc[linestyle=dotted](0,.9){0.05}{0}{180}
+    \psline[linestyle=dotted](-.05,.9)(-.05,.05)
+    \psline[linestyle=dotted](-.05,.05)(-.9,.05)
+    \psarc[linestyle=dotted](-.9,0){0.05}{90}{270}
+    \psline[linestyle=dotted](-.9,-.05)(-.05,-.05)
+    \psline[linestyle=dotted](-.05,-.05)(-.05,-.9)
+    \psarc[linestyle=dotted](0,-.9){.05}{180}{0}
+    \psline[linestyle=dotted](.05,-.9)(.05,-.05)
+    \psline[linestyle=dotted](.05,-.05)(.9,-.05)
+    \psarc[linestyle=dotted](.9,0){.05}{270}{90}
+    \psline[linestyle=dotted](.9,.05)(.05,.05)}}
+  \rput(1,1){\PstSE}
+  \rput(3,1){\PstSE}
+  \rput(2,2){\PstSE}
+\end{pspicture}
