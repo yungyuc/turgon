@@ -56,7 +56,7 @@ $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
 	mkdir -p $(LOG_DIR) ; num=1 ; while [ $$num -le $(NUM) ] ; do \
 		latex_logfile=$(LOG_DIR)/$@.latex.$$num.log ; \
 		echo -n "latex $@ #$$num ... " ; $(LATEX) $< 2>&1 | tee $$latex_logfile $(CMDLOG_DIR_REDIRECT) ; \
-		if [ -z "`grep 'LaTeX Error' $$latex_logfile`" ] ; then \
+		if [ -z "`grep 'No pages of output.' $$latex_logfile`" ] ; then \
 			echo "done" ; \
 		else \
 			echo "tail $$latex_logfile:" ; tail $$latex_logfile ; exit -1 ; \

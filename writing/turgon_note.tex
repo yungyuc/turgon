@@ -48,6 +48,7 @@ bottom=2cm,
 \numberwithin{equation}{section}
 
 \newcommand{\defeq}{\ensuremath{\buildrel {\text{def}}\over{=}}}
+\newcommand{\dif}{\mathop{}\!\mathrm{d}}
 
 \title{
 %
@@ -69,58 +70,75 @@ Yung-Yu Chen
 \maketitle
 
 \begin{abstract}
-%
-Summarize the schemes of the space-time conservation element and solution
-element (CESE) method.
-%
-\end{abstract}
-
-\section{Conservation Laws}
-%
-\label{s:conlaw}
 
 The space-time conservation element and solution element (CESE) method solves
-the conservation laws\cite{lax_hyperbolic_1973}.  The basic concept behind CESE
-is the conservation within space-time domain, which is fundamentally different
-from other traditional algorithms such as FVM, and also differs from
-non-conserving method such as FDM and FEM\cite{chang_method_1995}.  While a
-conservation law $u_t+[f(u)]_x=0$ can be rewritten as
+the conservation laws\cite{lax_hyperbolic_1973}.  Define a one-dimensional
+conservation law
 \begin{align*}
-  \nabla\cdot(f(u),u) = 0
+  \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0
 \end{align*}
-for 2D space-time Euclidean space, in which $x_1=x,x_2=t$, by divergence
-theorem, the original conservation law over a space-time domain $V$ can be
-casted into flux conserving form over the closed boundary surface $S(V)$
-surrounding $V$, as
+where $u(x, t)$ is the dependent variable, $f(u)$ a function, and $(x, t)$ the
+space-time coordinate.  Let $\mathbf{h}\defeq(f(u),u)^t$ in 2D space-time
+Euclidean space, in which $x_1=x,x_2=t$, the conservation law can be rewritten
+as
 \begin{align*}
-  \int_V\nabla\cdot\vec{h}dv = \oint_{S(V)}\vec{h}\cdot d\hat{\sigma} = 0,
+  \nabla\cdot\mathbf{h} = 0
 \end{align*}
-where $\vec{h}\defeq(f(u),u)$.
+By applying divergence theorem, the original conservation law over a space-time
+control volume $V$ can be casted into flux conserving form over the control
+surface $S(V)$ surrounding $V$
+\begin{align*}
+  \int_V\nabla\cdot\mathbf{h}\dif v =
+  \oint_{S(V)}\mathbf{h}\cdot\dif\hat{\sigma} = 0
+\end{align*}
+In two- or three-dimensional space, the equations are written as $\mathbf{u}_t
++ \sum_{k=1}^n \mathbf{f}_k(\mathbf{u})_{x_k} = 0$, $n = 2$ or $3$.
 
-Various codes has been developed using CESE\cite{chang_method_1995}.  Code
-accompanied by this document is yet another implementation of CESE, which
-solves for 1D Euler equations.  In order to well explain the algorithm in the
-implementation, this document is made as a supplement of the code, to exhibit
-the equations behind the lines.  Schemes described in this document includes
-$a$-$\mu$ scheme, $a$ scheme, $a$-$\varepsilon$ scheme\cite{chang_method_1995},
-$c$ scheme, and $c$-$\tau$/$c$-$\tau^*$
-scheme\cite{chang_multi-dimensional_2003}.  Corresponding schemes for weighted
-averaging, such as $\alpha$ scheme\cite{chang_method_1995}, Scheme-I,
+The basic concepts behind the CESE method are\cite{chang_method_1995}:
+%
+\begin{enumerate}
+%
+\item Flux conservation is enforced in both space and time.
+%
+\item Space and time are treat homogeneously.
+%
+\item The mesh value of both the dependent variables and their derivatives are
+both solved in the schemes.
+%
+\item The utilized discrete variables are local in stencil.
+%
+\item The conservation elements and solution elements are chosen to result in
+compact stencil.
+%
+\item Space-time invariants are used to minimize numerical dissipation.
+%
+\item Characteristics-based methods are excluded.
+%
+\item Ad hoc treatments are avoided as much as possible.
+%
+\end{enumerate}
+%
+This note is written to introduce the CESE method, from the most basic form to
+recently developed schemes: $a$-$\mu$ scheme, $a$ scheme, $a$-$\varepsilon$
+scheme\cite{chang_method_1995}, $c$ scheme, and $c$-$\tau$/$c$-$\tau^*$
+scheme\cite{chang_multi-dimensional_2003}.  Methods for weighted averaging,
+such as $\alpha$ scheme\cite{chang_method_1995}, Scheme-I,
 Scheme-II\cite{chang_courant_2002}, W-1 scheme, and W-2
-scheme\cite{chang_multi-dimensional_2003} are also stated.
+scheme\cite{chang_multi-dimensional_2003} are also stated.  The note is
+organized as follows: Section \ref{s:cese_intro} demonstrates the concept of
+CESE method with a single viscous model equation.  The CESE method for inviscid
+equations is described in Section \ref{s:inviscid_model}.  Formulation of the
+CESE method for system of equations is constructed in Section
+\ref{s:system_eqn}, and the Euler equations are used as the model equation.
+Weighting functions for spatial derivatives are discussed in Section
+\ref{s:weighted_average}.  The CFL-insensitive scheme of CESE is discussed in
+Section \ref{s:ctau}, along with various weighting function.  In Section
+\ref{s:nuni}, non-uniform spatial mesh formulation is introduced.  Local
+time-stepping is discussed in Section \ref{s:lts} (to be written).  Section
+\ref{s:code} shows the code that produces the results in this note (to be
+added).
 
-This document is written as an introduction of CESE method, from the most basic
-form to recently developed schemes, and is organized as follows: In section
-\ref{s:cese_intro}, the concept of CESE method is demonstrated with a single
-viscous model equation.  CESE for inviscid equations is described in section
-\ref{s:inviscid_model}.  Formulation of CESE for system of equations is
-constructed in section \ref{s:system_eqn}, and Euler equations are used as the
-model equation.  Weighting functions for spatial derivatives are discussed in
-section \ref{s:weighted_average}.  The CFL-insensitive scheme of CESE is
-discussed in section \ref{s:ctau}, along with various weighting function.  In
-section \ref{s:nuni}, non-uniform spatial mesh formulation is introduced.
-Local time-stepping is discussed in section \ref{s:lts}.  Finally, in section
-\ref{s:code}, the code itself is explained.
+\end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Section 1
