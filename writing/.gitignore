@@ -1,11 +1,12 @@
 /log/
-/handover/
+/handover
 /*_eps/
 /turgon_*.aux
 /turgon_*.bbl
 /turgon_*.blg
 /turgon_*.dvi
 /turgon_*.log
+/turgon_*.toc
 /turgon_*.out
 /turgon_*.pdf
 /turgon_*.ps
