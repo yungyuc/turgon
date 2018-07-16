@@ -1,0 +1,67 @@
+\psset{unit=2.7cm}
+\begin{pspicture}(-3,-.5)(3,1.5)
+  \psset{linewidth=1pt}
+  \psset{linecolor=black}
+  \scriptsize
+
+  % CCE frame.
+  \psframe(-2,0)(2,1)
+  \psline[linestyle=dashed](-.5,0)(-.5,1)
+  \psdots[dotstyle=*](-.5,1)
+  \uput{4pt}[u](-.5,1){$(j,n)$}
+  \psdots[dotstyle=*](-2,0)
+  \uput{4pt}[dr](-2,0){$(j-\frac{1}{2},n-\frac{1}{2})$}
+  \psdots[dotstyle=*](2,0)
+  \uput{4pt}[dl](2,0){$(j+\frac{1}{2},n-\frac{1}{2})$}
+  % Solution point of CE(j,n).
+  \psdots[dotstyle=x](0,1)
+  \uput{4pt}[u](0,1){$(j,n)^s$}
+  % Half position of CE_- and CE_+.
+  \psdots[dotstyle=o](-1.25,1)
+  \uput{4pt}[u](-1.25,1){$(j,n)^-$}
+  \psdots[dotstyle=o](.75,1)
+  \uput{4pt}[u](.75,1){$(j,n)^+$}
+  % Solution points of CE(j\pm\frac{1}{2},n-\frac{1}{2}).
+  \psline[linestyle=dashed,linewidth=.5pt](-2,0)(-2.5,0)
+  \psdots[dotstyle=x](-2.4,0)
+  \uput{4pt}[d](-2.4,0){$(j-\frac{1}{2},n-\frac{1}{2})^s$}
+  \psline[linestyle=dashed,linewidth=.5pt](2,0)(2.5,0)
+  \psdots[dotstyle=x](2.4,0)
+  \uput{4pt}[d](2.4,0){$(j+\frac{1}{2},n-\frac{1}{2})^s$}
+  % P^{\pm}.
+  \psdots[dotstyle=square](-1.8,1)
+  \uput{4pt}[u](-1.8,1){$P_j^{n-}$}
+  \psdots[dotstyle=square](1.5,1)
+  \uput{4pt}[u](1.5,1){$P_j^{n+}$}
+
+  % Rulers.
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](-2,1)(-2,1.3)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](2,1)(2,1.3)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](-1.25,1)(-1.25,.4)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](-1.8,1)(-1.8,.7)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](.75,1)(.75,.4)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](1.5,1)(1.5,.7)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](-2.4,0)(-2.4,1)
+  \psline[linewidth=.5pt,linestyle=dotted,dotsep=1pt](2.4,0)(2.4,1)
+  % \Delta x_j
+  \psline[linewidth=.5pt]{<->}(-2,1.25)(2,1.25)
+  \rput(0,1.25){\psframebox*{$\Delta x_j$}}
+  % \Delta x_j^-
+  \psline[linewidth=.5pt]{<->}(-2,.2)(-.5,.2)
+  \rput(-1.25,.2){\psframebox*{$\Delta x_j^-$}}
+  % \Delta x_j^+
+  \psline[linewidth=.5pt]{<->}(-.5,.2)(2,.2)
+  \rput(.75,.2){\psframebox*{$\Delta x_j^+$}}
+  % \tau(x_j^--x_{j-\frac{1}{2})^s}
+  \psline[linewidth=.5pt]{<->}(-2.4,.5)(-1.25,.5)
+  \rput(-1.8,.5){\psframebox*{$(x_j^- - x_{j-\frac{1}{2}}^s)$}}
+  % \tau(x_{j+\frac{1}{2})^s-x_j^+}
+  \psline[linewidth=.5pt]{<->}(.75,.5)(2.4,.5)
+  \rput(1.6,.5){\psframebox*{$(x_{j+\frac{1}{2}}^s - x_j^+)$}}
+  % \tau(x_j^--x_{j-\frac{1}{2})^s}
+  \psline[linewidth=.5pt]{<->}(-2.4,.85)(-1.8,.85)
+  \uput{2pt}[r](-1.8,.8){\psframebox*{$(1-\tau)(x_j^- - x_{j-\frac{1}{2}}^s)$}}
+  % \tau(x_{j+\frac{1}{2})^s-x_j^+}
+  \psline[linewidth=.5pt]{<->}(1.5,.85)(2.4,.85)
+  \uput{2pt}[l](1.5,.8){\psframebox*{$(1-\tau)(x_{j+\frac{1}{2}}^s - x_j^+)$}}
+\end{pspicture}

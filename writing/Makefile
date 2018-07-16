@@ -10,7 +10,7 @@ endif
 PSTAKE := ./pstake.py
 
 # tool binaries
-LATEX := latex
+LATEX := latex -halt-on-error -interaction=nonstopmode
 BIBTEX := bibtex
 DVIPS := dvips
 PS2PDF := ps2pdf
@@ -45,8 +45,30 @@ default: note mesh
 .PHONY: ho
 ho: note_ho mesh_ho
 
-$(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex $(MAKEFILES) pstake.py
+.PHONY: eps
+eps: $(ALL_EPS)
+
+$(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
 	mkdir -p $(LOG_DIR) ; $(DO_PSTAKE) 2>&1 | tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
+
+%.dvi: %.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
+	@echo "Having EPS files: $(ALL_EPS)"
+	mkdir -p $(LOG_DIR) ; num=1 ; while [ $$num -le $(NUM) ] ; do \
+		latex_logfile=$(LOG_DIR)/$@.latex.$$num.log ; \
+		echo -n "latex $@ #$$num ... " ; $(LATEX) $< 2>&1 | tee $$latex_logfile $(CMDLOG_DIR_REDIRECT) ; \
+		if [ -z "`grep 'No pages of output.' $$latex_logfile`" ] ; then \
+			echo "done" ; \
+		else \
+			echo "tail $$latex_logfile:" ; tail $$latex_logfile ; exit -1 ; \
+		fi ; \
+		$(BIBTEX) $(basename $<) 2>&1 | tee $(LOG_DIR)/$@.bibtex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
+	(( num = num + 1 )) ; done
+
+%.ps: %.dvi $(MAKEFILES)
+	mkdir -p $(LOG_DIR) ; $(DVIPS) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
+
+%.pdf: %.ps $(MAKEFILES)
+	mkdir -p $(LOG_DIR) ; $(PS2PDF) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
 
 .PHONY: note
 note: $(TRUNK)_note.pdf
@@ -57,22 +79,6 @@ note_ho: $(TRUNK)_note.pdf
 	mkdir -p $(HANDOVER_DIR)
 	cp -f $< $(HANDOVER_FN)
 
-$(TRUNK)_note.dvi: $(TRUNK)_note.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
-	mkdir -p $(LOG_DIR)
-	@echo "Having EPS files: $(ALL_EPS)"
-	num=1 ; while [ $$num -le $(NUM) ] ; do \
-		$(LATEX) $< 2>&1 | tee $(LOG_DIR)/$@.latex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
-		$(BIBTEX) $(basename $<) 2>&1 | tee $(LOG_DIR)/$@.bibtex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
-	(( num = num + 1 )) ; done
-
-$(TRUNK)_note.ps: $(TRUNK)_note.dvi $(MAKEFILES)
-	mkdir -p $(LOG_DIR)
-	$(DVIPS) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
-
-$(TRUNK)_note.pdf: $(TRUNK)_note.ps $(MAKEFILES)
-	mkdir -p $(LOG_DIR)
-	$(PS2PDF) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
-
 .PHONY: mesh
 mesh: $(TRUNK)_mesh.pdf
 
@@ -81,22 +87,6 @@ mesh_ho: $(TRUNK)_mesh.pdf
 	@echo "Generating today's PDF: $(HANDOVER_FN)"
 	mkdir -p $(HANDOVER_DIR)
 	cp -f $< $(HANDOVER_FN)
-
-$(TRUNK)_mesh.dvi: $(TRUNK)_mesh.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
-	mkdir -p $(LOG_DIR)
-	@echo "Having EPS files: $(ALL_EPS)"
-	num=1 ; while [ $$num -le $(NUM) ] ; do \
-		$(LATEX) $< 2>&1 | tee $(LOG_DIR)/$@.latex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
-		$(BIBTEX) $(basename $<) 2>&1 | tee $(LOG_DIR)/$@.bibtex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
-	(( num = num + 1 )) ; done
-
-$(TRUNK)_mesh.ps: $(TRUNK)_mesh.dvi $(MAKEFILES)
-	mkdir -p $(LOG_DIR)
-	$(DVIPS) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
-
-$(TRUNK)_mesh.pdf: $(TRUNK)_mesh.ps $(MAKEFILES)
-	mkdir -p $(LOG_DIR)
-	$(PS2PDF) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
 
 .PHONY: clean_tex
 clean_tex:

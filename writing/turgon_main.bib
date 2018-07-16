@@ -1,4 +1,28 @@
 
+@inproceedings{chang_multi-dimensional_2003,
+	address = {Huntsville, Alabama},
+	title = {Multi-{Dimensional} {Courant} {Number} {Insensitive} {CE}/{SE} {Euler} {Solvers} for {Applications} {Involving} {Highly} {Nonuniform} {Meshes}},
+	shorttitle = {{AIAA} {Paper} 2003-5285},
+	booktitle = {39th {AIAA}/{ASME}/{SAE}/{ASEE} {Joint} {Propulsion} {Conference} and {Exhibit}},
+	author = {Chang, Sin-Chung and Wang, Xiao-Yen},
+	month = jul,
+	year = {2003},
+	keywords = {cese, cfd, multi-dimension},
+	file = {chang_03_multidimensional.pdf:/Users/yungyuc/Zotero/storage/R4AUQIGK/chang_03_multidimensional.pdf:application/pdf}
+}
+
+@inproceedings{chang_courant_2002,
+	address = {Indianapolis, Indiana},
+	title = {Courant {Number} {Insensitive} {CE}/{SE} {Schemes}},
+	shorttitle = {{AIAA} {Paper} 2002-3890},
+	booktitle = {38th {AIAA}/{ASME}/{SAE}/{ASEE} {Joint} {Propulsion} {Conference} and {Exhibit}},
+	author = {Chang, Sin-Chung},
+	month = jul,
+	year = {2002},
+	keywords = {cese, cfd},
+	file = {chang_02_courant.pdf:/Users/yungyuc/Zotero/storage/QUXXTFVT/chang_02_courant.pdf:application/pdf}
+}
+
 @article{wang_2d_1999,
 	title = {A 2D {Non}-{Splitting} {Unstructured} {Triangular} {Mesh} {Euler} {Solver} {Based} on the {Space}-{Time} {Conservation} {Element} and {Solution} {Element} {Method}},
 	volume = {8},
@@ -9,6 +33,23 @@
 	keywords = {cese, cfd},
 	pages = {309--325},
 	file = {wang_99_2d.pdf:/Users/yungyuc/Zotero/storage/KC8Z955B/wang_99_2d.pdf:application/pdf}
+}
+
+@article{chang_method_1995,
+	title = {The {Method} of {Space}-{Time} {Conservation} {Element} and {Solution} {Element} -- {A} {New} {Approach} for {Solving} the {Navier}-{Stokes} and {Euler} {Equations}},
+	volume = {119},
+	issn = {0021-9991},
+	doi = {10.1006/jcph.1995.1137},
+	abstract = {A new numerical framework for solving conservation laws is being developed. This new framework differs substantially in both concept and methodology from the well-established methods, i.e., finite difference, finite volume, finite element, and spectral methods. It is conceptually simple and designed to overcome several key limitations of the above traditional methods. A two-level scheme for solving the convection-diffusion equation [not partial differential]u/[not partial differential]t + a [not partial differential]u/[not partial differential]x - [mu] [not partial differential]2u/[not partial differential]x2 = 0 ([mu] {\textgreater}= 0) is constructed and used to illuminate major differences between the present method and those mentioned above. This explicit scheme, referred to as the a-[mu] scheme, has two independent marching variables unj and (ux)nj which are the numerical analogues of u and [not partial differential]u/[not partial differential]x at (j, n), respectively. The a-[mu] scheme has the unusual property that its stability is limited only by the CFL condition, i.e., it is independent of [mu]. Also it can be shown that the amplification factors of the a -[mu] scheme are identical to those of the Leapfrog scheme if [mu] = O, and to those of the DuFort-Frankel scheme if a = O. These coincidences are unexpected because the a-[mu] scheme and the above classical schemes are derived from completely different perspectives, and the a -[mu] scheme does not reduce to the above classical schemes in the limiting cases. The a-[mu] scheme is extended to solve the 1D time-dependent Navier-Stokes equations of a perfect gas. Stability of this explicit solver also is limited only by the CFL condition. In spite of the fact that it does not use (i) any techniques related to the high-resolution upwind methods, and (ii) any ad hoc parameter, the current Navier-Stokes solver is capable of generating highly accurate shock tube solutions. Particularly, for high-Reynolds-number flows, shock discontinuities can be resolved within one mesh interval. The inviscid ([mu] = 0) a-[mu] scheme is reversible in time. It also is neutrally stable, i.e., free from numerical dissipation. Such a scheme generally cannot be extended to solve the Euler equations. Thus, the inviscid version is modified. Stability of this modified scheme, referred to as the a-[var epsilon] scheme, is limited by the CFL condition and 0 {\textless}= [var epsilon] {\textless}= 1, where [var epsilon] is a special parameter that controls numerical dissipation. Moreover, if [var epsilon] = 0, the amplification factors of the a-[var epsilon] scheme are identical to those of the Leapfrog scheme, which has no numerical dissipation. On the other hand, if [var epsilon] = 1, the two amplification factors of the a-[var epsilon] scheme become the same function of the Courant number and the phase angle. Unexpectedly, this function also is the amplification factor of the highly diffusive Lax scheme. Note that, because the Lax scheme is very diffusive and it uses a mesh that is staggered in time, a two-level scheme using such a mesh is often associated with a highly diffusive scheme. The a-[var epsilon] scheme, which also uses a mesh staggering in time, demonstrates that it can also be a scheme with no numerical dissipation. The Euler extension of the a -[var epsilon] scheme has stability conditions similar to those of the a -epsiv; scheme itself. It has the unusual property that numerical dissipation at all mesh points can be controlled by a set of local parameters, Moreover, it is capable of generating accurate shock tube solutions with the CFL number ranging from close to 1 to 0.022},
+	number = {2},
+	urldate = {2008-12-13},
+	journal = {Journal of Computational Physics},
+	author = {Chang, Sin-Chung},
+	month = jul,
+	year = {1995},
+	keywords = {cese},
+	pages = {295--324},
+	file = {chang95.pdf:/Users/yungyuc/Zotero/storage/3QDY9AIY/chang95.pdf:application/pdf}
 }
 
 @article{mavriplis_unstructured_1997,
@@ -58,4 +99,28 @@
 	author = {Lax, Peter D.},
 	year = {1973},
 	file = {Lax, Peter D. - Hyperbolic Systems of Conservation Laws and the Mathematical Theory of Shock Waves.pdf:/Users/yungyuc/Zotero/storage/9A4RNGX9/Lax, Peter D. - Hyperbolic Systems of Conservation Laws and the Mathematical Theory of Shock Waves.pdf:application/pdf}
+}
+
+@article{chang_local_2005,
+	title = {Local time-stepping procedures for the space-time conservation element and solution element method},
+	volume = {19},
+	issn = {1061-8562},
+	url = {https://doi.org/10.1080/10618560500092610},
+	doi = {10.1080/10618560500092610},
+	abstract = {A local time-stepping procedure for the space-time conservation element and solution element (CESE) method has been developed. This new procedure allows for variation of time-step size in both space and time, and can also be extended to become multi-dimensional solvers with structured/unstructured spatial grids. Moreover, it differs substantially in concept and methodology from the existing approaches. By taking full advantage of key concepts of the CESE method, in a simple and efficient manner it can enforce flux conservation across an interface separating grid zones of different time-step sizes. In particular, no correction pass is needed. Numerical experiments show that, for a variety of flow problems involving moving shock and flame discontinuities, accurate and robust numerical simulations can be achieved even with a reduction in time-step size on the order of 10 or higher for grids across a single interface.},
+	number = {5},
+	urldate = {2018-07-15},
+	journal = {International Journal of Computational Fluid Dynamics},
+	author = {Chang, Sin-Chung and Wu, Yuhui and Yang, Vigor and Wang, Xiao-Yen},
+	month = jul,
+	year = {2005},
+	keywords = {Flux conservation, Grid interface, Local time-stepping procedure, Space-time CESE method},
+	pages = {359--380},
+	file = {Chang et al. - 2005 - Local time-stepping procedures for the space-time.pdf:/Users/yungyuc/Zotero/storage/VLIQGCVR/Chang et al. - 2005 - Local time-stepping procedures for the space-time .pdf:application/pdf}
+}
+
+@unpublished{chang_not_2008,
+	title = {Not yet published manuscript},
+	author = {Chang, Sin-Chung},
+	year = {2008}
 }

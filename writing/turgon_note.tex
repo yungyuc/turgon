@@ -23,14 +23,18 @@ bottom=2cm,
 \usepackage{arydshln}
 % Authoring.
 %\usepackage{authblk}
+\usepackage[printwatermark]{xwatermark}
+\usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{subfigure}
-\usepackage{color}
 \usepackage{paralist}
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{setspace}
 %\usepackage{lmodern}
+
+\newwatermark[allpages,color=black!15,angle=55,scale=3,xpos=0,ypos=0]%
+{DRAFT NOTE}
 
 %\doublespacing
 
@@ -44,10 +48,12 @@ bottom=2cm,
 \numberwithin{equation}{section}
 
 \newcommand{\defeq}{\ensuremath{\buildrel {\text{def}}\over{=}}}
+\newcommand{\dif}{\mathop{}\!\mathrm{d}}
 
 \title{
 %
-The Space-Time Conservation Element and Solution Method Schemes
+(Drafting) The Space-Time Conservation Element and Solution Element Method
+Schemes
 %
 }
 
@@ -57,23 +63,1220 @@ Yung-Yu Chen
 %
 }
 
+%\date{2008.6.4}
+
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-%
-Summarize the schemes of the space-time conservation element and solution
-element (CESE) method.
-%
-\end{abstract}
-
-\section{Conservation Laws}
-%
-\label{s:conlaw}
 
 The space-time conservation element and solution element (CESE) method solves
-the conservation laws\cite{lax_hyperbolic_1973}.
+the conservation laws\cite{lax_hyperbolic_1973}.  Define a one-dimensional
+conservation law
+\begin{align*}
+  \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0
+\end{align*}
+where $u(x, t)$ is the dependent variable, $f(u)$ a function, and $(x, t)$ the
+space-time coordinate.  Let $\mathbf{h}\defeq(f(u),u)^t$ in 2D space-time
+Euclidean space, in which $x_1=x,x_2=t$, the conservation law can be rewritten
+as
+\begin{align*}
+  \nabla\cdot\mathbf{h} = 0
+\end{align*}
+By applying divergence theorem, the original conservation law over a space-time
+control volume $V$ can be casted into flux conserving form over the control
+surface $S(V)$ surrounding $V$
+\begin{align*}
+  \int_V\nabla\cdot\mathbf{h}\dif v =
+  \oint_{S(V)}\mathbf{h}\cdot\dif\hat{\sigma} = 0
+\end{align*}
+In two- or three-dimensional space, the equations are written as $\mathbf{u}_t
++ \sum_{k=1}^n \mathbf{f}_k(\mathbf{u})_{x_k} = 0$, $n = 2$ or $3$.
+
+The basic concepts behind the CESE method are\cite{chang_method_1995}:
+%
+\begin{enumerate}
+%
+\item Flux conservation is enforced in both space and time.
+%
+\item Space and time are treat homogeneously.
+%
+\item The mesh value of both the dependent variables and their derivatives are
+both solved in the schemes.
+%
+\item The utilized discrete variables are local in stencil.
+%
+\item The conservation elements and solution elements are chosen to result in
+compact stencil.
+%
+\item Space-time invariants are used to minimize numerical dissipation.
+%
+\item Characteristics-based methods are excluded.
+%
+\item Ad hoc treatments are avoided as much as possible.
+%
+\end{enumerate}
+%
+This note is written to introduce the CESE method, from the most basic form to
+recently developed schemes: $a$-$\mu$ scheme, $a$ scheme, $a$-$\varepsilon$
+scheme\cite{chang_method_1995}, $c$ scheme, and $c$-$\tau$/$c$-$\tau^*$
+scheme\cite{chang_multi-dimensional_2003}.  Methods for weighted averaging,
+such as $\alpha$ scheme\cite{chang_method_1995}, Scheme-I,
+Scheme-II\cite{chang_courant_2002}, W-1 scheme, and W-2
+scheme\cite{chang_multi-dimensional_2003} are also stated.  The note is
+organized as follows: Section \ref{s:cese_intro} demonstrates the concept of
+CESE method with a single viscous model equation.  The CESE method for inviscid
+equations is described in Section \ref{s:inviscid_model}.  Formulation of the
+CESE method for system of equations is constructed in Section
+\ref{s:system_eqn}, and the Euler equations are used as the model equation.
+Weighting functions for spatial derivatives are discussed in Section
+\ref{s:weighted_average}.  The CFL-insensitive scheme of CESE is discussed in
+Section \ref{s:ctau}, along with various weighting function.  In Section
+\ref{s:nuni}, non-uniform spatial mesh formulation is introduced.  Local
+time-stepping is discussed in Section \ref{s:lts} (to be written).  Section
+\ref{s:code} shows the code that produces the results in this note (to be
+added).
+
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 1
+\section{Introduction to CESE method}
+\label{s:cese_intro}
+%%%% * Explain spatial decomposition: CE and SE.
+%%%% * Use convection-diffusion equation as model equation to form
+%%%%   a-epsilon scheme, as demonstration of CESE method.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider a 1D convection-diffusion equation, which is a simple case,
+\begin{align}
+    \frac{\partial u}{\partial t} + a\frac{\partial u}{\partial x}
+  - \mu\frac{\partial^2u}{\partial x^2} = 0, \label{e:conv_diff_govern}
+\end{align}
+where the convection velocity $a$ and the viscosity coefficient $\mu$ ($\ge0$)
+are constant.  With divergence theorem in space-time domain, the equation can
+be transformed to
+\begin{align}
+  \oint_{S(V)}\vec{h}\cdot d\hat{\sigma}=0, \label{e:conservation}
+\end{align}
+where $\vec{h}\equiv(au-\mu\partial u/\partial x,u)$ and $d\hat{\sigma}=(dx,
+dt)$.
+
+CESE method discretizes the integral equation in space-time domain by
+defining Conservation Elements (CEs).  In a single $\mathrm{CE}(j,n)$ (CE at
+$(x_j,t^n)$), the conservation of $\vec{h}$ can be approximated/written as
+\begin{align}
+  \oint_{S(\mathrm{CE})}\vec{h}^*\cdot d\hat{\sigma} = 0,
+    \label{e:conserv_of_approx_h}
+\end{align}
+where $\vec{h}^*$ denotes the approximation function for $\vec{h}$.  Such a CE
+was regarded as Compounded Conservation Element (CCE, as dipicted in
+\figurename~\ref{f:cce}), and could be divided into two adjascent Basic
+Conservation Elements (BCEs) $\mathrm{CE}_-$ and $\mathrm{CE}_+$.  In BCEs,
+Equation (\ref{e:conserv_of_approx_h}) should also hold.  In another word,
+\begin{align*}
+  \oint_{S(\mathrm{CE}_-)}\vec{h}^*\cdot d\hat{\sigma} = 0; \quad
+  \oint_{S(\mathrm{CE}_+)}\vec{h}^*\cdot d\hat{\sigma} = 0,
+\end{align*}
+where $S(\mathrm{CE}_{\pm})$ is the boundary surface surrounding
+$\mathrm{CE}_{\pm}$.
+
+\begin{figure}[htbp]
+\centering
+  \includegraphics{cce.eps}
+  \caption{A compounded conservation element (CCE), containing two BCEs.}
+  \label{f:cce}
+\end{figure}
+
+Solution Elements (SEs) in CESE method were designed to provide a way to
+consistently evaluate approximated value of variables and functions.  In
+current setting, the shape of SEs is a cross mark around a mesh point $(j,n)$,
+as depicted in \figurename~\ref{f:crossse}.  The value of $u(x,t;j,n)$ within
+$\mathrm{SE}(j,n)$ (SE at space-time mesh $(j,n)$) would be approximated by
+\begin{align*}
+  u^*(x,t;j,n) = u_j^n + (u_x)_j^n(x-x_j) + (u_t)_j^n(t-t^n),
+\end{align*}
+where $u_j^n, (u_x)_j^n, (u_t)_j^n$ hold constant in $\mathrm{SE}(j,n)$, and
+$(x_j,t^n)$ are the coordinates of the mesh point $(j,n)$.  It should be noted
+that each CE is surrounded by SEs, so the evaluation of fluxes through boundary
+of CE depends only on the approximation of variables within SEs.
+
+\begin{figure}[hbtp]
+  \centering
+  \includegraphics{crossse.eps}
+  \caption{Cross-shaped solution element.}
+  \label{f:crossse}
+\end{figure}
+
+\subsection{Formulation for convection-diffusion equation}
+
+Back to the convection diffusion eqation (Equation (\ref{e:conv_diff_govern})),
+the approximation for $u$ was required to fulfill the original differential
+equation, and since
+\begin{align*}
+  \frac{\partial u^*(x,t;j,n)}{\partial x} = (u_x)_j^n, \quad
+  \frac{\partial u^*(x,t;j,n)}{\partial t} = (u_t)_j^n,
+\end{align*}
+for $(u_x)_j^n, (u_t)_j^n$ are both constant (such that $u^*_{xx}=0$), the
+relation between $(u_x)_j^n$ and $(u_t)_j^n$ can be obtained as
+\begin{align*}
+              (u_t)_j^n + a(u_x)_j^n = 0
+  \Rightarrow (u_t)_j^n = -a(u_x)_j^n\,.
+\end{align*}
+Further, the approximated $u^*$ can be rewritten as
+\begin{align*}
+  u^*(x,t;j,n) &= u_j^n + (u_x)_j^n[(x-x_j) - a(t-t^n)]
+\end{align*}
+for $(x,t)\in\mathrm{SE}(j,n)$.  Consequently, $\vec{h}=(au-\mu\partial
+u/\partial x, u)$ can be approximated by
+\begin{align*}
+  \vec{h}^*(x,t;j,n) =
+  \left(
+    au^*(x,t;j,n)-\mu\frac{\partial u^*(x,t;j,n)}{\partial x}, u^*(x,t;j,n)
+  \right)\,.
+\end{align*}
+
+With $u^*$ and $\vec{h}^*$ on hand, the time-marching formula can be easily
+obtained by applying $\oint_{S(\mathrm{CE}_{\pm})}\vec{h}^*\cdot
+d\hat{\sigma}=0$ to each CCE, where $\vec{h}^*$ is 2 dimensional in this
+derivation, $S(\mathrm{CE}_{\pm}(j,n))$ is a closed curve in $E_2$ space.  By
+choosing to integrate counterclockwisely (flux flows outward CE), the flux
+vector can be evaluated to
+\begin{align*}
+  d\hat{\sigma}
+  = \left[\begin{array}{cc} \cos90^{\circ} & \sin90^{\circ} \\
+                           -\sin90^{\circ} & \cos90^{\circ}
+    \end{array}\right] d\hat{s}
+  = \left[\begin{array}{cc} 0 & 1 \\
+                           -1 & 0
+    \end{array}\right]
+    \left[\begin{array}{c} dx \\ dt
+    \end{array}\right]
+  = (dt, -dx) \,.
+\end{align*}
+To simplify notation, define flux function
+\begin{align*}
+  F_{\pm} \equiv
+    \oint_{S(\mathrm{CE}_{\pm})}\vec{h}^*\cdot d\hat{\sigma} \,.
+\end{align*}
+Referring to \figurename~\ref{f:cce}, by evaluating $\vec{h}^*\cdot
+d\hat{\sigma}$ on each of the four sides $\overline{AB}, \overline{BC},
+\overline{CD}, \overline{DA}$ of $\mathrm{CE}_-(j,n)$, the conservation
+function $F_-$ becomes
+\begin{alignat*}{2}
+  F_-(j,n) &= \frac{\Delta x^2}{4}\Big\{
+    &&\frac{2}{\Delta x}\left(\frac{a\Delta t}{\Delta x}+1\right)
+      \left(u_j^n-u_{j-1/2}^{n-1/2}\right) \\
+  & &+\;& \frac{1}{2}\left[
+          \frac{a^2\Delta t^2}{\Delta x^2}
+        - \frac{2\mu\Delta t} {\Delta x^2} - 1
+        \right](u_x)_j^n
+    +     \frac{1}{2}\left[
+          \frac{a^2\Delta t^2}{\Delta x^2}
+        + \frac{2\mu\Delta t} {\Delta x^2} - 1
+        \right](u_x)_{j-1/2}^{n-1/2}
+    \Big\}\,.
+\end{alignat*}
+Simplify it by
+\begin{align}
+  \nu &\equiv \frac{a\Delta t}{\Delta x}, \label{e:nu} \\
+  \xi &\equiv \frac{4\mu\Delta t}{\Delta x^2}, \label{e:xi}
+\end{align}
+such that
+\begin{align*}
+  \frac{4}{\Delta x^2}F_-(j,n) &=
+    -\frac{1}{2}\left[
+      (1-\nu^2+\xi)(u_x)_j^n + (1-\nu^2-\xi)(u_x)_{j-1/2}^{n-1/2}
+    \right] \\
+  &\quad\quad
+  + \frac{2(\nu+1)}{\Delta x}\left(u_j^n-u_{j-1/2}^{n-1/2}\right) \,.
+\end{align*}
+$F_+$ for $\mathrm{CE}_+$ can be evaluated in the same way.  They can be
+written together as
+\begin{align}
+  \frac{2}{\Delta x}F_{\pm}(j,n) &=
+    \pm\left[
+        (1-\nu^2+\xi)\frac{\Delta x}{4}(u_x)_j^n
+      + (1-\nu^2-\xi)\frac{\Delta x}{4}(u_x)_{j\pm1/2}^{n-1/2}
+    \right] \notag \\
+  &\quad\quad
+  + (1\mp\nu)\left(u_j^n-u_{j\pm1/2}^{n-1/2}\right)\,.
+    \label{e:both_conserv_func}
+\end{align}
+There are two equations for two unknowns $u_j^n, (u_x)_j^n$.  A formula for the
+unknowns can be obtained by solving this system of equations.  Let
+\begin{alignat*}{2}
+  \alpha_1 &= 1-\nu^2+\xi,\quad &\alpha_2 &= 1-\nu^2-\xi, \\
+  \beta_1 &= 1-\nu, &\beta_2 &= 1+\nu, \\
+  q_1 &= x_j^n, &q_2 &= \frac{\Delta x}{4}(u_x)_j^n, \\
+  a_1 &= x_{j-1/2}^{n-1/2},
+ &a_2 &= \frac{\Delta x}{4}(x_n)_{j-1/2}^{n-1/2}, \\
+  b_1 &= x_{j+1/2}^{n-1/2},
+ &b_2 &= \frac{\Delta x}{4}(x_n)_{j+1/2}^{n-1/2},
+\end{alignat*}
+and Equation (\ref{e:both_conserv_func}) becomes
+\begin{align*}
+  \beta_2q_1 - \alpha_1q_2 &= \beta_2a_1 + \alpha_2a_2, \\
+  \beta_1q_1 + \alpha_1q_2 &= \beta_1b_1 - \alpha_2b_2\,.
+\end{align*}
+The solution can be rewritten in vector form
+\begin{align*}
+  \vec{q}(j,n) =
+    Q_+\vec{q}(j-\frac{1}{2},n-\frac{1}{2})
+  + Q_-\vec{q}(j+\frac{1}{2},n-\frac{1}{2}),
+\end{align*}
+where
+\begin{align*}
+  Q_+ &\equiv
+    \frac{1}{2}
+    \left[\begin{array}{cc}
+      1+\nu                                     &
+      1-\nu^2-\xi                               \\
+      \frac{-(1-\nu^2)}{1-\nu^2+\xi}            &
+      \frac{-(1-\nu)(1-\nu^2-\xi)}{1-\nu^2+\xi}
+    \end{array}\right], \\
+  Q_- &\equiv
+    \frac{1}{2}
+    \left[\begin{array}{cc}
+      1-\nu                                     &
+      -(1-\nu^2-\xi)                            \\
+      \frac{(1-\nu^2)}{1-\nu^2+\xi}             &
+      \frac{-(1+\nu)(1-\nu^2-\xi)}{1-\nu^2+\xi}
+    \end{array}\right], \\
+  \vec{q}(j,n) &\equiv
+    \left[\begin{array}{c}
+      u_j^n \\ \frac{\Delta x}{4}(u_x)_j^n
+    \end{array}\right]\,.
+\end{align*}
+
+By expanding the vector form of solution, the time-marching formula can be
+written as
+\begin{alignat}{2}
+  u_j^n &= &\frac{1}{2}\Big[
+    &(1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + (1-\nu^2-\xi)(u_{\bar{x}})_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    \notag \\
+  &&+ &(1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    - (1-\nu^2-\xi)(u_{\bar{x}})_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+           \Big] \label{e:amuu},
+\end{alignat}
+\begin{alignat}{2}
+  (u_{\bar{x}})_j^n &= &\frac{1}{2(1-\nu^2+\xi)}\Big[
+    -& (1-\nu^2)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    -  (1-\nu)(1-\nu^2-\xi)(u_{\bar{x}})_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    \notag \\
+  &&+& (1-\nu^2)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    -  (1+\nu)(1-\nu^2-\xi)(u_{\bar{x}})_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+                       \Big] \label{e:amuux},
+\end{alignat}
+where $u_{\bar{x}}\equiv\frac{\Delta x}{4}u_x$.  Remind that
+$\nu\equiv\frac{a\Delta t}{\Delta x}$, $\xi\equiv\frac{4\nu\Delta t}{\Delta
+x^2}$.  This set of equations is referred as $a$-$\mu$ scheme in
+\cite{chang_method_1995}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 2.
+\section{Inviscid model equation}
+\label{s:inviscid_model}
+%%%% * Introduce time-reversible a scheme with inviscid model equation.
+%%%% * Show how to add numerical dissipation to inviscid scheme to
+%%%%   achieve a time-irreversible a-epsilon scheme, along with the
+%%%%   formulation.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the original model equation (Equation (\ref{e:conv_diff_govern}))
+is changed to
+\begin{align}
+  \frac{\partial u}{\partial t} + a\frac{\partial u}{\partial x} = 0,
+    \label{e:conv_govern}
+\end{align}
+which is the inviscid convection equation, a time-reversable formulation can be
+obtained by set $\xi=0$ in Equation (\ref{e:amuu}), (\ref{e:amuux}), as
+\begin{align}
+  u_j^n &= \frac{1}{2}\Big[
+      (1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + (1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    - \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+  \Big], \label{e:au}
+\end{align}
+\begin{align}
+  (u_x)_j^n = \frac{1}{\Delta x/2}\Big\{
+      \Big[ u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+         - (1+\nu)(u_{\bar{x}})_{j+\frac{1}{2}}^{n-\frac{1}{2}} \Big]
+    - \Big[ u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+         + (1-\nu)(u_{\bar{x}})_{j-\frac{1}{2}}^{n-\frac{1}{2}} \Big]
+  \Big\} \label{e:aux}\,.
+\end{align}
+These two time-marching formulae are called $a$ scheme.
+
+Since $a$ scheme is time-reversible, it is not suitable to be used to simulate
+problems that is not reversible in time, such as shock.  To overcome this
+problem, artificial viscosity is added into $a$ scheme in a controllable
+fashion.  The conservation relation within a CCE will be adjusted to
+\begin{align}
+  F_{\pm}(j,n) = \pm\frac{\varepsilon(1-\nu^2)\Delta x^2}{4}(du_x)_j^n,
+    \label{e:aeconserv}
+\end{align}
+where
+\begin{align*}
+  (du_x)_j^n \equiv
+    \frac{(u_x)_{j+1/2}^{n-1/2} + (u_x)_{j-1/2}^{n-1/2}}{2}
+  - \frac{u_{j+1/2}^{n-1/2} - u_{j-1/2}^{n-1/2}}        {\Delta x},
+\end{align*}
+such that
+\begin{align*}
+    \oint_{S(\mathrm{CE}  )}\vec{h}^*\cdot d\hat{\sigma} &= 0, \\
+    \oint_{S(\mathrm{CE}_-)}\vec{h}^*\cdot d\hat{\sigma} &=
+  - \oint_{S(\mathrm{CE}_+)}\vec{h}^*\cdot d\hat{\sigma} \,.
+\end{align*}
+This modified scheme is referred as $a$-$\varepsilon$ in
+\cite{chang_method_1995}.
+
+\subsection{Formulation for artificial viscosity}
+
+In order to build the time-marching formula for $a$-$\varepsilon$ scheme,
+recall Equation (\ref{e:both_conserv_func}) for the expression of
+$F_{\pm}$, and let $\mu=0\Rightarrow\xi=0$, such that
+\begin{align*}
+  \frac{4}{\Delta x^2}F_{\pm}(j,n)
+    = \pm\frac{(1-\nu^2)[(u_x)_j^n+(u_x)_{j\pm1/2}^{n-1/2}]}{2}
+    + \frac{2(1\mp\nu)}{\Delta x}(u_j^n-u_{j\pm1/2}^{n-1/2})\,.
+\end{align*}
+Use Equation (\ref{e:aeconserv}) to form two relationships within a CCE
+\begin{align*}
+  &(1-\nu^2)\frac{\Delta x}{4}[(u_x)_j^n+(u_x)_{j+1/2}^{n-1/2}]
+    + (1-\nu)(u_j^n-u_{j+1/2}^{n-1/2}) \\
+  &\quad = \varepsilon(1-\nu^2)\frac{\Delta x}{4}
+           [(u_x)_{j+1/2}^{n-1/2}+(u_x)_{j-1/2}^{n-1/2}]
+         - \frac{1}{2}
+           \varepsilon(1-\nu^2)(u_{j+1/2}^{n-1/2}-u_{j-1/2}^{n-1/2}), \\
+  &-(1-\nu^2)\frac{\Delta x}{4}[(u_x)_j^n+(u_x)_{j-1/2}^{n-1/2}]
+    + (1+\nu)(u_j^n-u_{j-1/2}^{n-1/2}) \\
+  &\quad = -\varepsilon(1-\nu^2)\frac{\Delta x}{4}
+            [(u_x)_{j+1/2}^{n-1/2}+(u_x)_{j-1/2}^{n-1/2}]
+          + \frac{1}{2}
+            \varepsilon(1-\nu^2)(u_{j+1/2}^{n-1/2}-u_{j-1/2}^{n-1/2})\,.
+\end{align*}
+Let
+\begin{alignat*}{2}
+  &       q_1 = u_j^n,
+  &\quad& q_2 = \frac{\Delta x}{4}(u_x)_j^n, \\
+  &       a_1 = x_{j-1/2}^{n-1/2},
+  &&      a_2 = \frac{\Delta x}{4}(u_x)_{j-1/2}^{n-1/2}, \\
+  &       b_1 = x_{j+1/2}^{n-1/2},
+  &&      b_2 = \frac{\Delta x}{4}(u_x)_{j+1/2}^{n-1/2}, \\
+  &       \alpha = 1-\nu^2, && \\
+  &       \beta_1 = 1-\nu,
+  &&      \beta_2 = 1+\nu,
+\end{alignat*}
+the equations can be rewritten as
+\begin{align*}
+  \alpha(q_2+b_2) + \beta_1(q_1-b_1)
+    &=   \varepsilon\alpha(b_2+a_2)
+       - \frac{1}{2}\varepsilon\alpha(b_1-a_1), \\
+  -\alpha(q_2+a_2) + \beta_2(q_1-a_1)
+    &=  -\varepsilon\alpha(b_2+a_2)
+       + \frac{1}{2}\varepsilon\alpha(b_1-a_1),
+\end{align*}
+and the unknows $q_1, q_2$ are solved to
+\begin{align*}
+  \left[\begin{array}{c} q_1 \\ q_2 \end{array}\right]
+    = \frac{1}{2}\left[\begin{array}{cc} 1+\nu & 1-\nu^2 \\
+      \varepsilon-1 & 2\varepsilon-1+\nu \end{array}\right]
+      \left[\begin{array}{c} a_1 \\ a_2 \end{array}\right]
+    + \frac{1}{2}\left[\begin{array}{cc} 1-\nu & 1-\nu^2 \\
+      1-\varepsilon & 2\varepsilon - 1 - \nu \end{array}\right]
+  \left[\begin{array}{c} b_1 \\ b_2 \end{array}\right]\,.
+\end{align*}
+
+By expanding the vector form of solution, the time-marching formula for
+$a$-$\varepsilon$ scheme is obtained as
+\begin{align}
+  u_j^n &= \frac{1}{2}\Big[
+      (1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + (1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    - \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+  \Big], \label{e:aeu}
+\end{align}
+\begin{align}
+  (u_x)_j^n = \frac{(u')_{j+1/2}^n - (u')_{j-1/2}^n}{\Delta x}
+            + (2\varepsilon-1)(du_x)_j^n, \label{e:aeux}
+\end{align}
+where
+\begin{align*}
+  (u')_{j\pm1/2}^n \equiv
+    u_{j\pm1/2}^{n-1/2}+\frac{\Delta t}{2}(u_t)_{j\pm1/2}^{n-1/2}\,.
+\end{align*}
+Note that in $a$-$\varepsilon$ scheme, $u_j^n$ term is evaluated in the same
+way as in $a$ scheme.  The difference between $a$-$\varepsilon$ scheme and $a$
+scheme lies on the evaluation of $(u_x)_j^n$ term.
+
+\subsection{Simplified scheme}
+
+By letting $\varepsilon=0.5$, the $(du_x)_j^n$ term in the formala evaluating
+$(u_x)_j^n$ (Equation (\ref{e:aeux})) vanishes.  With this special
+$\varepsilon=0.5$ specified, a new scheme named $c$ scheme is obtained by
+incorporating the following formulae
+\begin{align}
+  u_j^n &= \frac{1}{2}\Big[
+      (1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + (1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    - \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+  \Big], \label{e:cu}
+\end{align}
+\begin{align}
+  (u_x)_j^n = \frac{(u')_{j+1/2}^n - (u')_{j-1/2}^n}{\Delta x}
+  \,. \label{e:cux}
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 3
+\section{Formulation for system of equations}
+\label{s:system_eqn}
+%%%% * Formulate for vector form of coupling equations with a-epsilon
+%%%%   scheme and c scheme.
+%%%% * Jacobian and eigenvalues for 1D Euler equations.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Up to here, the model equations (Equation (\ref{e:conv_diff_govern}),
+(\ref{e:conv_govern})) being dealt with are both scaler equations.
+In order to apply CESE method to various conservation laws in physics
+and engineering, the formulation is going to be extended to a system
+of equations.
+
+Consider the general form of the system of conservation laws for 1D case,
+\begin{align}
+  \frac{\partial u_m}{\partial t} + \frac{\partial f_m}{\partial x} = 0
+    , \label{e:syswave}
+\end{align}
+where $m=1,\ldots,n$ and $f_m(u_1,\ldots,u_n)$.  By defining
+$\vec{h}_m\equiv(f_m,u_m)$, the differential system equations can be rewritten
+in the space-time integral form for control volume $V$
+\begin{align*}
+  \oint_{S(V)}\vec{h}_m\cdot d\hat{\sigma} = 0\,.
+\end{align*}
+In a SE, $u_m, f_m$ are approximated as
+\begin{align*}
+  & u_m^*(x,t;j,n) \equiv (u_m)_j^n + (u_{mx})_j^n(x-x_j)
+                        + (u_{mt})_j^n(t-t^n), \\
+  & f_m^*(x,t;j,n) \equiv (f_m)_j^n + (f_{mx})_j^n(x-x_j)
+                        + (f_{mt})_j^n(t-t^n)  \,.
+\end{align*}
+Referring to the CCE $\square BCEF$ in \figurename~\ref{f:cce} that contains
+two BCEs $\mathrm{CE}_-$, $\mathrm{CE}_+$, two relationships can be formed as
+\begin{align*}
+  \oint_{S(\mathrm{CE}_-)} \vec{h}_m^*\cdot d\hat{\sigma} &=
+    -\frac{\varepsilon(1-\nu^2)\Delta x^2}{4}(du_{mx})_j^n, \\
+  \oint_{S(\mathrm{CE}_+)} \vec{h}_m^*\cdot d\hat{\sigma} &=
+    \frac{\varepsilon(1-\nu^2)\Delta x^2}{4}(du_{mx})_j^n,
+\end{align*}
+where
+\begin{align}
+  (du_{mx})_j^n
+    \equiv \frac{(u_{mx})_{j+1/2}^{n-1/2}
+                + (u_{mx})_{j-1/2}^{n-1/2}}{2}
+  - \frac{(u_m)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+        - (u_m)_{j-\frac{1}{2}}^{n-\frac{1}{2}}}
+         {\Delta x}, \label{e:dumx}
+\end{align}
+and Courant number $\nu$ should be determined by the maximum in the system of
+equations.  By evaluating the sum of the two equations
+\begin{align*}
+    \oint_{S(\mathrm{CE}_-)} \vec{h}^*\cdot d\hat{\sigma}
+  + \oint_{S(\mathrm{CE}_+)} \vec{h}^*\cdot d\hat{\sigma} = 0,
+\end{align*}
+the formulation for $u_j^n$ is obtained as
+\begin{alignat*}{2}
+  (u_m)_j^n &= \frac{1}{2}\Big[
+      &&(u_m)_{j-1/2}^{n-1/2}+(u_m)_{j+1/2}^{n-1/2} \\
+  & &+ &\left(
+        \frac{\Delta t}{\Delta x}(f_m)_{j-1/2}^{n-1/2}
+      + \frac{\Delta t^2}{4\Delta x}(f_{mt})_{j-1/2}^{n-1/2}
+      + \frac{\Delta x}{4}(u_{mx})_{j-1/2}^{n-1/2}
+      \right) \\
+  & &- &\left(
+        \frac{\Delta t}{\Delta x}(f_m)_{j+1/2}^{n-1/2}
+      + \frac{\Delta t^2}{4\Delta x}(f_{mt})_{j+1/2}^{n-1/2}
+      + \frac{\Delta x}{4}(u_{mx})_{j+1/2}^{n-1/2}
+      \right)
+    \Big]\,.
+\end{alignat*}
+To simplify the formulation, let
+\begin{align}
+  (s_m)_j^n \equiv \frac{\Delta t}{\Delta x}(f_m)_j^n
+    + \frac{\Delta t^2}{4\Delta x}(f_{mt})_j^n
+    + \frac{\Delta x}{4}(u_{mx})_j^n, \label{e:sm}
+\end{align}
+such that
+\begin{align*}
+  (u_m)_j^n = \frac{1}{2}\left[
+      (u_m)_{j-1/2}^{n-1/2} + (u_m)_{j+1/2}^{n-1/2}
+    + (s_m)_{j-1/2}^{n-1/2} - (s_m)_{j+1/2}^{n-1/2}
+    \right]\,.
+\end{align*}
+
+In order to evaluate $u_{mt}, f_{mx}, f_{mt}$, recall that $u_m^*, f_m^*$
+follow $u_{mt}+f_{mx}=0$ (Equation (\ref{e:syswave})), such
+that
+\begin{align}
+  (u_{mt})_j^n = -(f_{mx})_j^n\,. \label{e:sysumt}
+\end{align}
+By chain rule
+\begin{align}
+  f_{mx} = f_{m,k}u_{kx}, \label{e:sysfmk}
+\end{align}
+where
+\begin{align}
+  f_{m,k} \equiv \frac{\partial f_m}{\partial u_k} \label{e:sysjacobian}
+\end{align}
+is the Jacobian.
+Similarly, $f_{mt}$ can be written as
+\begin{align}
+  f_{mt} = f_{m,k}u_{kt} = -f_{m,k}f_{k,l}u_{lx}\,. \label{e:sysfmt}
+\end{align}
+
+As to the spatial derivative, directly use the generalization of the
+scaler analog of $(u_{mx})_j^n$ to have
+\begin{align*}
+  (u_{mx})_j^n = \frac{(u_m')_{j+1/2}^n-(u_m')_{j-1/2}^n}{\Delta x}
+    + (2\varepsilon-1)(du_{mx})_j^n,
+\end{align*}
+where
+\begin{align}
+  (u_m')_{j\pm1/2}^n &\equiv
+      (u_m)_{j\pm1/2}^{n-1/2}
+    + \frac{\Delta t}{2}(u_{mt})_{j\pm1/2}^{n-1/2}\,. \label{e:ump}
+\end{align}
+
+In summary, the formulation of
+\begin{align}
+  (u_m)_j^n &= \frac{1}{2}\left[
+      (u_m)_{j-1/2}^{n-1/2} + (u_m)_{j+1/2}^{n-1/2}
+    + (s_m)_{j-1/2}^{n-1/2} - (s_m)_{j+1/2}^{n-1/2}
+    \right], \label{e:sysaeu} \\
+  (u_{mx})_j^n &= \frac{(u_m')_{j+1/2}^n-(u_m')_{j-1/2}^n}{\Delta x}
+    + (2\varepsilon-1)(du_{mx})_j^n, \label{e:sysaeux}
+\end{align}
+where
+\begin{align*}
+  (s_m)_j^n &=
+      \frac{\Delta t}  {\Delta x} (f_m)_j^n
+    + \frac{\Delta t^2}{4\Delta x}(f_{mt})_j^n
+    + \frac{\Delta x}  {4}        (u_{mx})_j^n, \\
+  (du_{mx})_j^n &=
+      \frac{(u_{mx})_{j+1/2}^{n-1/2}
+                  + (u_{mx})_{j-1/2}^{n-1/2}}{2}
+    - \frac{(u_m)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+          - (u_m)_{j-\frac{1}{2}}^{n-\frac{1}{2}}}
+           {\Delta x}, \\
+  (u_m')_{j\pm1/2}^n &=
+      (u_m)_{j\pm1/2}^{n-1/2}
+    + \frac{\Delta t}{2}(u_{mt})_{j\pm1/2}^{n-1/2},
+\end{align*}
+forms $a$-$\varepsilon$ scheme for Equation
+(\ref{e:syswave})\cite{chang_method_1995}.  Also, by letting $\varepsilon=0.5$,
+$c$ scheme can be also obtained from these two equations.
+
+For system of equations, the CFL number $\nu$ is determined to be the
+eigenvalue of the Jacobian (Equation (\ref{e:sysjacobian})) of the
+maximal absolute value.
+
+\subsection{1D Euler equations}
+
+The Euler equations are
+\begin{alignat}{3}
+  & \frac{\partial}{\partial t}(\rho)
+    &\,+\,& \frac{\partial}{\partial x}(\rho v) &\;=\;& 0
+    , \label{e:euler1} \\
+  & \frac{\partial}{\partial t}(\rho v)
+    &\,+\,& \frac{\partial}{\partial x}(p+\rho v^2) &\;=\;& 0
+    , \label{e:euler2} \\
+  & \frac{\partial}{\partial t}(\frac{p}{\gamma-1}+\frac{\rho v^2}{2})
+    &\,+\,& \frac{\partial}{\partial x}
+      (\frac{\gamma}{\gamma-1}pv+\frac{1}{2}\rho v^3) &\;=\;& 0
+    \,. \label{e:euler3}
+  \end{alignat}
+Let
+\begin{align*}
+  u_1 \equiv \rho,
+  u_2 \equiv \rho v,
+  u_3 \equiv \frac{p}{\gamma-1} + \frac{1}{2}\rho v^2,
+\end{align*}
+and
+\begin{align*}
+  &f_1 \equiv u_2, \\
+  &f_2 \equiv (\gamma-1)u_3 + \frac{3-\gamma}{2}\frac{u_2^2}{u_1}, \\
+  &f_3 \equiv \gamma\frac{u_2u_3}{u_1}
+             - \frac{\gamma-1}{2}\frac{u_2^3}{u_1^2},
+\end{align*}
+and then the Euler equations can be expressed as a system of conservation
+laws (Equation (\ref{e:syswave})).
+Define
+\begin{align}
+  F \equiv
+    \left[\begin{array}{ccc}
+      f_{1,1} & f_{1,2} & f_{1,3} \\
+      f_{2,1} & f_{2,2} & f_{2,3} \\
+      f_{3,1} & f_{3,2} & f_{3,3}
+    \end{array}\right]
+    =
+    \left[\begin{array}{ccc}
+      0 & 1 & 0 \\
+      \frac{\gamma-3}{2}\frac{u_2^2}{u_1^2} &
+      -(\gamma-3)\frac{u_2}{u_1} &
+      \gamma-1 \\
+      (\gamma-1)\frac{u_2^3}{u_1^3} - \gamma\frac{u_2u_3}{u_1^2} &
+      \gamma\frac{u_3}{u_1} - \frac{3}{2}(\gamma-1)\frac{u_2^2}{u_1^2} &
+      \gamma\frac{u_2}{u_1}
+    \end{array}\right], \label{e:euler_jacobian}
+\end{align}
+as the Jacobian matrix.
+The eigenvalues of $F$ can be calculated from the characeristic
+polynomial
+\begin{align*}
+  |F-\lambda| =
+    \left|\begin{array}{ccc}
+      -\lambda & 1 & 0 \\
+      \frac{\gamma-3}{2}\frac{u_2^2}{u_1^2}
+      & -(\gamma-3)\frac{u_2}{u_1} - \lambda
+      & \gamma-1 \\
+      (\gamma-1)\frac{u_2^3}{u_1^3} - \gamma\frac{u_2u_3}{u_1^2}
+      & \gamma\frac{u_3}{u_1} - \frac{3}{2}(\gamma-1)\frac{u_2^2}{u_1^2}
+      & \gamma\frac{u_2}{u_1} - \lambda
+    \end{array}\right| = 0\,.
+\end{align*}
+Since
+\begin{align*}
+  & \frac{u_2}{u_1} = v, \\
+  & \frac{u_3}{u_1} = \frac{1}{\gamma-1}\frac{p}{\rho} + \frac{1}{2}v^2
+    = \frac{1}{\gamma(\gamma-1)}c^2 + \frac{1}{2}v^2,
+\end{align*}
+then
+\begin{align*}
+  |F-\lambda| &=
+    \left|\begin{array}{ccc}
+      -\lambda & 1 & 0 \\
+      \frac{\gamma-3}{2}v^2 &
+      -(\gamma-3)v - \lambda &
+      \gamma-1 \\
+      (\gamma-1)v^3
+        - \gamma v(\frac{c^2}{\gamma(\gamma-1)}+\frac{v^2}{2}) &
+      \gamma(\frac{c^2}{\gamma(\gamma-1)}+\frac{v^2}{2})
+        - \frac{3}{2}(\gamma-1)v^2 &
+      \gamma v - \lambda
+    \end{array}\right| \\
+  &= -\lambda^3 + 3v\lambda^2 + (c^2-3v^2)\lambda + v(v^2-c^2)
+   = 0,
+\end{align*}
+such that
+\begin{align}
+  \lambda =
+  \left\{\begin{aligned}
+    &v   , \\
+    &v+c , \\
+    &v-c .
+  \end{aligned}\right. \label{e:euler_eigenvalue}
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 4
+\section{Weighted average}
+\label{s:weighted_average}
+%%%% * The origin of weighting functions for evaluation of spatial
+%%%%   derivative.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In $a$ scheme and $c$ scheme, the formulae (Equation (\ref{e:aux}),
+(\ref{e:cux})) for spatial derivative $(u_x)_j^n$ can be regarded as simply
+central-differencing analogy\cite{chang_method_1995,
+chang_multi-dimensional_2003}.  With discontinuity, numerical wiggles may occur
+in the solution\cite{chang_multi-dimensional_2003}.  The wiggles can be
+supressed by introducing weighting functions\cite{chang_method_1995,
+chang_multi-dimensional_2003}.
+
+Take $c$ scheme for example.  The spatial derivative is computed with Equation
+(\ref{e:cux})
+\begin{align*}
+  (u_x)_j^n = \frac{(u')_{j+1/2}^n - (u')_{j-1/2}^n}{\Delta x}\,.
+\end{align*}
+If define
+\begin{align}
+  (u_{x-})_j^n &\equiv
+    \frac{u_j^n - (u')_{j-\frac{1}{2}}^n}{\Delta x/2}, \label{e:ux-} \\
+  (u_{x+})_j^n &\equiv
+    \frac{(u')_{j+\frac{1}{2}}^n - u_j^n}{\Delta x/2}, \label{e:ux+}
+\end{align}
+then the spatial derivative can be rewritten as
+\begin{align*}
+  (u_x)_j^n = \frac{1}{2}(u_{x-})_j^n + \frac{1}{2}(u_{x+})_j^n,
+\end{align*}
+which is a special case for the weighted average in the form of
+\begin{align}
+  (u_x)_j^n = (w_-)_j^n(u_{x-})_j^n + (w_+)_j^n(u_{x+})_j^n
+    , \label{e:weighting}
+\end{align}
+where the weight factors $(w_-)_j^n=(w_+)_j^n=\frac{1}{2}$.  By designing
+weight factors, $(u_x)_j^n$ can be evaluated to be closer to the value with
+smaller absolute value of $(u_{x-})_j^n$ and $(u_{x+})_j^n$.  With the designed
+weight factors, the absolute value of $(u_x)_j^n$ is smaller than that
+calculated with simple average.  The local numerical dissipation introduced in
+this way annihilates the numerical wiggle and
+overshoot\cite{chang_multi-dimensional_2003}.
+
+\subsection{alpha/Scheme-I/W-1}
+
+In the literatures, various weighting functions were
+designed\cite{chang_method_1995, chang_courant_2002,
+chang_multi-dimensional_2003}.  The simplest one is
+\begin{align}
+  (w_-)_j^n =
+    \frac{|(u_{x+})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \quad
+  (w_+)_j^n =
+    \frac{|(u_{x-})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \label{e:alpha}
+\end{align}
+where $\alpha\ge0$.  It is the original $\alpha$ scheme referred as Equation
+(4.39) in \cite{chang_method_1995}.  Also, Scheme-I (Equation (2.21) in
+\cite{chang_courant_2002}) and W-1 scheme (Equation (2.38a), (2.38b) in
+\cite{chang_multi-dimensional_2003}) are basically $\alpha$ scheme, but they
+are specific to the $c$-$\tau$ scheme.
+
+\subsection{Scheme-II}
+
+Scheme-I/W-1 scheme is flawed since it can not supress wiggle/overshoot
+while $|\nu|\rightarrow0$.
+Another weighting scheme named Scheme-II was proposed to remedy it.
+The formulation for Scheme-II is
+\begin{align}
+  w_- = \frac{[1+f(|\nu|)(s_+)_j^n]}
+             {2 + f(|\nu|)[(s_-)_j^n+(s_+)_j^n]}, \quad
+  w_+ = \frac{[1+f(|\nu|)(s_-)_j^n]}
+             {2 + f(|\nu|)[(s_-)_j^n+(s_+)_j^n]}, \label{e:Scheme-II}
+\end{align}
+where
+\begin{align}
+  (s_{\pm})_j^n &\equiv
+    \frac{|(u_{\bar{x}\pm})_j^n|}
+         {\min\left(|(u_{\bar{x}-})_j^n|,
+                    |(u_{\bar{x}+})_j^n|\right)} - 1
+    \ge 0, \label{e:Scheme-IIs} \\
+  f(|\nu|) &\equiv
+    \frac{1}{2|\nu|}\,. \label{e:Scheme-IIf}
+\end{align}
+Remind that $(u_{\bar{x}})_j^n\equiv \frac{\Delta x}{4}(u_x)_j^n$.
+Remarks:
+\begin{itemize}
+\item While calculating $f(|\nu|)$, add a tiny value in the denominator,
+to prevent error of divided by zero.
+\item Also, while calculating $(s_{\pm})_j^n$, add a tiny value both in
+numerator and denominator, to prevent evaluating
+$\lim_{x\rightarrow0}\frac{x}{x}=1$ wrongly to 0.
+\end{itemize}
+(See also Equation (3.23), (3.26), (3.27) in \cite{chang_courant_2002}.)
+
+\subsection{W-2}
+
+W-2 scheme is different to W-1 scheme only for CFL insensitive scheme
+$c$-$\tau$ scheme in the following Section~\ref{s:ctau}.
+W-2 scheme still uses Equation (\ref{e:alpha})
+\begin{align*}
+  (w_-)_j^n =
+    \frac{|(u_{x+})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \quad
+  (w_+)_j^n =
+    \frac{|(u_{x-})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}\,.
+\end{align*}
+However, instead of using the value to be weighted (calculated from
+$(u')_j^n(P_-)$ and $(u')_j^n(P_+)$) to calculate the weighting factors, the
+spatial difference that is not moved to $P_{\pm}$ (calculated from unmoved
+$(u')_{j\pm\frac{1}{2}}^n$) is used for weighting factor calculation.  (See
+also section 4.2 in \cite{chang_multi-dimensional_2003}.)
+
+\subsection{W-3}
+
+Derived from W-1, W-3 scheme tries to amplify weighting factor with the
+deviation of itself.
+Define
+\begin{align}
+  \delta_{\pm} \equiv w_{\pm} - \frac{1}{2} \label{e:W3_delta}
+\end{align}
+with $w_- + w_+ = 1$, such that $\delta_- + \delta_+ = 0$.
+Let $\delta = |\delta_{\pm}|$, the maximum amplification factor can be
+defined as $\sigma_{\text{max}} \equiv \frac{1}{2\delta}$.
+The real amplification factor can be then chosen to
+\begin{align}
+  \sigma = \min\left\{\frac{1}{2\delta}, \frac{\sigma_0}{|\nu|}\right\},
+    \label{e:W3_sigma}
+\end{align}
+where $\sigma_0\sim1$.
+The amplified weighting factors can be determined by
+\begin{align}
+  w_{\pm}' = \frac{1}{2} + \sigma\delta_{\pm}\,. \label{e:W3_w}
+\end{align}
+(See also Equations (4.16), (4.30), (4.32), (4.25) in
+\cite{chang_multi-dimensional_2003}.)
+
+\subsection{W-4}
+
+Scheme W-4 also tries to amplify the weighting factors, but in different
+way to W-3.
+For $w_- = w_1 = \frac{s_1}{s_1+s_2}$, $w_+ = w_2 = \frac{s_2}{s_1+s_2}$,
+$s_1<s_2$, define
+\begin{align}
+  \eta \equiv \frac{s_2}{s_1} - 1\,. \label{e:W4_eta}
+\end{align}
+With the amplification factor
+\begin{align}
+  \sigma = \frac{\sigma_0}{|\nu|}, \label{e:W4_sigma}
+\end{align}
+where $\sigma_0 \sim 1$ (as W-3), the weighting factors can be amplified
+as
+\begin{align}
+  &\tilde{s}_1 = s_1, \tilde{s}_2 = (1+\sigma\eta)\tilde{s}_1,
+    \label{e:W4_s} \\
+  \Rightarrow\quad &\tilde{w}_l = \frac{\tilde{s}_l}{\sum_i\tilde{s}_i}
+    \label{e:W4_w} \,.
+\end{align}
+While coding this scheme up, some branching statements (if's) are
+needed.
+(See also Equation (4.35), (4.37), (4.38), (4.39), (4.46) in
+\cite{chang_multi-dimensional_2003}.)
+
+\subsection{Comparison of W-series weighting schemes}
+
+Some comments of the 4 W-series weighting schemes can be made from the
+simulation result ($\nu\approx0.0004$).
+\begin{itemize}
+  \item Significant overshoot can be
+        confirmed\cite{chang_multi-dimensional_2003} in W-1 scheme (see
+        \figurename~\ref{f:W-1}).
+  \item W-3 scheme is OK, but the numerical diffusion is larger than W-2 and
+        W-4 around the discontinuity.
+  \item Despite the potential problem in W-2 (see the last two paragraph in the
+        section 4.2 of \cite{chang_multi-dimensional_2003}), its performance is
+        the best, even better than W-4.
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW1_4.0e-6_1.0.eps}
+  \caption{W-1 scheme (TBA).}
+  \label{f:W-1}
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW2_4.0e-6_1.0.eps}
+  \caption{W-2 scheme (TBA).}
+  \label{f:W-2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW3_4.0e-6_1.0.eps}
+  \caption{W-3 scheme (TBA).}
+  \label{f:W-3}
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW4_4.0e-6_1.0.eps}
+  \caption{W-4 scheme (TBA).}
+  \label{f:W-4}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 5
+\section{CFL insensitive schemes}
+\label{s:ctau}
+%%%% * Introduce CFL insensitive c-tau scheme.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The original $a$-$\varepsilon$ scheme and $c$ scheme have a problem of severe
+smearing for small Courant (CFL) number ($\nu$).  An ``ideal solver'' was
+proposed in \cite{chang_multi-dimensional_2003} named $c$-$\tau$ scheme to
+remedy this problem.
+
+$c$-$\tau$ scheme is simply a scheme that evaluates $(u_x)_j^n$ with $c$ scheme
+(Equation (\ref{e:cux})) while $|\nu|\rightarrow1$, and with $a$ scheme
+(Equation (\ref{e:aux})) while $\nu\rightarrow0$.  Note that $|\nu|<1$.  With
+$\nu\rightarrow0$, the formula for spatial derivative (Equation (\ref{e:aux}))
+becomes
+\begin{align*}
+  (u_x)_j^n = \frac{1}{\Delta x/2}\Big\{
+      \Big[ u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+         - \frac{\Delta x}{4}(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+      \Big]
+    - \Big[ u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+         + \frac{\Delta x}{4}(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+      \Big]
+  \Big\},
+\end{align*}
+and can be furthur written as
+\begin{align*}
+  (u_x)_j^n =
+    \frac{\left[(u')_j^n(M_+) - (u')_j^n(M_-)\right]}{\Delta x/2}
+\end{align*}
+since $(u')_j^n(M_{\pm}) \rightarrow u_j^{n-\frac{1}{2}}(M_{\pm})$ as
+$\nu\rightarrow0$, where $M_{\pm}$ is the spatial mid-point of
+$\mathrm{CE}_{\pm}$, as depicted in \figurename~\ref{f:ctau}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{ctau.eps}
+  \caption{Definition of points for CFL insensitive scheme.}
+  \label{f:ctau}
+\end{figure}
+
+In $c$-$\tau$ scheme, the spatial derivative is evaluated with
+\begin{align}
+  (u_x)_j^n =
+    \frac{(u')_j^n(P_+) - (u')_j^n(P_-)}
+         {(1+\tau)\Delta x/2}, \label{e:ctauux}
+\end{align}
+where
+\begin{align}
+  (u')_j^n(P_{\pm}) \equiv
+        (u')_{j\pm\frac{1}{2}}^n
+    \mp (1-\tau)\frac{\Delta x}{4}(u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+  \,. \label{e:upp}
+\end{align}
+Also referring to \figurename~\ref{f:ctau}, point $P_{\pm}$ is floated with the
+parameter $0\le\tau\le1$.  As $\tau\rightarrow0$, $P_{\pm}\rightarrow M_{\pm}$,
+the value evaluated by Equation (\ref{e:ctauux}) is approaching to $a$ scheme;
+on the other hand, as $\tau\rightarrow1$,
+$P_{\pm}\rightarrow(j\pm\frac{1}{2},n)$, the value evaluated is approaching to
+$c$ scheme.  By designing the strictly increasing function $\tau = \tau(s)$
+carefully\cite{chang_multi-dimensional_2003}, the ``ideal solver'' requirement
+is achieved.
+
+Generally, there are infinitely many choices for the parameter function
+$\tau=\tau(s)$ in $c$-$\tau$ scheme.  Specifically,
+\begin{align}
+  \tau = \tau(|\nu|) = |\nu| \label{e:ctau*}
+\end{align}
+can be one of such functions, and is referred as $c$-$\tau^*$ scheme in
+\cite{chang_courant_2002, chang_multi-dimensional_2003}.
+
+In summary, the time-marching formulation for $c$-$\tau^*$ scheme are Equation
+(\ref{e:cu}), (\ref{e:ctauux}), along with the definition Equation
+(\ref{e:upp}), (\ref{e:ctau*}), and can be written as
+\begin{align*}
+  u_j^n = \frac{1}{2}\Big[
+      (1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + (1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    - \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+  \Big],
+\end{align*}
+\begin{align*}
+  (u_x)_j^n &=
+    \frac{\left[(u')_j^n(P_+) - (u')_j^n(P_-)\right]}
+         {(1+\tau)\Delta x/2}, \\
+  (u')_j^n(P_{\pm}) &\equiv
+        (u')_{j\pm\frac{1}{2}}^n
+    \mp (1-\tau)\frac{\Delta x}{4}
+        (u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}, \\
+  \tau &\equiv |\nu|\,.
+\end{align*}
+
+\subsection{Modification to weighting function}
+
+Various schemes to calculated the weighted average of spatial derivative can be
+deployed to $c$-$\tau$/$c$-$\tau^*$ scheme.  The simplest one is the $\alpha$
+scheme as described with Equation (\ref{e:alpha}).  From $\alpha$ scheme,
+Scheme-I\cite{chang_courant_2002} and W-1
+scheme\cite{chang_multi-dimensional_2003} were developed to use Equation
+(\ref{e:alpha})
+\begin{align*}
+  (w_{\pm})_j^n =
+    \frac{|({u_x}_{\mp})_j^n|^{\alpha}}
+         {|({u_x}_-)_j^n|^{\alpha}+|({u_x}_+)_j^n|^{\alpha}},
+\end{align*}
+with Equation (\ref{e:ux-}), (\ref{e:ux+}) replaced with
+\begin{align}
+  (u_{x-})_j^n &\equiv
+    \frac{u_j^n - (u')_j^n(P_-)}{(1+\tau)\Delta x/4}, \label{e:uxp-} \\
+  (u_{x+})_j^n &\equiv
+    \frac{(u')_j^n(P_+) - u_j^n}{(1+\tau)\Delta x/4}\,. \label{e:uxp+}
+\end{align}
+While applying other weighting schemes (except W-2 scheme), just use the new
+$({u_{x}}_{\pm})_j^n$.
+
+\subsection{Extension to system of equations}
+
+While system of equations as Equation (\ref{e:syswave}) is considered, the
+formulation for $c$-$\tau^*$ scheme is similar to $a$-$\varepsilon$/$c$ scheme.
+Equation (\ref{e:sysaeu}) along with Equation (\ref{e:sm}) can be directly used
+as the formula for $(u_m)_j^n$,
+\begin{align*}
+  (u_m)_j^n &= \frac{1}{2}\left[
+      (u_m)_{j-1/2}^{n-1/2} + (u_m)_{j+1/2}^{n-1/2}
+    + (s_m)_{j-1/2}^{n-1/2} - (s_m)_{j+1/2}^{n-1/2}
+    \right], \\
+  (s_m)_j^n &=
+      \frac{\Delta t}  {\Delta x} (f_m)_j^n
+    + \frac{\Delta t^2}{4\Delta x}(f_{mt})_j^n
+    + \frac{\Delta x}  {4}        (u_{mx})_j^n\,.
+\end{align*}
+$(u_{mx})_j^n$ is time-marched with the analogous formulation to
+Equation (\ref{e:ctauux}) along with Equation (\ref{e:upp}), as
+\begin{align}
+  (u_{mx})_j^n &=
+    \frac{(u_m')_j^n(P_+)-(u_m')_j^n(P_-)}
+         {(1+\tau)\Delta x/2}, \\
+  (u_m')_j^n(P_{\pm}) &=
+        (u_m')_{j\pm\frac{1}{2}}^n
+    \mp (1-\tau)\frac{\Delta x}{4}(u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}},
+\end{align}
+and $\tau=|\nu|$.  In order to time-march $(u_{mx})_j^n$, the CFL number
+($\nu$) in $c$-$\tau^*$ scheme has to be determined for the system of
+equations.  Take the 1D Euler equations (Equation (\ref{e:euler1}),
+(\ref{e:euler2}), (\ref{e:euler3})) for example,
+\begin{align}
+\nu \equiv \left\{
+  \begin{aligned}
+    &(v_j^n+c_j^n)\frac{\Delta t}{\Delta x}
+      \quad\text{for}\quad v_j^n \ge 0, \\
+    &(v_j^n-c_j^n)\frac{\Delta t}{\Delta x}
+      \quad\text{for}\quad v_j^n < 0, \\
+  \end{aligned}
+  \right. \label{e:eulernu}
+\end{align}
+where
+\begin{align}
+  v_j^n &=
+    \frac{(u_2)_j^n}{(u_1)_j^n}, \label{e:eulerv} \\
+  c_j^n &= \sqrt{\frac{\gamma p}{\rho}} =
+    \sqrt{\gamma(\gamma-1)
+          \left[
+              \frac{(u_3)_j^n}{(u_1)_j^n}
+            - \frac{1}{2}\left(\frac{(u_2)_j^n}{(u_1)_j^n}\right)^2
+          \right]}\,. \label{e:eulerc}
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 6
+\section{Non-uniform spatial mesh}
+\label{s:nuni}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+CESE has been extended to non-uniform spatial
+mesh\cite{chang_multi-dimensional_2003}.  Generally, in the non-uniform mesh,
+the CCE can be arbitrarily non-symmetric, as depicted in
+\figurename~\ref{f:nonuni}.  The variables are evaluated on the ``solution
+points'', which is marked by $\times$ in \figurename~\ref{f:nonuni}.  This
+document has a convention to use superscript $s$ to denote value on solution
+points.  For example, $x_j^s$ denotes for the spatial location of the solution
+point of $j$-th CCE.  It should be noted that in the two BCEs within the single
+CCE, the mid mesh points are defined as
+\begin{align*}
+  x_j^{\pm} = \frac{x_{j\pm\frac{1}{2}} + x_j}{2}\,.
+\end{align*}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{nonuni.eps}
+  \caption{Definition of points non-uniform scheme.}
+  \label{f:nonuni}
+\end{figure}
+
+A general formulation for 1D Euler equations is given in the section 6 of
+\cite{chang_not_2008}.  The marching formulae for each half time step are
+\begin{alignat}{2}
+u_m^s &=
+    &&\frac{\Delta x_j^-}{\Delta x_j}
+      \left[
+          (u_m^s)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+        + (x_j^- - x_{j-\frac{1}{2}}^s)
+          (u_{mx})_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+      \right] \notag \\
+& &+ &\frac{\Delta x_j^+}{\Delta x_j}
+      \left[
+          (u_m^s)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+        + (x_{j+\frac{1}{2}}^s - x_j^+)
+          (u_{mx})_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+      \right] \notag \\
+& &+ &\frac{\Delta t}{2\Delta x_j}(s_m)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+   -  \frac{\Delta t}{2\Delta x_j}(s_m)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    \label{e:nonunisys_us}
+\end{alignat}
+where
+\begin{align*}
+  (s_m)_j^n \equiv (f_m)_j^n + \frac{\Delta t}{4}(f_{mt})_j^n \,.
+\end{align*}
+Note that $(f_m)_j$ is $f_m$ on $j$-th ``mesh'' point, so it should be
+evaluated from value at solution point as
+\begin{align*}
+  (f_m)_j^n = (f_m^s)_j^n + (x_j - x_j^s)(f_{mx})_j^n,
+\end{align*}
+such that
+\begin{align}
+  (s_m)_j^n \equiv (f_m^s)_j^n + (x_j - x_j^s)(f_{mx})_j^n
+                 + \frac{\Delta t}{4}(f_{mt})_j^n \,.
+    \label{e:nonunisys_s}
+\end{align}
+(See also Equation (6.39), (6.40) in \cite{chang_not_2008}.) The advance of
+$u_{mx}$ is given by
+\begin{align}
+  (u_{mx})_j^n = \frac{u_m'({P_j^n}^+)-u_m'({P_j^n}^-)}
+                      {x  ({P_j^n}^+)-x  ({P_j^n}^-)},
+    \label{e:nonunisys_ux}
+\end{align}
+where
+\begin{align}
+  x({P_j^n}^{\pm}) &=
+      x_j^{\pm} + \tau(x_{j\pm\frac{1}{2}}^s-x_j^{\pm}),
+    \label{e:nonunisys_xp} \\
+  u_m'({P_j^n}^{\pm}) &=
+      (u_m^s)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta t}{2}(u_{mt})_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+    + \left[x({P_j^n}^{\pm})-x_{j\pm\frac{1}{2}}^s\right]
+      (u_{mx})_{j\pm\frac{1}{2}}^{n-\frac{1}{2}} \,.
+    \label{e:nonunisys_upp}
+\end{align}
+(See also Equation (6.43), (6.33), (6.41), (6.42) in \cite{chang_not_2008}.)
+For the calculation of weighted averaged (Equation \ref{e:weighting}), define
+\begin{align}
+  (u_{mx-})_j^n &\equiv
+    \frac{(u_m^s)_j^n-u_m'({P_j^n}^-)}{x_j^s-x({P_j^n}^-)}, \\
+  (u_{mx+})_j^n &\equiv
+    \frac{u_m'({P_j^n}^+)-(u_m^s)_j^n}{x({P_j^n}^+)-x_j^s}\,.
+\end{align}
+(See also Equation (6.44), (6.45) in \cite{chang_not_2008}.) CFL number should
+be determined by either
+\begin{align}
+  [\nu^{(1)}]_j^n =
+    \max\left\{
+      \frac{(c_j^n+v_j^n)\Delta t}{x_{j+1}^s-x_j^s},
+      \frac{(c_j^n-v_j^n)\Delta t}{x_j^s-x_{j-1}^s}
+    \right\}, \label{e:sysnonuni_nu1}
+\end{align}
+or
+\begin{align}
+  [\nu^{(2)}]_j^n =
+    (c_j^n+v_j^n)\max\left\{
+      \frac{\Delta t}{x_{j+1}^s-x_j^s},
+      \frac{\Delta t}{x_j^s-x_{j-1}^s}
+    \right\}\,. \label{e:sysnonuni_nu2}
+\end{align}
+If on the boundary, $x_{j+1}^s-x_j^s$, $x_j^s-x_{j-1}^s$ in Equation
+(\ref{e:sysnonuni_nu1}), (\ref{e:sysnonuni_nu2}) should be replaced to
+$2(x_{j+\frac{1}{2}}^s-x_j^s)$, $2(x_j^s-x_{j-\frac{1}{2}}^s)$.  (See also
+Equation (6.62), (6.64) in \cite{chang_not_2008}.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 7
+\section{Local time-stepping}
+\label{s:lts}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Section 8
+\section{Sample code}
+\label{s:code}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
 
