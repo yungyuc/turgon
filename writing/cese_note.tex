@@ -1,59 +1,14 @@
-\documentclass[11pt,dvips]{article}
-%\documentclass[12pt,dvips]{article}
-%\documentclass[preprint,dvips,numbers,sort&compress]{elsarticle}
-%\documentclass[12pt,review,dvips,numbers,sort&compress]{elsarticle}
-% Geometry.
-\usepackage{geometry}
-\geometry{a4paper,
-left=2cm,
-right=2cm,
-top=2cm,
-bottom=2cm,
-}
-% Global functionalities.
-\usepackage[authoryear,round,sort]{natbib}
-\usepackage{hyperref}
-% encoding.
-\usepackage[utf8]{inputenc}
-% Mathematics.
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{amsthm}
-\usepackage{arydshln}
-% Authoring.
-%\usepackage{authblk}
-\usepackage[printwatermark]{xwatermark}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{subfigure}
-\usepackage{paralist}
-\usepackage{multirow}
-\usepackage{booktabs}
-\usepackage{setspace}
-%\usepackage{lmodern}
+\documentclass{turgon}
 
 \newwatermark[allpages,color=black!15,angle=55,scale=3,xpos=0,ypos=0]%
 {DRAFT NOTE}
 
 %\doublespacing
 
-\graphicspath{{turgon_eps/}}
-
-\renewcommand{\figurename}{Fig.}
-\newcommand{\topcaption}{%
-\setlength{\abovecaptionskip}{0pt}%
-\setlength{\belowcaptionskip}{10pt}%
-\caption}
-\numberwithin{equation}{section}
-
-\newcommand{\defeq}{\ensuremath{\buildrel {\text{def}}\over{=}}}
-\newcommand{\dif}{\mathop{}\!\mathrm{d}}
-
 \title{
 %
-(Drafting) The Space-Time Conservation Element and Solution Element Method
-Schemes
+(Drafting) Code Development for the Space-Time Conservation Element and
+Solution Element Method
 %
 }
 
@@ -69,7 +24,42 @@ Yung-Yu Chen
 
 \maketitle
 
-\begin{abstract}
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This document introduces how to learn the mathematics behind the space-time
+conservation element and solution element (CESE) method and then develop
+computing code.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\chapter{Hyperbolic Partial Differential Equations}
+\label{c:hyper}
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To be determined.
+
+% Possible contents:
+% * d'Alembert solution
+% * Method of characteristics
+% * Non-linear equations
+% * Weak solutions
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\chapter{The Conservation Element and Solution Element Method}
+\label{c:cese}
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% TODO: reorder to a-\mu, a-\varepsion, c, c-\tau, and non-uniform grid.
 
 The space-time conservation element and solution element (CESE) method solves
 hyperbolic partial differential equations (PDEs) or conservation
@@ -114,30 +104,18 @@ Scheme-II \citep{chang_courant_2002}, W-1 scheme, and W-2
 scheme \citep{chang_multi-dimensional_2003} are also stated.  The note is
 organized as follows: Section \ref{s:cese_intro} demonstrates the concept of
 CESE method with a single viscous model equation.  The CESE method for inviscid
-equations is described in Section \ref{s:inviscid_model}.  Formulation of the
-CESE method for system of equations is constructed in Section
-\ref{s:system_eqn}, and the Euler equations are used as the model equation.
-Weighting functions for spatial derivatives are discussed in Section
-\ref{s:weighted_average}.  The CFL-insensitive scheme of CESE is discussed in
-Section \ref{s:ctau}, along with various weighting function.  In Section
-\ref{s:nuni}, non-uniform spatial mesh formulation is introduced.  Local
-time-stepping is discussed in Section \ref{s:lts} (to be written).  Section
-\ref{s:code} shows the code that produces the results in this note (to be
-added).
-
-\end{abstract}
-\clearpage
-
-\tableofcontents
+equations is described in Section \ref{s:inviscid_model}.  Weighting functions
+for spatial derivatives are discussed in Section \ref{s:weighted_average}.  The
+CFL-insensitive scheme of CESE is discussed in Section \ref{s:ctau}, along with
+various weighting function.  In Section \ref{s:nuni}, non-uniform spatial mesh
+formulation is introduced.  Local time-stepping is discussed in Section
+\ref{s:lts} (to be written).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 1
-\section{One-dimensional convection-diffusion equation and the $a$-$\mu$
-scheme}
+%%%%
+\section{Convection-Diffusion Equation and the $a$-$\mu$ scheme}
 \label{s:cese_intro}
-%%%% * Explain spatial decomposition: CE and SE.
-%%%% * Use convection-diffusion equation as model equation to form
-%%%%   a-epsilon scheme, as demonstration of CESE method.
+%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This section introduces the space-time conservation element and solution
@@ -380,13 +358,10 @@ This set of equations is referred as $a$-$\mu$ scheme in
 \citep{chang_method_1995}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 2.
-\section{Inviscid model equation}
+%%%%
+\section{Inviscid Equation}
 \label{s:inviscid_model}
-%%%% * Introduce time-reversible a scheme with inviscid model equation.
-%%%% * Show how to add numerical dissipation to inviscid scheme to
-%%%%   achieve a time-irreversible a-epsilon scheme, along with the
-%%%%   formulation.
+%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Consider the inviscid equation
@@ -434,7 +409,7 @@ such that
 This modified scheme is referred as the $a$-$\varepsilon$ in
 \citep[][Section 3]{chang_method_1995}.
 
-\subsection{Formulation for artificial viscosity}
+\subsection{Formulation for Artificial Viscosity}
 
 In order to build the time-marching formula for $a$-$\varepsilon$ scheme,
 recall Eq~.(\ref{e:both_conserv_func}) for the expression of
@@ -529,12 +504,502 @@ the $c$ scheme, and the formula is
 \end{gather}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 3
-\section{Formulation for system of equations}
-\label{s:system_eqn}
-%%%% * Formulate for vector form of coupling equations with a-epsilon
-%%%%   scheme and c scheme.
-%%%% * Jacobian and eigenvalues for 1D Euler equations.
+%%%%
+\section{Weighted Average}
+\label{s:weighted_average}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In $a$ scheme and $c$ scheme, the formulae (Eq.~(\ref{e:aux}) and
+(\ref{e:cux})) for spatial derivative $(u_x)_j^n$ can be regarded as simply
+central-differencing analogy \citep{chang_method_1995,
+chang_multi-dimensional_2003}.  With discontinuity, numerical wiggles may occur
+in the solution \citep{chang_multi-dimensional_2003}.  The wiggles can be
+suppressed by introducing weighting functions \citep{chang_method_1995,
+chang_multi-dimensional_2003}.
+
+Take $c$ scheme for example.  The spatial derivative is computed with
+Eq.~(\ref{e:cux})
+\begin{align*}
+  (u_x)_j^n = \frac{(u')_{j+1/2}^n - (u')_{j-1/2}^n}{\Delta x}
+\end{align*}
+If define
+\begin{align}
+  (u_{x-})_j^n &\defeq
+    \frac{u_j^n - (u')_{j-\frac{1}{2}}^n}{\Delta x/2}
+  \label{e:ux-} \\
+  (u_{x+})_j^n &\defeq
+    \frac{(u')_{j+\frac{1}{2}}^n - u_j^n}{\Delta x/2}
+  \label{e:ux+}
+\end{align}
+then the spatial derivative can be rewritten as
+\begin{align*}
+  (u_x)_j^n = \frac{1}{2}(u_{x-})_j^n + \frac{1}{2}(u_{x+})_j^n
+\end{align*}
+which is a special case for the weighted average in the form of
+\begin{align}
+  (u_x)_j^n = (w_-)_j^n(u_{x-})_j^n + (w_+)_j^n(u_{x+})_j^n
+  \label{e:weighting}
+\end{align}
+where the weight factors $(w_-)_j^n=(w_+)_j^n=\frac{1}{2}$.  By designing
+weight factors, $(u_x)_j^n$ can be evaluated to be closer to the value with
+smaller absolute value of $(u_{x-})_j^n$ and $(u_{x+})_j^n$.  With the designed
+weight factors, the absolute value of $(u_x)_j^n$ is smaller than that
+calculated with simple average.  The local numerical dissipation introduced in
+this way annihilates the numerical wiggle and
+overshoot \citep{chang_multi-dimensional_2003}.
+
+\subsection{$\alpha$/Scheme-I/W-1}
+
+In the literatures, various weighting functions were
+designed \citep{chang_method_1995, chang_courant_2002,
+chang_multi-dimensional_2003}.  The simplest one is
+\begin{align}
+  (w_-)_j^n =
+    \frac{|(u_{x+})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \quad
+  (w_+)_j^n =
+    \frac{|(u_{x-})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}
+  \label{e:alpha}
+\end{align}
+where $\alpha\ge0$.  It is the original $\alpha$ scheme
+\citep[][Eq.~(4.39)]{chang_method_1995}.  Also, Scheme-I
+\citep[][Eq.~(2.21)]{chang_courant_2002} and W-1 scheme \citep[][Eq.~(2.38a),
+(2.38b)]{chang_multi-dimensional_2003} are basically $\alpha$ scheme, but they
+are specific to the $c$-$\tau$ scheme.
+
+\subsection{Scheme-II}
+
+Scheme-I/W-1 scheme is flawed since it can not suppress wiggle/overshoot while
+$|\nu|\rightarrow0$.  Another weighting scheme named Scheme-II was proposed to
+remedy it.  The formulation for Scheme-II is
+\begin{align}
+  w_- = \frac{[1+f(|\nu|)(s_+)_j^n]}
+             {2 + f(|\nu|)[(s_-)_j^n+(s_+)_j^n]}, \quad
+  w_+ = \frac{[1+f(|\nu|)(s_-)_j^n]}
+             {2 + f(|\nu|)[(s_-)_j^n+(s_+)_j^n]}
+  \label{e:Scheme-II}
+\end{align}
+where
+\begin{align}
+  (s_{\pm})_j^n &\defeq
+    \frac{|(u_{\bar{x}\pm})_j^n|}
+         {\min\left(|(u_{\bar{x}-})_j^n|,
+                    |(u_{\bar{x}+})_j^n|\right)} - 1
+    \ge 0 \label{e:Scheme-IIs} \\
+  f(|\nu|) &\defeq
+    \frac{1}{2|\nu|} \label{e:Scheme-IIf}
+\end{align}
+Remind that $(u_{\bar{x}})_j^n\defeq \frac{\Delta x}{4}(u_x)_j^n$.  Remarks:
+\begin{itemize}
+  %
+  \item While calculating $f(|\nu|)$, add a tiny value in the denominator, to
+  prevent error of divided by zero.
+  %
+  \item Also, while calculating $(s_{\pm})_j^n$, add a tiny value both in
+  numerator and denominator, to prevent evaluating $\lim_{x\rightarrow0}
+  \frac{x}{x} = 1$ wrongly to 0.
+  %
+\end{itemize}
+\citep[See also][Eq.~(3.23), (3.26), (3.27)]{chang_courant_2002}
+
+\subsection{W-2}
+
+W-2 scheme is different to W-1 scheme only for CFL insensitive scheme
+$c$-$\tau$ scheme in the following Section~\ref{s:ctau}.  W-2 scheme still uses
+Eq.~(\ref{e:alpha})
+\begin{align*}
+  (w_-)_j^n =
+    \frac{|(u_{x+})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \quad
+  (w_+)_j^n =
+    \frac{|(u_{x-})_j^n|^{\alpha}}
+         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}
+\end{align*}
+However, instead of using the value to be weighted (calculated from
+$(u')_j^n(P_-)$ and $(u')_j^n(P_+)$) to calculate the weighting factors, the
+spatial difference that is not moved to $P_{\pm}$ (calculated from unmoved
+$(u')_{j\pm\frac{1}{2}}^n$) is used for weighting factor calculation.
+\cite[See also section 4.2 in][]{chang_multi-dimensional_2003}
+
+\subsection{W-3}
+
+Derived from W-1, W-3 scheme tries to amplify weighting factor with the
+deviation of itself.  Define
+\begin{align}
+  \delta_{\pm} \defeq w_{\pm} - \frac{1}{2} \label{e:W3_delta}
+\end{align}
+with $w_- + w_+ = 1$, such that $\delta_- + \delta_+ = 0$.  Let $\delta =
+|\delta_{\pm}|$, the maximum amplification factor can be defined as
+$\sigma_{\text{max}} \defeq \frac{1}{2\delta}$.  The real amplification factor
+can be then chosen to
+\begin{align}
+  \sigma = \min\left\{\frac{1}{2\delta}, \frac{\sigma_0}{|\nu|}\right\}
+  \label{e:W3_sigma}
+\end{align}
+where $\sigma_0\sim1$.  The amplified weighting factors can be determined by
+\begin{align}
+  w_{\pm}' = \frac{1}{2} + \sigma\delta_{\pm} \label{e:W3_w}
+\end{align}
+\citep[See also][Eq.~(4.16), (4.30), (4.32), (4.25)]%
+{chang_multi-dimensional_2003}
+
+\subsection{W-4}
+
+Scheme W-4 also tries to amplify the weighting factors, but in different way to
+W-3.  For $w_- = w_1 = \frac{s_1}{s_1+s_2}$, $w_+ = w_2 = \frac{s_2}{s_1+s_2}$,
+$s_1<s_2$, define
+\begin{align}
+  \eta \defeq \frac{s_2}{s_1} - 1 \label{e:W4_eta}
+\end{align}
+With the amplification factor
+\begin{align}
+  \sigma = \frac{\sigma_0}{|\nu|} \label{e:W4_sigma}
+\end{align}
+where $\sigma_0 \sim 1$ (as W-3), the weighting factors can be amplified
+as
+\begin{align}
+ &\tilde{s}_1 = s_1, \tilde{s}_2 = (1+\sigma\eta)\tilde{s}_1
+  \label{e:W4_s} \\
+  \Rightarrow\quad &\tilde{w}_l = \frac{\tilde{s}_l}{\sum_i\tilde{s}_i}
+  \label{e:W4_w}
+\end{align}
+While coding this scheme up, some branching statements (if's) are needed.
+\citep[See also][Eq.(4.35), (4.37), (4.38), (4.39), (4.46)]%
+{chang_multi-dimensional_2003}
+
+\subsection{Comparison of W-series Weighting Schemes}
+
+Some comments of the 4 W-series weighting schemes can be made from the
+simulation result ($\nu\approx0.0004$).
+\begin{itemize}
+  \item Significant overshoot can be
+        confirmed \citep{chang_multi-dimensional_2003} in W-1 scheme (see
+        \figurename~\ref{f:W-1}).
+  \item W-3 scheme is OK, but the numerical diffusion is larger than W-2 and
+        W-4 around the discontinuity.
+  \item Despite the potential problem in W-2 (see the last two paragraph in the
+        section 4.2 of \citep{chang_multi-dimensional_2003}), its performance is
+        the best, even better than W-4.
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW1_4.0e-6_1.0.eps}
+  \caption{W-1 scheme (TBA).}
+  \label{f:W-1}
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW2_4.0e-6_1.0.eps}
+  \caption{W-2 scheme (TBA).}
+  \label{f:W-2}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW3_4.0e-6_1.0.eps}
+  \caption{W-3 scheme (TBA).}
+  \label{f:W-3}
+  %\includegraphics[width=0.8\textwidth]{simple_NuniW4_4.0e-6_1.0.eps}
+  \caption{W-4 scheme (TBA).}
+  \label{f:W-4}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+\section{CFL Insensitive Schemes}
+\label{s:ctau}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The original $a$-$\varepsilon$ scheme and $c$ scheme have a problem of severe
+smearing for small Courant (CFL) number ($\nu$).  An ``ideal solver'' was
+proposed in \citep{chang_multi-dimensional_2003} named $c$-$\tau$ scheme to
+remedy this problem.
+
+$c$-$\tau$ scheme is simply a scheme that evaluates $(u_x)_j^n$ with $c$ scheme
+(Eq.~(\ref{e:cux})) while $|\nu|\rightarrow1$, and with $a$ scheme
+(Eq.~(\ref{e:aux})) while $\nu\rightarrow0$.  Note that $|\nu|<1$.  With
+$\nu\rightarrow0$, the formula for spatial derivative (Eq.~(\ref{e:aux}))
+becomes
+\begin{align*}
+  (u_x)_j^n = \frac{1}{\Delta x/2}\Big\{
+      \Big[ u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+         - \frac{\Delta x}{4}(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+      \Big]
+    - \Big[ u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+         + \frac{\Delta x}{4}(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+      \Big]
+  \Big\}
+\end{align*}
+and then
+\begin{align*}
+  (u_x)_j^n =
+  \frac{\left[(u')_j^n(M_+) - (u')_j^n(M_-)\right]}{\Delta x/2}
+\end{align*}
+since $(u')_j^n(M_{\pm}) \rightarrow u_j^{n-\frac{1}{2}}(M_{\pm})$ as
+$\nu\rightarrow0$, where $M_{\pm}$ is the spatial mid-point of
+$\mathrm{CE}_{\pm}$, as depicted in \figurename~\ref{f:ctau}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{ctau.eps}
+  \caption{Definition of points for CFL insensitive scheme.}
+  \label{f:ctau}
+\end{figure}
+
+In $c$-$\tau$ scheme, the spatial derivative is evaluated with
+\begin{align}
+  (u_x)_j^n = \frac{(u')_j^n(P_+) - (u')_j^n(P_-)}{(1+\tau)\Delta x/2}
+  \label{e:ctauux}
+\end{align}
+where
+\begin{align}
+  (u')_j^n(P_{\pm}) \defeq
+        (u')_{j\pm\frac{1}{2}}^n
+    \mp (1-\tau)\frac{\Delta x}{4}(u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+  \label{e:upp}
+\end{align}
+Also referring to \figurename~\ref{f:ctau}, point $P_{\pm}$ is floated with the
+parameter $0\le\tau\le1$.  As $\tau\rightarrow0$, $P_{\pm}\rightarrow M_{\pm}$,
+the value evaluated by Eq.~(\ref{e:ctauux}) is approaching to $a$ scheme;
+on the other hand, as $\tau\rightarrow1$,
+$P_{\pm}\rightarrow(j\pm\frac{1}{2},n)$, the value evaluated is approaching to
+$c$ scheme.  By designing the strictly increasing function $\tau = \tau(s)$
+carefully \citep{chang_multi-dimensional_2003}, the ``ideal solver''
+requirement is met.
+
+Generally, there are infinitely many choices for the parameter function
+$\tau=\tau(s)$ in $c$-$\tau$ scheme.  Specifically,
+\begin{align}
+  \tau = \tau(|\nu|) = |\nu| \label{e:ctau*}
+\end{align}
+can be one of such functions, and is referred as $c$-$\tau^*$ scheme in
+\cite{chang_courant_2002, chang_multi-dimensional_2003}.
+
+In summary, the time-marching formulation for $c$-$\tau^*$ scheme are
+Eq.~(\ref{e:cu}), (\ref{e:ctauux}), along with the definition
+Eq.~(\ref{e:upp}), (\ref{e:ctau*}), and can be written as
+\begin{align*}
+  u_j^n = \frac{1}{2}\Big[
+      (1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+    + (1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+    - \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+  \Big]
+\end{align*}
+\begin{align*}
+  (u_x)_j^n &=
+    \frac{\left[(u')_j^n(P_+) - (u')_j^n(P_-)\right]}
+         {(1+\tau)\Delta x/2}, \\
+  (u')_j^n(P_{\pm}) &\defeq
+        (u')_{j\pm\frac{1}{2}}^n
+    \mp (1-\tau)\frac{\Delta x}{4}
+        (u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}, \\
+  \tau &\defeq |\nu|
+\end{align*}
+
+\subsection{Modification to Weighting Function}
+
+Various schemes to calculated the weighted average of spatial derivative can be
+deployed to $c$-$\tau$/$c$-$\tau^*$ scheme.  The simplest one is the $\alpha$
+scheme as described with Eq.~(\ref{e:alpha}).  From $\alpha$ scheme,
+Scheme-I \citep{chang_courant_2002} and W-1 scheme
+\citep{chang_multi-dimensional_2003} were developed to use Eq.~(\ref{e:alpha})
+\begin{align*}
+  (w_{\pm})_j^n =
+    \frac{|({u_x}_{\mp})_j^n|^{\alpha}}
+         {|({u_x}_-)_j^n|^{\alpha}+|({u_x}_+)_j^n|^{\alpha}}
+\end{align*}
+with Eq.~(\ref{e:ux-}), (\ref{e:ux+}) replaced with
+\begin{align}
+  (u_{x-})_j^n &\defeq
+    \frac{u_j^n - (u')_j^n(P_-)}{(1+\tau)\Delta x/4}
+  \label{e:uxp-} \\
+  (u_{x+})_j^n &\defeq
+    \frac{(u')_j^n(P_+) - u_j^n}{(1+\tau)\Delta x/4}
+  \label{e:uxp+}
+\end{align}
+While applying other weighting schemes (except W-2 scheme), just use the new
+$({u_{x}}_{\pm})_j^n$.
+
+\subsection{Extension to System of Equations}
+
+While system of equations as Eq.~(\ref{e:syswave}) is considered, the
+formulation for $c$-$\tau^*$ scheme is similar to $a$-$\varepsilon$/$c$ scheme.
+Eq.~(\ref{e:sysaeu}) along with Eq.~(\ref{e:sm}) can be directly used as the
+formula for $(u_m)_j^n$,
+\begin{align*}
+  (u_m)_j^n &= \frac{1}{2}\left[
+      (u_m)_{j-1/2}^{n-1/2} + (u_m)_{j+1/2}^{n-1/2}
+    + (s_m)_{j-1/2}^{n-1/2} - (s_m)_{j+1/2}^{n-1/2}
+    \right] \\
+  (s_m)_j^n &=
+      \frac{\Delta t}  {\Delta x} (f_m)_j^n
+    + \frac{\Delta t^2}{4\Delta x}(f_{mt})_j^n
+    + \frac{\Delta x}  {4}        (u_{mx})_j^n
+\end{align*}
+$(u_{mx})_j^n$ is time-marched with the analogous formulation to
+Eq.~(\ref{e:ctauux}) along with Eq.~(\ref{e:upp}), as
+\begin{align}
+  (u_{mx})_j^n &=
+    \frac{(u_m')_j^n(P_+)-(u_m')_j^n(P_-)}
+         {(1+\tau)\Delta x/2} \\
+  (u_m')_j^n(P_{\pm}) &=
+        (u_m')_{j\pm\frac{1}{2}}^n
+    \mp (1-\tau)\frac{\Delta x}{4}(u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+\end{align}
+and $\tau=|\nu|$.  In order to time-march $(u_{mx})_j^n$, the CFL number
+($\nu$) in $c$-$\tau^*$ scheme has to be determined for the system of
+equations.  Take the 1D Euler equations (Eq.~(\ref{e:euler1}),
+(\ref{e:euler2}), (\ref{e:euler3})) for example,
+\begin{align}
+  \nu \defeq \left\{\begin{aligned}
+    &(v_j^n+c_j^n)\frac{\Delta t}{\Delta x}
+      \quad\text{for}\quad v_j^n \ge 0 \\
+    &(v_j^n-c_j^n)\frac{\Delta t}{\Delta x}
+      \quad\text{for}\quad v_j^n < 0 \\
+  \end{aligned} \right.
+  \label{e:eulernu}
+\end{align}
+where
+\begin{align}
+  v_j^n &=
+    \frac{(u_2)_j^n}{(u_1)_j^n}
+  \label{e:eulerv} \\
+  c_j^n &= \sqrt{\frac{\gamma p}{\rho}} =
+    \sqrt{\gamma(\gamma-1)
+          \left[
+              \frac{(u_3)_j^n}{(u_1)_j^n}
+            - \frac{1}{2}\left(\frac{(u_2)_j^n}{(u_1)_j^n}\right)^2
+          \right]}
+  \label{e:eulerc}
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+\section{Non-Uniform Spatial Grid}
+\label{s:nuni}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+CESE has been extended to non-uniform spatial mesh
+\citep{chang_multi-dimensional_2003}.  Generally, in the non-uniform mesh, the
+CCE can be arbitrarily non-symmetric, as depicted in
+\figurename~\ref{f:nonuni}.  The variables are evaluated on the ``solution
+points'', which is marked by $\times$ in \figurename~\ref{f:nonuni}.  This
+document has a convention to use superscript $s$ to denote value on solution
+points.  For example, $x_j^s$ denotes for the spatial location of the solution
+point of $j$-th CCE.  It should be noted that in the two BCEs within the single
+CCE, the mid mesh points are defined as
+\begin{align*}
+  x_j^{\pm} = \frac{x_{j\pm\frac{1}{2}} + x_j}{2}
+\end{align*}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{nonuni.eps}
+  \caption{Definition of points non-uniform scheme.}
+  \label{f:nonuni}
+\end{figure}
+
+A general formulation for 1D Euler equations is given in the section 6 of
+\cite{chang_not_2008}.  The marching formulae for each half time step are
+\begin{alignat}{2}
+u_m^s &=
+    &&\frac{\Delta x_j^-}{\Delta x_j}
+      \left[
+          (u_m^s)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+        + (x_j^- - x_{j-\frac{1}{2}}^s)
+          (u_{mx})_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+      \right] \notag \\
+& &+ &\frac{\Delta x_j^+}{\Delta x_j}
+      \left[
+          (u_m^s)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+        + (x_{j+\frac{1}{2}}^s - x_j^+)
+          (u_{mx})_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+      \right] \notag \\
+& &+ &\frac{\Delta t}{2\Delta x_j}(s_m)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
+   -  \frac{\Delta t}{2\Delta x_j}(s_m)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
+  \label{e:nonunisys_us}
+\end{alignat}
+where
+\begin{align*}
+  (s_m)_j^n \defeq (f_m)_j^n + \frac{\Delta t}{4}(f_{mt})_j^n
+\end{align*}
+Note that $(f_m)_j$ is $f_m$ on $j$-th ``mesh'' point, so it should be
+evaluated from value at solution point as
+\begin{align*}
+  (f_m)_j^n = (f_m^s)_j^n + (x_j - x_j^s)(f_{mx})_j^n
+\end{align*}
+such that
+\begin{align}
+  (s_m)_j^n \defeq (f_m^s)_j^n + (x_j - x_j^s)(f_{mx})_j^n
+                 + \frac{\Delta t}{4}(f_{mt})_j^n
+    \label{e:nonunisys_s}
+\end{align}
+\citep[See also][Eq.~(6.39), (6.40)]{chang_not_2008}  The advance of $u_{mx}$
+is given by
+\begin{align}
+  (u_{mx})_j^n = \frac{u_m'({P_j^n}^+)-u_m'({P_j^n}^-)}
+                      {x  ({P_j^n}^+)-x  ({P_j^n}^-)}
+  \label{e:nonunisys_ux}
+\end{align}
+where
+\begin{align}
+  x({P_j^n}^{\pm}) &=
+      x_j^{\pm} + \tau(x_{j\pm\frac{1}{2}}^s-x_j^{\pm})
+    \label{e:nonunisys_xp} \\
+  u_m'({P_j^n}^{\pm}) &=
+      (u_m^s)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+    + \frac{\Delta t}{2}(u_{mt})_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+    + \left[x({P_j^n}^{\pm})-x_{j\pm\frac{1}{2}}^s\right]
+      (u_{mx})_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
+    \label{e:nonunisys_upp}
+\end{align}
+\citep[See also][Eq.~(6.43), (6.33), (6.41), (6.42)]{chang_not_2008} For the
+calculation of weighted averaged (Eq.~\ref{e:weighting}), define
+\begin{align}
+  (u_{mx-})_j^n &\defeq
+    \frac{(u_m^s)_j^n-u_m'({P_j^n}^-)}{x_j^s-x({P_j^n}^-)} \\
+  (u_{mx+})_j^n &\defeq
+    \frac{u_m'({P_j^n}^+)-(u_m^s)_j^n}{x({P_j^n}^+)-x_j^s}
+\end{align}
+\citep[See also][Eq.~(6.44), (6.45)]{chang_not_2008}  CFL number should be
+determined by either
+\begin{align}
+  [\nu^{(1)}]_j^n =
+    \max\left\{
+      \frac{(c_j^n+v_j^n)\Delta t}{x_{j+1}^s-x_j^s},
+      \frac{(c_j^n-v_j^n)\Delta t}{x_j^s-x_{j-1}^s}
+    \right\} \label{e:sysnonuni_nu1}
+\end{align}
+or
+\begin{align}
+  [\nu^{(2)}]_j^n =
+    (c_j^n+v_j^n)\max\left\{
+      \frac{\Delta t}{x_{j+1}^s-x_j^s},
+      \frac{\Delta t}{x_j^s-x_{j-1}^s}
+    \right\} \label{e:sysnonuni_nu2}
+\end{align}
+If on the boundary, $x_{j+1}^s-x_j^s$, $x_j^s-x_{j-1}^s$ in Equation
+(\ref{e:sysnonuni_nu1}), (\ref{e:sysnonuni_nu2}) should be replaced to
+$2(x_{j+\frac{1}{2}}^s-x_j^s)$, $2(x_j^s-x_{j-\frac{1}{2}}^s)$.  \citep[See
+also][Eq.~(6.62), (6.64)]{chang_not_2008}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+\section{Local Time-Stepping}
+\label{s:lts}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To be determined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\chapter{Solving Systems of Equations}
+\label{c:system_eqn}
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In order to apply CESE method to various conservation laws for practical
@@ -681,7 +1146,11 @@ where
 By letting $\varepsilon=0.5$, $c$ scheme can be also obtained from these two
 equations.
 
-\subsection{The one-dimensional Euler equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+\section{The One-Dimensional Euler Equations}
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The Euler equations are
 \begin{alignat}{3}
@@ -777,506 +1246,19 @@ such that
 \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 4
-\section{Weighted average}
-\label{s:weighted_average}
-%%%% * The origin of weighting functions for evaluation of spatial
-%%%%   derivative.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In $a$ scheme and $c$ scheme, the formulae (Eq.~(\ref{e:aux}) and
-(\ref{e:cux})) for spatial derivative $(u_x)_j^n$ can be regarded as simply
-central-differencing analogy \citep{chang_method_1995,
-chang_multi-dimensional_2003}.  With discontinuity, numerical wiggles may occur
-in the solution \citep{chang_multi-dimensional_2003}.  The wiggles can be
-suppressed by introducing weighting functions \citep{chang_method_1995,
-chang_multi-dimensional_2003}.
-
-Take $c$ scheme for example.  The spatial derivative is computed with
-Eq.~(\ref{e:cux})
-\begin{align*}
-  (u_x)_j^n = \frac{(u')_{j+1/2}^n - (u')_{j-1/2}^n}{\Delta x}
-\end{align*}
-If define
-\begin{align}
-  (u_{x-})_j^n &\defeq
-    \frac{u_j^n - (u')_{j-\frac{1}{2}}^n}{\Delta x/2}
-  \label{e:ux-} \\
-  (u_{x+})_j^n &\defeq
-    \frac{(u')_{j+\frac{1}{2}}^n - u_j^n}{\Delta x/2}
-  \label{e:ux+}
-\end{align}
-then the spatial derivative can be rewritten as
-\begin{align*}
-  (u_x)_j^n = \frac{1}{2}(u_{x-})_j^n + \frac{1}{2}(u_{x+})_j^n
-\end{align*}
-which is a special case for the weighted average in the form of
-\begin{align}
-  (u_x)_j^n = (w_-)_j^n(u_{x-})_j^n + (w_+)_j^n(u_{x+})_j^n
-  \label{e:weighting}
-\end{align}
-where the weight factors $(w_-)_j^n=(w_+)_j^n=\frac{1}{2}$.  By designing
-weight factors, $(u_x)_j^n$ can be evaluated to be closer to the value with
-smaller absolute value of $(u_{x-})_j^n$ and $(u_{x+})_j^n$.  With the designed
-weight factors, the absolute value of $(u_x)_j^n$ is smaller than that
-calculated with simple average.  The local numerical dissipation introduced in
-this way annihilates the numerical wiggle and
-overshoot \citep{chang_multi-dimensional_2003}.
-
-\subsection{alpha/Scheme-I/W-1}
-
-In the literatures, various weighting functions were
-designed \citep{chang_method_1995, chang_courant_2002,
-chang_multi-dimensional_2003}.  The simplest one is
-\begin{align}
-  (w_-)_j^n =
-    \frac{|(u_{x+})_j^n|^{\alpha}}
-         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \quad
-  (w_+)_j^n =
-    \frac{|(u_{x-})_j^n|^{\alpha}}
-         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}
-  \label{e:alpha}
-\end{align}
-where $\alpha\ge0$.  It is the original $\alpha$ scheme
-\citep[][Eq.~(4.39)]{chang_method_1995}.  Also, Scheme-I
-\citep[][Eq.~(2.21)]{chang_courant_2002} and W-1 scheme \citep[][Eq.~(2.38a),
-(2.38b)]{chang_multi-dimensional_2003} are basically $\alpha$ scheme, but they
-are specific to the $c$-$\tau$ scheme.
-
-\subsection{Scheme-II}
-
-Scheme-I/W-1 scheme is flawed since it can not suppress wiggle/overshoot while
-$|\nu|\rightarrow0$.  Another weighting scheme named Scheme-II was proposed to
-remedy it.  The formulation for Scheme-II is
-\begin{align}
-  w_- = \frac{[1+f(|\nu|)(s_+)_j^n]}
-             {2 + f(|\nu|)[(s_-)_j^n+(s_+)_j^n]}, \quad
-  w_+ = \frac{[1+f(|\nu|)(s_-)_j^n]}
-             {2 + f(|\nu|)[(s_-)_j^n+(s_+)_j^n]}
-  \label{e:Scheme-II}
-\end{align}
-where
-\begin{align}
-  (s_{\pm})_j^n &\defeq
-    \frac{|(u_{\bar{x}\pm})_j^n|}
-         {\min\left(|(u_{\bar{x}-})_j^n|,
-                    |(u_{\bar{x}+})_j^n|\right)} - 1
-    \ge 0 \label{e:Scheme-IIs} \\
-  f(|\nu|) &\defeq
-    \frac{1}{2|\nu|} \label{e:Scheme-IIf}
-\end{align}
-Remind that $(u_{\bar{x}})_j^n\defeq \frac{\Delta x}{4}(u_x)_j^n$.  Remarks:
-\begin{itemize}
-  %
-  \item While calculating $f(|\nu|)$, add a tiny value in the denominator, to
-  prevent error of divided by zero.
-  %
-  \item Also, while calculating $(s_{\pm})_j^n$, add a tiny value both in
-  numerator and denominator, to prevent evaluating $\lim_{x\rightarrow0}
-  \frac{x}{x} = 1$ wrongly to 0.
-  %
-\end{itemize}
-\citep[See also][Eq.~(3.23), (3.26), (3.27)]{chang_courant_2002}
-
-\subsection{W-2}
-
-W-2 scheme is different to W-1 scheme only for CFL insensitive scheme
-$c$-$\tau$ scheme in the following Section~\ref{s:ctau}.  W-2 scheme still uses
-Eq.~(\ref{e:alpha})
-\begin{align*}
-  (w_-)_j^n =
-    \frac{|(u_{x+})_j^n|^{\alpha}}
-         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}, \quad
-  (w_+)_j^n =
-    \frac{|(u_{x-})_j^n|^{\alpha}}
-         {|(u_{x-})_j^n|^{\alpha}+|(u_{x+})_j^n|^{\alpha}}
-\end{align*}
-However, instead of using the value to be weighted (calculated from
-$(u')_j^n(P_-)$ and $(u')_j^n(P_+)$) to calculate the weighting factors, the
-spatial difference that is not moved to $P_{\pm}$ (calculated from unmoved
-$(u')_{j\pm\frac{1}{2}}^n$) is used for weighting factor calculation.
-\cite[See also section 4.2 in][]{chang_multi-dimensional_2003}
-
-\subsection{W-3}
-
-Derived from W-1, W-3 scheme tries to amplify weighting factor with the
-deviation of itself.  Define
-\begin{align}
-  \delta_{\pm} \defeq w_{\pm} - \frac{1}{2} \label{e:W3_delta}
-\end{align}
-with $w_- + w_+ = 1$, such that $\delta_- + \delta_+ = 0$.  Let $\delta =
-|\delta_{\pm}|$, the maximum amplification factor can be defined as
-$\sigma_{\text{max}} \defeq \frac{1}{2\delta}$.  The real amplification factor
-can be then chosen to
-\begin{align}
-  \sigma = \min\left\{\frac{1}{2\delta}, \frac{\sigma_0}{|\nu|}\right\}
-  \label{e:W3_sigma}
-\end{align}
-where $\sigma_0\sim1$.  The amplified weighting factors can be determined by
-\begin{align}
-  w_{\pm}' = \frac{1}{2} + \sigma\delta_{\pm} \label{e:W3_w}
-\end{align}
-\citep[See also][Eq.~(4.16), (4.30), (4.32), (4.25)]%
-{chang_multi-dimensional_2003}
-
-\subsection{W-4}
-
-Scheme W-4 also tries to amplify the weighting factors, but in different way to
-W-3.  For $w_- = w_1 = \frac{s_1}{s_1+s_2}$, $w_+ = w_2 = \frac{s_2}{s_1+s_2}$,
-$s_1<s_2$, define
-\begin{align}
-  \eta \defeq \frac{s_2}{s_1} - 1 \label{e:W4_eta}
-\end{align}
-With the amplification factor
-\begin{align}
-  \sigma = \frac{\sigma_0}{|\nu|} \label{e:W4_sigma}
-\end{align}
-where $\sigma_0 \sim 1$ (as W-3), the weighting factors can be amplified
-as
-\begin{align}
- &\tilde{s}_1 = s_1, \tilde{s}_2 = (1+\sigma\eta)\tilde{s}_1
-  \label{e:W4_s} \\
-  \Rightarrow\quad &\tilde{w}_l = \frac{\tilde{s}_l}{\sum_i\tilde{s}_i}
-  \label{e:W4_w}
-\end{align}
-While coding this scheme up, some branching statements (if's) are needed.
-\citep[See also][Eq.(4.35), (4.37), (4.38), (4.39), (4.46)]%
-{chang_multi-dimensional_2003}
-
-\subsection{Comparison of W-series weighting schemes}
-
-Some comments of the 4 W-series weighting schemes can be made from the
-simulation result ($\nu\approx0.0004$).
-\begin{itemize}
-  \item Significant overshoot can be
-        confirmed \citep{chang_multi-dimensional_2003} in W-1 scheme (see
-        \figurename~\ref{f:W-1}).
-  \item W-3 scheme is OK, but the numerical diffusion is larger than W-2 and
-        W-4 around the discontinuity.
-  \item Despite the potential problem in W-2 (see the last two paragraph in the
-        section 4.2 of \citep{chang_multi-dimensional_2003}), its performance is
-        the best, even better than W-4.
-\end{itemize}
-
-\begin{figure}[htbp]
-  \centering
-  %\includegraphics[width=0.8\textwidth]{simple_NuniW1_4.0e-6_1.0.eps}
-  \caption{W-1 scheme (TBA).}
-  \label{f:W-1}
-  %\includegraphics[width=0.8\textwidth]{simple_NuniW2_4.0e-6_1.0.eps}
-  \caption{W-2 scheme (TBA).}
-  \label{f:W-2}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  %\includegraphics[width=0.8\textwidth]{simple_NuniW3_4.0e-6_1.0.eps}
-  \caption{W-3 scheme (TBA).}
-  \label{f:W-3}
-  %\includegraphics[width=0.8\textwidth]{simple_NuniW4_4.0e-6_1.0.eps}
-  \caption{W-4 scheme (TBA).}
-  \label{f:W-4}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 5
-\section{CFL insensitive schemes}
-\label{s:ctau}
-%%%% * Introduce CFL insensitive c-tau scheme.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The original $a$-$\varepsilon$ scheme and $c$ scheme have a problem of severe
-smearing for small Courant (CFL) number ($\nu$).  An ``ideal solver'' was
-proposed in \citep{chang_multi-dimensional_2003} named $c$-$\tau$ scheme to
-remedy this problem.
-
-$c$-$\tau$ scheme is simply a scheme that evaluates $(u_x)_j^n$ with $c$ scheme
-(Eq.~(\ref{e:cux})) while $|\nu|\rightarrow1$, and with $a$ scheme
-(Eq.~(\ref{e:aux})) while $\nu\rightarrow0$.  Note that $|\nu|<1$.  With
-$\nu\rightarrow0$, the formula for spatial derivative (Eq.~(\ref{e:aux}))
-becomes
-\begin{align*}
-  (u_x)_j^n = \frac{1}{\Delta x/2}\Big\{
-      \Big[ u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-         - \frac{\Delta x}{4}(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-      \Big]
-    - \Big[ u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-         + \frac{\Delta x}{4}(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-      \Big]
-  \Big\}
-\end{align*}
-and then
-\begin{align*}
-  (u_x)_j^n =
-  \frac{\left[(u')_j^n(M_+) - (u')_j^n(M_-)\right]}{\Delta x/2}
-\end{align*}
-since $(u')_j^n(M_{\pm}) \rightarrow u_j^{n-\frac{1}{2}}(M_{\pm})$ as
-$\nu\rightarrow0$, where $M_{\pm}$ is the spatial mid-point of
-$\mathrm{CE}_{\pm}$, as depicted in \figurename~\ref{f:ctau}.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics{ctau.eps}
-  \caption{Definition of points for CFL insensitive scheme.}
-  \label{f:ctau}
-\end{figure}
-
-In $c$-$\tau$ scheme, the spatial derivative is evaluated with
-\begin{align}
-  (u_x)_j^n = \frac{(u')_j^n(P_+) - (u')_j^n(P_-)}{(1+\tau)\Delta x/2}
-  \label{e:ctauux}
-\end{align}
-where
-\begin{align}
-  (u')_j^n(P_{\pm}) \defeq
-        (u')_{j\pm\frac{1}{2}}^n
-    \mp (1-\tau)\frac{\Delta x}{4}(u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
-  \label{e:upp}
-\end{align}
-Also referring to \figurename~\ref{f:ctau}, point $P_{\pm}$ is floated with the
-parameter $0\le\tau\le1$.  As $\tau\rightarrow0$, $P_{\pm}\rightarrow M_{\pm}$,
-the value evaluated by Eq.~(\ref{e:ctauux}) is approaching to $a$ scheme;
-on the other hand, as $\tau\rightarrow1$,
-$P_{\pm}\rightarrow(j\pm\frac{1}{2},n)$, the value evaluated is approaching to
-$c$ scheme.  By designing the strictly increasing function $\tau = \tau(s)$
-carefully \citep{chang_multi-dimensional_2003}, the ``ideal solver''
-requirement is met.
-
-Generally, there are infinitely many choices for the parameter function
-$\tau=\tau(s)$ in $c$-$\tau$ scheme.  Specifically,
-\begin{align}
-  \tau = \tau(|\nu|) = |\nu| \label{e:ctau*}
-\end{align}
-can be one of such functions, and is referred as $c$-$\tau^*$ scheme in
-\cite{chang_courant_2002, chang_multi-dimensional_2003}.
-
-In summary, the time-marching formulation for $c$-$\tau^*$ scheme are
-Eq.~(\ref{e:cu}), (\ref{e:ctauux}), along with the definition
-Eq.~(\ref{e:upp}), (\ref{e:ctau*}), and can be written as
-\begin{align*}
-  u_j^n = \frac{1}{2}\Big[
-      (1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-    + \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-    + (1-\nu)u_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-    - \frac{\Delta x}{4}(1-\nu^2)(u_x)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-  \Big]
-\end{align*}
-\begin{align*}
-  (u_x)_j^n &=
-    \frac{\left[(u')_j^n(P_+) - (u')_j^n(P_-)\right]}
-         {(1+\tau)\Delta x/2}, \\
-  (u')_j^n(P_{\pm}) &\defeq
-        (u')_{j\pm\frac{1}{2}}^n
-    \mp (1-\tau)\frac{\Delta x}{4}
-        (u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}, \\
-  \tau &\defeq |\nu|
-\end{align*}
-
-\subsection{Modification to weighting function}
-
-Various schemes to calculated the weighted average of spatial derivative can be
-deployed to $c$-$\tau$/$c$-$\tau^*$ scheme.  The simplest one is the $\alpha$
-scheme as described with Eq.~(\ref{e:alpha}).  From $\alpha$ scheme,
-Scheme-I \citep{chang_courant_2002} and W-1 scheme
-\citep{chang_multi-dimensional_2003} were developed to use Eq.~(\ref{e:alpha})
-\begin{align*}
-  (w_{\pm})_j^n =
-    \frac{|({u_x}_{\mp})_j^n|^{\alpha}}
-         {|({u_x}_-)_j^n|^{\alpha}+|({u_x}_+)_j^n|^{\alpha}}
-\end{align*}
-with Eq.~(\ref{e:ux-}), (\ref{e:ux+}) replaced with
-\begin{align}
-  (u_{x-})_j^n &\defeq
-    \frac{u_j^n - (u')_j^n(P_-)}{(1+\tau)\Delta x/4}
-  \label{e:uxp-} \\
-  (u_{x+})_j^n &\defeq
-    \frac{(u')_j^n(P_+) - u_j^n}{(1+\tau)\Delta x/4}
-  \label{e:uxp+}
-\end{align}
-While applying other weighting schemes (except W-2 scheme), just use the new
-$({u_{x}}_{\pm})_j^n$.
-
-\subsection{Extension to system of equations}
-
-While system of equations as Eq.~(\ref{e:syswave}) is considered, the
-formulation for $c$-$\tau^*$ scheme is similar to $a$-$\varepsilon$/$c$ scheme.
-Eq.~(\ref{e:sysaeu}) along with Eq.~(\ref{e:sm}) can be directly used as the
-formula for $(u_m)_j^n$,
-\begin{align*}
-  (u_m)_j^n &= \frac{1}{2}\left[
-      (u_m)_{j-1/2}^{n-1/2} + (u_m)_{j+1/2}^{n-1/2}
-    + (s_m)_{j-1/2}^{n-1/2} - (s_m)_{j+1/2}^{n-1/2}
-    \right] \\
-  (s_m)_j^n &=
-      \frac{\Delta t}  {\Delta x} (f_m)_j^n
-    + \frac{\Delta t^2}{4\Delta x}(f_{mt})_j^n
-    + \frac{\Delta x}  {4}        (u_{mx})_j^n
-\end{align*}
-$(u_{mx})_j^n$ is time-marched with the analogous formulation to
-Eq.~(\ref{e:ctauux}) along with Eq.~(\ref{e:upp}), as
-\begin{align}
-  (u_{mx})_j^n &=
-    \frac{(u_m')_j^n(P_+)-(u_m')_j^n(P_-)}
-         {(1+\tau)\Delta x/2} \\
-  (u_m')_j^n(P_{\pm}) &=
-        (u_m')_{j\pm\frac{1}{2}}^n
-    \mp (1-\tau)\frac{\Delta x}{4}(u_x)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
-\end{align}
-and $\tau=|\nu|$.  In order to time-march $(u_{mx})_j^n$, the CFL number
-($\nu$) in $c$-$\tau^*$ scheme has to be determined for the system of
-equations.  Take the 1D Euler equations (Eq.~(\ref{e:euler1}),
-(\ref{e:euler2}), (\ref{e:euler3})) for example,
-\begin{align}
-  \nu \defeq \left\{\begin{aligned}
-    &(v_j^n+c_j^n)\frac{\Delta t}{\Delta x}
-      \quad\text{for}\quad v_j^n \ge 0 \\
-    &(v_j^n-c_j^n)\frac{\Delta t}{\Delta x}
-      \quad\text{for}\quad v_j^n < 0 \\
-  \end{aligned} \right.
-  \label{e:eulernu}
-\end{align}
-where
-\begin{align}
-  v_j^n &=
-    \frac{(u_2)_j^n}{(u_1)_j^n}
-  \label{e:eulerv} \\
-  c_j^n &= \sqrt{\frac{\gamma p}{\rho}} =
-    \sqrt{\gamma(\gamma-1)
-          \left[
-              \frac{(u_3)_j^n}{(u_1)_j^n}
-            - \frac{1}{2}\left(\frac{(u_2)_j^n}{(u_1)_j^n}\right)^2
-          \right]}
-  \label{e:eulerc}
-\end{align}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 6
-\section{Non-uniform spatial mesh}
-\label{s:nuni}
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-CESE has been extended to non-uniform spatial mesh
-\citep{chang_multi-dimensional_2003}.  Generally, in the non-uniform mesh, the
-CCE can be arbitrarily non-symmetric, as depicted in
-\figurename~\ref{f:nonuni}.  The variables are evaluated on the ``solution
-points'', which is marked by $\times$ in \figurename~\ref{f:nonuni}.  This
-document has a convention to use superscript $s$ to denote value on solution
-points.  For example, $x_j^s$ denotes for the spatial location of the solution
-point of $j$-th CCE.  It should be noted that in the two BCEs within the single
-CCE, the mid mesh points are defined as
-\begin{align*}
-  x_j^{\pm} = \frac{x_{j\pm\frac{1}{2}} + x_j}{2}
-\end{align*}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics{nonuni.eps}
-  \caption{Definition of points non-uniform scheme.}
-  \label{f:nonuni}
-\end{figure}
-
-A general formulation for 1D Euler equations is given in the section 6 of
-\cite{chang_not_2008}.  The marching formulae for each half time step are
-\begin{alignat}{2}
-u_m^s &=
-    &&\frac{\Delta x_j^-}{\Delta x_j}
-      \left[
-          (u_m^s)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-        + (x_j^- - x_{j-\frac{1}{2}}^s)
-          (u_{mx})_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-      \right] \notag \\
-& &+ &\frac{\Delta x_j^+}{\Delta x_j}
-      \left[
-          (u_m^s)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-        + (x_{j+\frac{1}{2}}^s - x_j^+)
-          (u_{mx})_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-      \right] \notag \\
-& &+ &\frac{\Delta t}{2\Delta x_j}(s_m)_{j-\frac{1}{2}}^{n-\frac{1}{2}}
-   -  \frac{\Delta t}{2\Delta x_j}(s_m)_{j+\frac{1}{2}}^{n-\frac{1}{2}}
-  \label{e:nonunisys_us}
-\end{alignat}
-where
-\begin{align*}
-  (s_m)_j^n \defeq (f_m)_j^n + \frac{\Delta t}{4}(f_{mt})_j^n
-\end{align*}
-Note that $(f_m)_j$ is $f_m$ on $j$-th ``mesh'' point, so it should be
-evaluated from value at solution point as
-\begin{align*}
-  (f_m)_j^n = (f_m^s)_j^n + (x_j - x_j^s)(f_{mx})_j^n
-\end{align*}
-such that
-\begin{align}
-  (s_m)_j^n \defeq (f_m^s)_j^n + (x_j - x_j^s)(f_{mx})_j^n
-                 + \frac{\Delta t}{4}(f_{mt})_j^n
-    \label{e:nonunisys_s}
-\end{align}
-\citep[See also][Eq.~(6.39), (6.40)]{chang_not_2008}  The advance of $u_{mx}$
-is given by
-\begin{align}
-  (u_{mx})_j^n = \frac{u_m'({P_j^n}^+)-u_m'({P_j^n}^-)}
-                      {x  ({P_j^n}^+)-x  ({P_j^n}^-)}
-  \label{e:nonunisys_ux}
-\end{align}
-where
-\begin{align}
-  x({P_j^n}^{\pm}) &=
-      x_j^{\pm} + \tau(x_{j\pm\frac{1}{2}}^s-x_j^{\pm})
-    \label{e:nonunisys_xp} \\
-  u_m'({P_j^n}^{\pm}) &=
-      (u_m^s)_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
-    + \frac{\Delta t}{2}(u_{mt})_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
-    + \left[x({P_j^n}^{\pm})-x_{j\pm\frac{1}{2}}^s\right]
-      (u_{mx})_{j\pm\frac{1}{2}}^{n-\frac{1}{2}}
-    \label{e:nonunisys_upp}
-\end{align}
-\citep[See also][Eq.~(6.43), (6.33), (6.41), (6.42)]{chang_not_2008} For the
-calculation of weighted averaged (Eq.~\ref{e:weighting}), define
-\begin{align}
-  (u_{mx-})_j^n &\defeq
-    \frac{(u_m^s)_j^n-u_m'({P_j^n}^-)}{x_j^s-x({P_j^n}^-)} \\
-  (u_{mx+})_j^n &\defeq
-    \frac{u_m'({P_j^n}^+)-(u_m^s)_j^n}{x({P_j^n}^+)-x_j^s}
-\end{align}
-\citep[See also][Eq.~(6.44), (6.45)]{chang_not_2008}  CFL number should be
-determined by either
-\begin{align}
-  [\nu^{(1)}]_j^n =
-    \max\left\{
-      \frac{(c_j^n+v_j^n)\Delta t}{x_{j+1}^s-x_j^s},
-      \frac{(c_j^n-v_j^n)\Delta t}{x_j^s-x_{j-1}^s}
-    \right\} \label{e:sysnonuni_nu1}
-\end{align}
-or
-\begin{align}
-  [\nu^{(2)}]_j^n =
-    (c_j^n+v_j^n)\max\left\{
-      \frac{\Delta t}{x_{j+1}^s-x_j^s},
-      \frac{\Delta t}{x_j^s-x_{j-1}^s}
-    \right\} \label{e:sysnonuni_nu2}
-\end{align}
-If on the boundary, $x_{j+1}^s-x_j^s$, $x_j^s-x_{j-1}^s$ in Equation
-(\ref{e:sysnonuni_nu1}), (\ref{e:sysnonuni_nu2}) should be replaced to
-$2(x_{j+\frac{1}{2}}^s-x_j^s)$, $2(x_j^s-x_{j-\frac{1}{2}}^s)$.  \citep[See
-also][Eq.~(6.62), (6.64)]{chang_not_2008}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 7
-\section{Local time-stepping}
-\label{s:lts}
-%%%%
+%%
+\chapter{Two- and Three-Dimensional Unstructured Mesh}
+\label{c:ustmesh}
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Section 8
-\section{Sample code}
-\label{s:code}
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%
 \clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\addcontentsline{toc}{section}{Bibliography}
 %\bibliographystyle{myunsrtnat} % no sort (order in appearance)
 \bibliographystyle{myplainnat} % sort by author
 \bibliography{turgon_main}

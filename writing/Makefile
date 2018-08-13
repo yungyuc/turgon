@@ -53,14 +53,14 @@ $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
 	$(DO_PSTAKE) 2>&1 | \
 		tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
-%.dvi: %.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
+%.dvi: %.tex $(TRUNK)_main.bib $(TRUNK).cls $(ALL_EPS) $(MAKEFILES)
 	@echo "Having EPS files: $(ALL_EPS)"
 	mkdir -p $(LOG_DIR) ; num=1 ; while [ $$num -le $(NUM) ] ; do \
 		latex_logfile=$(LOG_DIR)/$@.latex.$$num.log ; \
 		echo -n "latex $@ #$$num ... " ; \
 		$(LATEX) $< 2>&1 | \
 			tee $$latex_logfile $(CMDLOG_DIR_REDIRECT) ; \
-		if [ -z "`grep 'No pages of output.' $$latex_logfile`" ] ; \
+		if [ -z "`grep 'LaTeX Error:' $$latex_logfile`" ] ; \
 		then \
 			echo "done" ; \
 		else \
