@@ -10,7 +10,6 @@ pdf_build:
   artifacts:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-    - ${CI_PROJECT_DIR}/writing/turgon_note.pdf
-    - ${CI_PROJECT_DIR}/writing/turgon_mesh.pdf
+    - ${CI_PROJECT_DIR}/writing/*.pdf
     - ${CI_PROJECT_DIR}/writing/log/
     expire_in: 1 week
