@@ -25,17 +25,14 @@ bottom=2cm,
 \usepackage{arydshln}
 % Authoring.
 %\usepackage{authblk}
-\usepackage[printwatermark]{xwatermark}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\graphicspath{{turgon_eps/}}
 \usepackage{subfigure}
 \usepackage{paralist}
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{setspace}
-%\usepackage{lmodern}
-
-\graphicspath{{turgon_eps/}}
 
 \renewcommand{\abstractname}{Forewords}
 \renewcommand{\figurename}{Fig.}
