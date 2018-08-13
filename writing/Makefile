@@ -49,60 +49,67 @@ ho: note_ho mesh_ho
 eps: $(ALL_EPS)
 
 $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
-	mkdir -p $(LOG_DIR) ; $(DO_PSTAKE) 2>&1 | tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
+	mkdir -p $(LOG_DIR) ; \
+	$(DO_PSTAKE) 2>&1 | \
+		tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
 %.dvi: %.tex $(TRUNK)_main.bib $(ALL_EPS) $(MAKEFILES)
 	@echo "Having EPS files: $(ALL_EPS)"
 	mkdir -p $(LOG_DIR) ; num=1 ; while [ $$num -le $(NUM) ] ; do \
 		latex_logfile=$(LOG_DIR)/$@.latex.$$num.log ; \
-		echo -n "latex $@ #$$num ... " ; $(LATEX) $< 2>&1 | tee $$latex_logfile $(CMDLOG_DIR_REDIRECT) ; \
-		if [ -z "`grep 'No pages of output.' $$latex_logfile`" ] ; then \
+		echo -n "latex $@ #$$num ... " ; \
+		$(LATEX) $< 2>&1 | \
+			tee $$latex_logfile $(CMDLOG_DIR_REDIRECT) ; \
+		if [ -z "`grep 'No pages of output.' $$latex_logfile`" ] ; \
+		then \
 			echo "done" ; \
 		else \
-			echo "tail $$latex_logfile:" ; tail $$latex_logfile ; exit -1 ; \
+			echo "tail $$latex_logfile:" ; \
+			tail $$latex_logfile ; \
+			exit -1 ; \
 		fi ; \
-		$(BIBTEX) $(basename $<) 2>&1 | tee $(LOG_DIR)/$@.bibtex.$$num.log $(CMDLOG_DIR_REDIRECT) ; \
+		$(BIBTEX) $(basename $<) 2>&1 | \
+			tee $(LOG_DIR)/$@.bibtex.$$num.log \
+			$(CMDLOG_DIR_REDIRECT) ; \
 	(( num = num + 1 )) ; done
 
 %.ps: %.dvi $(MAKEFILES)
-	mkdir -p $(LOG_DIR) ; $(DVIPS) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
+	mkdir -p $(LOG_DIR) ; \
+	$(DVIPS) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
 
 %.pdf: %.ps $(MAKEFILES)
-	mkdir -p $(LOG_DIR) ; $(PS2PDF) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
+	mkdir -p $(LOG_DIR) ; \
+	$(PS2PDF) $< 2>&1 | tee $(LOG_DIR)/$@.log $(CMDLOG_DIR_REDIRECT)
 
 .PHONY: note
-note: $(TRUNK)_note.pdf
+note: cese_note.pdf
 
 .PHONY: note_ho
-note_ho: $(TRUNK)_note.pdf
+note_ho: cese_note.pdf
 	@echo "Generating today's PDF: $(HANDOVER_FN)"
 	mkdir -p $(HANDOVER_DIR)
 	cp -f $< $(HANDOVER_FN)
 
 .PHONY: mesh
-mesh: $(TRUNK)_mesh.pdf
+mesh: ustmesh.pdf
 
 .PHONY: mesh_ho
-mesh_ho: $(TRUNK)_mesh.pdf
+mesh_ho: ustmesh.pdf
 	@echo "Generating today's PDF: $(HANDOVER_FN)"
 	mkdir -p $(HANDOVER_DIR)
 	cp -f $< $(HANDOVER_FN)
 
 .PHONY: clean_tex
 clean_tex:
-	rm -f \
-		$(TRUNK)_*.aux \
-		$(TRUNK)_*.bbl \
-		$(TRUNK)_*.blg \
-		$(TRUNK)_*.dvi \
-		$(TRUNK)_*.log \
-		$(TRUNK)_*.out \
-		$(TRUNK)_*.pdf \
-		$(TRUNK)_*.ps
+	rm -f *.aux *.bbl *.blg *.dvi *.log *.out *.xwm *.toc *.pdf *.ps
+
+.PHONY: clean_log
+clean_log:
+	rm -rf $(LOG_DIR)
 
 .PHONY: clean_eps
 clean_eps:
-	rm -rf $(LOG_DIR) $(EPS_DIR)
+	rm -rf $(EPS_DIR)
 
 .PHONY: clean
-clean: clean_tex clean_eps
+clean: clean_tex clean_log clean_eps
