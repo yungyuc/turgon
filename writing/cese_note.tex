@@ -36,9 +36,45 @@ Yung-Yu Chen
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This document introduces how to learn the mathematics behind the space-time
-conservation element and solution element (CESE) method and then develop
-computing code.
+Numerical computation, facilitated by the advancement of digital computers,
+enables all kinds of simulation that only existed by imagination.  Among them,
+hyperbolic partial differential equations (PDEs) are one significant
+application, because they demand huge amount of computing power, and alternate
+approaches to detailed knowledge of the physical process are few.  The
+importance keeps increasing when we deal with non-linear equations, which come
+from conservation laws.  Except numerical simulation, there is not an effective
+way to solve real-world problems governed by non-linear hyperbolic PDEs.
+
+The physics, mathematics, and computer code are all key to the solution.  The
+physical insight guides us what we want from the problems.  The mathematical
+expression gives us tools.  The computer code materializes the numerical
+solution.  In between mathematics and computer program, there is a staging area
+called numerical method.  It uses mathematics to describe how the computer
+program should solve the problems, but is formulated to enable the most
+efficient programming.  It must be emphasized that the numerical simulation
+demands utmost runtime performance.  An efficient numerical formulation is a
+decisive factor for the usefulness of a code.
+
+This note takes a practical approach for numerical solution of hyperbolic PDEs.
+The performance demand significantly restricts how the computer program may be
+constructed, and then calls for specially-tuned practices of software
+engineering.  The computer program is all the tangibles of what produce the
+numerical solution.  No matter how beautiful the formulation is made, a messy
+code won't deliver quality results.  This is the first side of the
+practicality.
+
+The other side is the focus on the space-time conservation element and solution
+element (CESE) method.  The strong non-linearity in conservation laws is
+notoriously challenging, but the CESE method treats it well by incorporating
+the space-time conservation.  It also takes into account the complex geometry
+in the two- and three-dimensional space from the beginning.  Simplices are the
+most basic set-up in multi-dimensional space, while extension to other mesh
+elements has been done in a comprehensive way, e.g., the use of unstructured
+spatial meshes of mixed elements.
+
+In the end, this note will help the readers to understand the CESE method, the
+mathematics behind it, and the coding and engineering skills required to
+materialize it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -53,6 +89,10 @@ To be determined.
 % * d'Alembert solution
 % * Method of characteristics
 % * Non-linear equations
+%   * Burger's equations
+% * Riemann-invariant
+%   * The shallow-water equations
+%   * The Euler equations
 % * Weak solutions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
