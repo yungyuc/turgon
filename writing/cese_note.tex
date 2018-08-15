@@ -42,8 +42,9 @@ hyperbolic partial differential equations (PDEs) are one significant
 application, because they demand huge amount of computing power, and alternate
 approaches to detailed knowledge of the physical process are few.  The
 importance keeps increasing when we deal with non-linear equations, which come
-from conservation laws.  Except numerical simulation, there is not an effective
-way to solve real-world problems governed by non-linear hyperbolic PDEs.
+from conservation laws \citep{lax_hyperbolic_1973}.  Except numerical
+simulation, there is not an effective way to solve real-world problems governed
+by non-linear hyperbolic PDEs.
 
 The physics, mathematics, and computer code are all key to the solution.  The
 physical insight guides us what we want from the problems.  The mathematical
@@ -104,30 +105,31 @@ To be determined.
 
 % TODO: reorder to a-\mu, a-\varepsion, c, c-\tau, and non-uniform grid.
 
-The space-time conservation element and solution element (CESE) method solves
-hyperbolic partial differential equations (PDEs) or conservation
-laws \citep{lax_hyperbolic_1973}
+Write the general form of a conservation law in one-dimensional space
 \begin{align*}
   \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0
+  \,.
 \end{align*}
-$u = u(x, t)$ is the dependent variable, $f(u)$ a function, and $(x, t)$ the
-space-time coordinate.  Let $\mathbf{h} \defeq (f(u),u)^t$ in two-dimensional
-space-time Euclidean space, in which $x_1=x, x_2=t$, the equation can be
-written as
-\begin{align*}
-  \nabla\cdot\mathbf{h} = 0
-\end{align*}
-In the space-time control volume $V$, assume the equation applies everywhere,
-and write
+In the equation, $u$ is the dependent variable, $f(u)$ a function of the
+dependent variable, and $(x, t)$ the space-time coordinate.  Let $\mathbf{h}
+\defeq (f(u),u)^t$ (the superscript ${}^t$ here denotes transpose) in the
+two-dimensional space-time Euclidean space, in which $x_1=x, x_2=t$.  The
+equation is then written as $\nabla\cdot\mathbf{h} = 0$.  Assume the equation
+applies everywhere in the control volume $V$, and write
 \begin{align*}
   \int_V\nabla\cdot\mathbf{h}\dif v = 0
+  \,.
 \end{align*}
-By applying divergence theorem, the differential equation is casted into the
+By applying divergence theorem, the differential equation is cast into an
 integral equation over the control surface $S(V)$ surrounding $V$
-\begin{align*}
+\begin{align}
   \oint_{S(V)}\mathbf{h}\cdot\dif\hat{\sigma} = 0
-\end{align*}
-$\dif\hat{\sigma}$ is the area vector on the control surface.
+  \,.
+  \label{e:cese:1d_integral_form}
+\end{align}
+$\dif\hat{\sigma}$ is the infinitesimal surface vector.  This
+Eq.~(\ref{e:cese:1d_integral_form}) is what the conservation element and
+solution element (CESE) method solves.
 
 The CESE method enforces flux conservation in both space and time, and the
 space-time is treated homogeneously in stencil.  Both the mesh value of
