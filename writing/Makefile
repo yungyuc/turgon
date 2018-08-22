@@ -29,8 +29,9 @@ SCHEMATIC_DIR := schematic
 
 HANDOVER_DIR := handover
 NOWDATE := $(shell date +"%Y%m%d")
+CURRENTBRANCH := $(shell git rev-parse --abbrev-ref HEAD 2> /dev/null || echo "nobranch")
 NOWID := $(shell git rev-parse --short HEAD 2> /dev/null || echo "nogit")
-HANDOVER_FN = $(HANDOVER_DIR)/$(basename $<).$(NOWID).$(NOWDATE).pdf
+HANDOVER_FN = $(HANDOVER_DIR)/$(basename $<).$(CURRENTBRANCH).$(NOWID).$(NOWDATE).pdf
 
 TRUNK := turgon
 
