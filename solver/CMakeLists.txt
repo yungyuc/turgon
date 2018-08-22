@@ -10,6 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(xtl REQUIRED)
 find_package(xsimd REQUIRED)
 find_package(xtensor REQUIRED)
+find_package(pybind11 REQUIRED)
 include_directories(${xtensor_INCLUDE_DIRS})
 
 set(SOLVER_SOURCES
