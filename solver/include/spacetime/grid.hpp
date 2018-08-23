@@ -12,6 +12,7 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xview.hpp"
 
+#include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 
 namespace spacetime
@@ -58,6 +59,7 @@ public:
     size_t nelement() const { return m_nelement; }
 
     Element element(size_t ielm);
+    Element element_at(size_t ielm);
 
     real_type x(size_t ielm) const { return m_xcoord[index_e2c(ielm,0)]; }
     real_type xleft(size_t ielm) const { return m_xcoord[index_e2c(ielm,-2)]; }
@@ -136,10 +138,29 @@ public:
         return *this;
     }
 
+    Element & move_at(ssize_t offset)
+    {
+        const ssize_t icrd = m_icrd + offset;
+        if (icrd < 0 || icrd >= m_grid->m_xcoord.size()) {
+            throw std::out_of_range(Formatter()
+                << "Element::move_at() m_icrd = " << m_icrd
+                << ", offset = " << offset << ", icrd = " << icrd
+                << " outside the interval [0, " << m_grid->m_xcoord.size() << ")"
+            );
+        }
+        m_icrd = icrd;
+        return *this;
+    }
+
     Element & move_left() { return move(-2); }
     Element & move_right() { return move(2); }
     Element & move_neg() { return move(-1); }
     Element & move_pos() { return move(1); }
+
+    Element & move_left_at() { return move_at(-2); }
+    Element & move_right_at() { return move_at(2); }
+    Element & move_neg_at() { return move_at(-1); }
+    Element & move_pos_at() { return move_at(1); }
 
 private:
 
@@ -150,6 +171,18 @@ private:
 
 inline Element Grid::element(size_t ielm)
 {
+    return Element(*this, ielm);
+}
+
+inline Element Grid::element_at(size_t ielm)
+{
+    const ssize_t icrd = this->index_e2c(ielm, 0);
+    if (icrd < 0 || icrd >= this->m_xcoord.size()) {
+        throw std::out_of_range(Formatter()
+            << "Grid::element_at() icrd = " << icrd
+            << " outside the interval [0, " << this->m_xcoord.size() << ")"
+        );
+    }
     return Element(*this, ielm);
 }
 

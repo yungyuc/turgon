@@ -24,13 +24,20 @@ class GridTC(unittest.TestCase):
             str(self.grid100.element(0)),
         )
 
+        with self.assertRaisesRegexp(
+            IndexError,
+            "Grid::element_at\\(\\) icrd = 205 outside the interval "
+            "\\[0, 205\\)",
+        ):
+            self.grid100.element(101)
+
 
 class ElementTC(unittest.TestCase):
 
     def setUp(self):
 
         self.grid100 = libst.Grid(0, 100, 100)
-        self.elm0 = libst.Element(self.grid100, 0)
+        self.elm0 = self.grid100.element(0)
 
     def test_str(self):
 

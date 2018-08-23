@@ -5,6 +5,7 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/grid.hpp"
 #include "spacetime/io.hpp"

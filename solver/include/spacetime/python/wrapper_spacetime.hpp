@@ -36,7 +36,7 @@ WrapGrid
             .def_property_readonly("xmin", &wrapped_type::xmin)
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("nelement", &wrapped_type::nelement)
-            .def("element", &wrapped_type::element)
+            .def("element", &wrapped_type::element_at)
         ;
     }
 
@@ -53,10 +53,10 @@ WrapGrid
         return def(
             "__str__",
             [](wrapped_type & self) {
-                std::ostringstream os;
-                os << "Grid(" << "xmin=" << self.xmin() << ", xmax=" << self.xmax() << ", "
-                   << "nelement=" << self.nelement() << ")";
-                return os.str();
+                return Formatter()
+                    << "Grid(" << "xmin=" << self.xmin() << ", xmax=" << self.xmax() << ", "
+                    << "nelement=" << self.nelement() << ")"
+                    >> Formatter::to_str;
             }
         );
     }
@@ -75,7 +75,6 @@ WrapElement
         : base_type(mod, pyname, clsdoc)
     {
         (*this)
-            .def(pybind11::init<Grid &, size_t>())
             .str()
             .def("duplicate", &wrapped_type::duplicate)
             .def_property_readonly("grid", &wrapped_type::grid)
@@ -84,11 +83,11 @@ WrapElement
             .def_property_readonly("x", &wrapped_type::x)
             .def_property_readonly("xneg", &wrapped_type::xneg)
             .def_property_readonly("xpos", &wrapped_type::xpos)
-            .def("move", &wrapped_type::move)
-            .def("move_left", &wrapped_type::move_left)
-            .def("move_right", &wrapped_type::move_right)
-            .def("move_neg", &wrapped_type::move_neg)
-            .def("move_pos", &wrapped_type::move_pos)
+            .def("move", &wrapped_type::move_at)
+            .def("move_left", &wrapped_type::move_left_at)
+            .def("move_right", &wrapped_type::move_right_at)
+            .def("move_neg", &wrapped_type::move_neg_at)
+            .def("move_pos", &wrapped_type::move_pos_at)
         ;
     }
 
@@ -97,10 +96,11 @@ WrapElement
         return def(
             "__str__",
             [](wrapped_type & self) {
-                std::ostringstream os;
-                os << "Element(" << (self.on_even_plane() ? "even" : "odd") << ", ";
-                os << "index=" << self.index() << ", x=" << self.x() << ", xneg=" << self.xneg() << ", xpos=" << self.xpos() << ")";
-                return os.str();
+                return Formatter()
+                    << "Element(" << (self.on_even_plane() ? "even" : "odd") << ", "
+                    << "index=" << self.index() << ", x=" << self.x() << ", "
+                    << "xneg=" << self.xneg() << ", xpos=" << self.xpos() << ")"
+                    >> Formatter::to_str;
             }
         );
     }
