@@ -42,11 +42,7 @@ public:
         return instance;
     }
 
-    Grid(real_type xmin, real_type xmax, size_t nelm, ctor_passkey const &)
-      : m_xmin(xmin), m_xmax(xmax), m_nelement(nelm)
-    {
-        initialize_arrays();
-    }
+    Grid(real_type xmin, real_type xmax, size_t nelement, ctor_passkey const &);
 
     Grid() = delete;
     Grid(Grid const & ) = delete;
@@ -59,7 +55,9 @@ public:
     size_t nelement() const { return m_nelement; }
 
     Element element(size_t ielm);
+    Element element(size_t ielm, bool odd_plane);
     Element element_at(size_t ielm);
+    Element element_at(size_t ielm, bool odd_plane);
 
     real_type x(size_t ielm) const { return m_xcoord[index_e2c(ielm,0)]; }
     real_type xleft(size_t ielm) const { return m_xcoord[index_e2c(ielm,-2)]; }
@@ -69,32 +67,30 @@ public:
 
 private:
 
-    void initialize_arrays()
-    {
-        // Mark the boundary of conservation elements.
-        const real_type xspace = (m_xmax - m_xmin) / m_nelement;
-        const array_type mark = xt::arange(m_xmin-xspace, m_xmax+xspace*2, xspace);
-        // Fill x-coordinates.
-        auto left = xt::view(mark, xt::range(0, mark.size()-1));
-        auto right = xt::view(mark, xt::range(1, mark.size()));
-        const array_type middle = (left + right) / 2;
-        m_xcoord = array_type(std::vector<size_t>{mark.size() + middle.size()});
-        for (size_t it=0; it<middle.size(); ++it) {
-            m_xcoord[it*2] = mark[it];
-            m_xcoord[it*2+1] = middle[it];
-        }
-        m_xcoord[m_xcoord.size()-1] = mark[mark.size()-1];
-    }
-
     /**
      * Convert element index to coordinate index.
      */
-    size_t index_e2c(size_t ielm, ssize_t offset) const { return 3 + ielm*2 + offset; }
+    size_t index_e2c(size_t ielm, ssize_t offset) const { return 1 + ielm*2 + offset; }
+    size_t index_e2c(size_t ielm, ssize_t offset, bool odd_plane) const
+    {
+        size_t icrd = 1 + ielm*2 + offset;
+        if (odd_plane) { ++icrd; }
+        return icrd;
+    }
+
+    real_type       * xptr()       { return m_xcoord.data(); }
+    real_type const * xptr() const { return m_xcoord.data(); }
+    real_type       * xptr(size_t icrd)       { return m_xcoord.data() + icrd; }
+    real_type const * xptr(size_t icrd) const { return m_xcoord.data() + icrd; }
+    real_type       * xptr(size_t ielm, ssize_t offset)       { return m_xcoord.data() + index_e2c(ielm, offset); }
+    real_type const * xptr(size_t ielm, ssize_t offset) const { return m_xcoord.data() + index_e2c(ielm, offset); }
+    real_type       * xptr(size_t ielm, ssize_t offset, bool odd_plane)       { return m_xcoord.data() + index_e2c(ielm, offset, odd_plane); }
+    real_type const * xptr(size_t ielm, ssize_t offset, bool odd_plane) const { return m_xcoord.data() + index_e2c(ielm, offset, odd_plane); }
 
     /**
      * Convert coordinate index to element index.
      */
-    size_t index_c2e(size_t icrd) const { return (icrd - 3) >> 1; }
+    size_t index_c2e(size_t icrd) const { return (icrd - 1) >> 1; }
 
     real_type m_xmin;
     real_type m_xmax;
@@ -107,6 +103,26 @@ private:
 
 }; /* end class Grid */
 
+inline
+Grid::Grid(real_type xmin, real_type xmax, size_t nelement, ctor_passkey const &)
+  : m_xmin(xmin), m_xmax(xmax), m_nelement(nelement)
+{
+    // Mark the boundary of conservation elements.
+    const real_type xspace = (xmax - xmin) / nelement;
+    m_xcoord = array_type(std::vector<size_t>{nelement*2+1});
+    // Fill x-coordinates at CE boundary.
+    for (size_t it=0; it<nelement; ++it)
+    {
+        m_xcoord[it*2] = xmin + xspace * it;
+    }
+    m_xcoord[m_xcoord.size()-1] = xmax;
+    // Fill x-coordinates at CE center.
+    for (size_t it=0; it<nelement; ++it)
+    {
+        m_xcoord[it*2+1] = (m_xcoord[it*2] + m_xcoord[it*2+2])/2;
+    }
+}
+
 /**
  * A compound conservation element.
  */
@@ -117,40 +133,33 @@ public:
 
     Element(Grid & grid, size_t index)
       : m_grid(&grid)
-      , m_icrd(grid.index_e2c(index, 0))
+      , m_xptr(grid.xptr(index, 0))
     {}
 
+    Element(Grid & grid, size_t index, bool odd_plane)
+      : m_grid(&grid)
+      , m_xptr(grid.xptr(index, 0, odd_plane))
+    {}
+ 
     Element duplicate() const { return *this; }
     std::shared_ptr<Grid> grid() const { return m_grid->shared_from_this(); }
-    index_type index() const { return m_grid->index_c2e(m_icrd); }
+    index_type index() const { return m_grid->index_c2e(coord_index()); }
     /**
      * Return true for even plane, false for odd plane (temporal).
      */
-    bool on_even_plane() const { return !bool((m_icrd - 3) & 1); }
+    bool on_even_plane() const { return !bool((coord_index() - 1) & 1); }
 
-    real_type x() const { return m_grid->m_xcoord(m_icrd); }
-    real_type xneg() const { return m_grid->m_xcoord(m_icrd-1); }
-    real_type xpos() const { return m_grid->m_xcoord(m_icrd+1); }
+    real_type x() const { return m_grid->m_xcoord(coord_index()); }
+    real_type xneg() const { return m_grid->m_xcoord(coord_index()-1); }
+    real_type xpos() const { return m_grid->m_xcoord(coord_index()+1); }
 
     Element & move(ssize_t offset)
     {
-        m_icrd += offset;
+        m_xptr += offset;
         return *this;
     }
 
-    Element & move_at(ssize_t offset)
-    {
-        const ssize_t icrd = m_icrd + offset;
-        if (icrd < 0 || icrd >= m_grid->m_xcoord.size()) {
-            throw std::out_of_range(Formatter()
-                << "Element::move_at() m_icrd = " << m_icrd
-                << ", offset = " << offset << ", icrd = " << icrd
-                << " outside the interval [0, " << m_grid->m_xcoord.size() << ")"
-            );
-        }
-        m_icrd = icrd;
-        return *this;
-    }
+    Element & move_at(ssize_t offset);
 
     Element & move_left() { return move(-2); }
     Element & move_right() { return move(2); }
@@ -164,8 +173,12 @@ public:
 
 private:
 
+    size_t coord_index() const { return m_xptr - m_grid->xptr(); }
+
     Grid * m_grid;
-    size_t m_icrd; //< Coordinate index.
+    real_type * m_xptr;
+
+    friend Grid;
 
 }; /* end class Element */
 
@@ -174,16 +187,47 @@ inline Element Grid::element(size_t ielm)
     return Element(*this, ielm);
 }
 
+inline Element Grid::element(size_t ielm, bool odd_plane)
+{
+    return Element(*this, ielm, odd_plane);
+}
+ 
 inline Element Grid::element_at(size_t ielm)
 {
-    const ssize_t icrd = this->index_e2c(ielm, 0);
-    if (icrd < 0 || icrd >= this->m_xcoord.size()) {
+    const Element elm = element(ielm);
+    if (elm.coord_index() < 1 || elm.coord_index() >= this->m_xcoord.size()-1) {
         throw std::out_of_range(Formatter()
-            << "Grid::element_at() icrd = " << icrd
-            << " outside the interval [0, " << this->m_xcoord.size() << ")"
+            << "Grid::element_at(ielm=" << ielm << ") icrd = " << elm.coord_index()
+            << " outside the interval [1, " << this->m_xcoord.size()-1 << ")"
         );
     }
-    return Element(*this, ielm);
+    return elm;
+}
+
+inline Element Grid::element_at(size_t ielm, bool odd_plane)
+{
+    const Element elm = element(ielm, odd_plane);
+    if (elm.coord_index() < 1 || elm.coord_index() >= this->m_xcoord.size()-1) {
+        throw std::out_of_range(Formatter()
+            << "Grid::element_at(ielm=" << ielm << ", odd_plane=" << odd_plane
+            << ") icrd = " << elm.coord_index()
+            << " outside the interval [1, " << this->m_xcoord.size()-1 << ")"
+        );
+    }
+    return elm;
+}
+
+inline Element & Element::move_at(ssize_t offset)
+{
+    const ssize_t icrd = coord_index() + offset;
+    if (icrd < 1 || icrd >= m_grid->m_xcoord.size()-1) {
+        throw std::out_of_range(Formatter()
+            << "Element::move_at() (coord_index = " << coord_index()
+            << ", offset = " << offset << ") icrd = " << icrd
+            << " outside the interval [1, " << m_grid->m_xcoord.size()-1 << ")"
+        );
+    }
+    return move(offset);
 }
 
 } /* end namespace spacetime */

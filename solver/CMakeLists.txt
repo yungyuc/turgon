@@ -23,10 +23,10 @@ set(SPACETIME_HEADERS
     # Overall.
     include/spacetime.hpp
     # Others.
-    include/spacetime/system.hpp
-    include/spacetime/type.hpp
     include/spacetime/grid.hpp
     include/spacetime/io.hpp
+    include/spacetime/system.hpp
+    include/spacetime/type.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
        SPACETIME_HEADERS "${SPACETIME_HEADERS}")

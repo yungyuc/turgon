@@ -36,7 +36,11 @@ WrapGrid
             .def_property_readonly("xmin", &wrapped_type::xmin)
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("nelement", &wrapped_type::nelement)
-            .def("element", &wrapped_type::element_at)
+            .def(
+                "element",
+                static_cast<Element (wrapped_type::*)(size_t, bool)>(&wrapped_type::element_at),
+                pybind11::arg("ielm"), pybind11::arg("odd_plane")=false
+            )
         ;
     }
 
@@ -77,6 +81,7 @@ WrapElement
         (*this)
             .str()
             .def("duplicate", &wrapped_type::duplicate)
+            .def_property_readonly("dup", &wrapped_type::duplicate)
             .def_property_readonly("grid", &wrapped_type::grid)
             .def_property_readonly("index", &wrapped_type::index)
             .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
