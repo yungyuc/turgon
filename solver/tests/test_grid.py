@@ -14,42 +14,42 @@ class GridTC(unittest.TestCase):
 
     def test_str(self):
 
-        self.assertEqual("Grid(xmin=0, xmax=10, nelement=10)",
+        self.assertEqual("Grid(xmin=0, xmax=10, ncelm=10)",
                          str(self.grid10))
 
-    def test_element(self):
+    def test_celm(self):
 
         with self.assertRaises(TypeError):
-            self.grid10.element(-1)
+            self.grid10.celm(-1)
 
         self.assertEqual(
             "Celm(even, index=0, x=0.5, xneg=0, xpos=1)",
-            str(self.grid10.element(0)),
+            str(self.grid10.celm(0)),
         )
 
         self.assertEqual(
             "Celm(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
-            str(self.grid10.element(0, odd_plane=True)),
+            str(self.grid10.celm(0, odd_plane=True)),
         )
 
         self.assertEqual(
             "Celm(even, index=9, x=9.5, xneg=9, xpos=10)",
-            str(self.grid10.element(9, odd_plane=False)),
+            str(self.grid10.celm(9, odd_plane=False)),
         )
 
         with self.assertRaisesRegexp(
             IndexError,
-            "Grid::element_at\(ielm=9, odd_plane=1\) icrd = 20 "
+            "Grid::celm_at\(ielm=9, odd_plane=1\): xindex = 20 "
             "outside the interval \[1, 20\)",
         ):
-            self.grid10.element(9, odd_plane=True)
+            self.grid10.celm(9, odd_plane=True)
 
         with self.assertRaisesRegexp(
             IndexError,
-            "Grid::element_at\(ielm=10, odd_plane=0\) icrd = 21 "
+            "Grid::celm_at\(ielm=10, odd_plane=0\): xindex = 21 "
             "outside the interval \[1, 20\)",
         ):
-            self.grid10.element(10)
+            self.grid10.celm(10)
 
 
 class CelmTC(unittest.TestCase):
@@ -57,8 +57,8 @@ class CelmTC(unittest.TestCase):
     def setUp(self):
 
         self.grid10 = libst.Grid(0, 10, 10)
-        self.elm0 = self.grid10.element(0)
-        self.elm9 = self.grid10.element(9)
+        self.elm0 = self.grid10.celm(0)
+        self.elm9 = self.grid10.celm(9)
 
     def test_str(self):
 
@@ -79,7 +79,7 @@ class CelmTC(unittest.TestCase):
         # "dup" attribute is a shorthand for duplicate() function.
         self.assertEqual(golden, str(self.elm0.dup))
 
-        # Duplicated element has standalone index.
+        # Duplicated celm has standalone index.
         elm = self.elm0.dup
         elm.move(1)
         self.assertEqual(
@@ -134,16 +134,32 @@ class CelmTC(unittest.TestCase):
         elm0d = self.elm0.dup
         with self.assertRaisesRegexp(
             IndexError,
-            "Celm::move_at\(\) \(coord_index = 1, offset = -1\) icrd = 0 "
+            "Celm\(xindex=1\)::move_at\(offset=-1\): xindex = 0 "
             "outside the interval \[1, 20\)",
         ):
             elm0d.move_neg()
         elm9d = self.elm9.dup
         with self.assertRaisesRegexp(
             IndexError,
-            "Celm::move_at\(\) \(coord_index = 19, offset = 1\) icrd = 20 "
+            "Celm\(xindex=19\)::move_at\(offset=1\): xindex = 20 "
             "outside the interval \[1, 20\)",
         ):
             elm9d.move_pos()
+
+class SelmTC(unittest.TestCase):
+
+    def setUp(self):
+
+        self.grid10 = libst.Grid(0, 10, 10)
+        self.se0 = self.grid10.selm(0)
+        self.se9 = self.grid10.selm(9)
+        self.se10 = self.grid10.selm(10)
+
+    def test_str(self):
+
+        self.assertEqual(
+            "Selm(index=0, x=0)",
+            str(self.se0),
+        )
 
 # vim: set et sw=4 ts=4:

@@ -30,6 +30,7 @@ PyObject * ModuleInitializer::initialize_spacetime(pybind11::module & mod)
 
     WrapGrid::commit(mod, "Grid", "Spatial grid");
     WrapCelm::commit(mod, "Celm", "Conservation element");
+    WrapSelm::commit(mod, "Selm", "Solution element");
 
     return mod.ptr();
 }

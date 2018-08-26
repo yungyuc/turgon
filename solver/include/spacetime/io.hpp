@@ -14,7 +14,7 @@ namespace spacetime
 
 std::ostream& operator<<(std::ostream& os, const Grid & grid)
 {
-    os << "Grid(xmin=" << grid.xmin() << ", xmax=" << grid.xmax() << ", nelement=" << grid.nelement() << ", ncoord=" << grid.m_xcoord.size() << ")";
+    os << "Grid(xmin=" << grid.xmin() << ", xmax=" << grid.xmax() << ", ncelm=" << grid.ncelm() << ", ncoord=" << grid.m_xcoord.size() << ")";
     return os;
 }
 
