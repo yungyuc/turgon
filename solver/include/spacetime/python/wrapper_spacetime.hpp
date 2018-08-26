@@ -101,6 +101,14 @@ protected:
             .def_property_readonly("x", &wrapped_type::x)
             .def_property_readonly("xneg", &wrapped_type::xneg)
             .def_property_readonly("xpos", &wrapped_type::xpos)
+            // On the template derivation.
+            .def_property_readonly("index", &wrapped_type::index)
+            .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
+            .def("move", &wrapped_type::move_at)
+            .def("move_left", &wrapped_type::move_left_at)
+            .def("move_right", &wrapped_type::move_right_at)
+            .def("move_neg", &wrapped_type::move_neg_at)
+            .def("move_pos", &wrapped_type::move_pos_at)
         ;
     }
 
@@ -124,13 +132,6 @@ WrapCelm
     {
         (*this)
             .str()
-            .def_property_readonly("index", &wrapped_type::index)
-            .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
-            .def("move", &wrapped_type::move_at)
-            .def("move_left", &wrapped_type::move_left_at)
-            .def("move_right", &wrapped_type::move_right_at)
-            .def("move_neg", &wrapped_type::move_neg_at)
-            .def("move_pos", &wrapped_type::move_pos_at)
         ;
     }
 
@@ -179,8 +180,9 @@ WrapSelm
             "__str__",
             [](wrapped_type & self) {
                 return Formatter()
-                    << "Selm("
-                    << "index=" << self.index() << ", x=" << self.x() << ")"
+                    << "Selm(" << (self.on_even_plane() ? "even" : "odd") << ", "
+                    << "index=" << self.index() << ", x=" << self.x() << ", "
+                    << "xneg=" << self.xneg() << ", xpos=" << self.xpos() << ")"
                     >> Formatter::to_str;
             }
         );

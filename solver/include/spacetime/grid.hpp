@@ -97,7 +97,7 @@ private:
     /**
      * Convert celm index to coordinate index.
      */
-    size_t xindex_celm(size_t ielm) const { return 1 + ielm*2; }
+    size_t xindex_celm(size_t ielm) const { return 2 + (ielm << 1); }
     size_t xindex_celm(size_t ielm, bool odd_plane) const
     {
         size_t xindex = xindex_celm(ielm);
@@ -108,7 +108,7 @@ private:
     /**
      * Convert selm index to coordinate index.
      */
-    size_t xindex_selm(size_t ielm) const { return ielm*2; }
+    size_t xindex_selm(size_t ielm) const { return 1 + (ielm << 1); }
     size_t xindex_selm(size_t ielm, bool odd_plane) const
     {
         size_t xindex = xindex_selm(ielm);
@@ -139,20 +139,37 @@ inline
 Grid::Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &)
   : m_xmin(xmin), m_xmax(xmax), m_ncelm(ncelm)
 {
+    if (ncelm < 1) {
+        throw std::invalid_argument(Formatter()
+            << "Grid::Grid(xmin=" << xmin << ", xmax=" << xmax
+            << ", ncelm=" << ncelm << ") invalid argument: ncelm smaller than 1"
+        );
+    }
+    if (xmin >= xmax) {
+        throw std::invalid_argument(Formatter()
+            << "Grid::Grid(xmin=" << xmin << ", xmax=" << xmax
+            << ", ncelm=" << ncelm << ") invalid arguments: xmin >= xmax"
+        );
+    }
     // Mark the boundary of conservation celms.
     const real_type xspace = (xmax - xmin) / ncelm;
-    m_xcoord = array_type(std::vector<size_t>{ncelm*2+1});
+    const size_t nx = ncelm*2+3;
+    m_xcoord = array_type(std::vector<size_t>{nx});
     // Fill x-coordinates at CE boundary.
-    for (size_t it=0; it<ncelm; ++it)
+    m_xcoord[1] = xmin;
+    for (size_t it=3; it<nx-2; it+=2)
     {
-        m_xcoord[it*2] = xmin + xspace * it;
+        m_xcoord[it] = m_xcoord[it-2] + xspace;
     }
-    m_xcoord[m_xcoord.size()-1] = xmax;
+    m_xcoord[nx-2] = xmax;
     // Fill x-coordinates at CE center.
     for (size_t it=0; it<ncelm; ++it)
     {
-        m_xcoord[it*2+1] = (m_xcoord[it*2] + m_xcoord[it*2+2])/2;
+        m_xcoord[it*2+2] = (m_xcoord[it*2+1] + m_xcoord[it*2+3])/2;
     }
+    // Fill the front and back values.
+    m_xcoord[0] = m_xcoord[1] + m_xcoord[1] - m_xcoord[2];
+    m_xcoord[nx-1] = m_xcoord[nx-2] + m_xcoord[nx-2] - m_xcoord[nx-3];
 }
 
 template< class ET >
@@ -213,12 +230,12 @@ public:
     /**
      * Celm index.
      */
-    index_type index() const { return (xindex() - 1) >> 1; }
+    index_type index() const { return (xindex() - 2) >> 1; }
 
     /**
      * Return true for even plane, false for odd plane (temporal).
      */
-    bool on_even_plane() const { return !bool((xindex() - 1) & 1); }
+    bool on_even_plane() const { return !bool((xindex() - 2) & 1); }
 
     Celm & move(ssize_t offset)
     {
@@ -243,11 +260,11 @@ public:
 Celm & Celm::move_at(ssize_t offset)
 {
     const ssize_t xindex = this->xindex() + offset;
-    if (xindex < 1 || xindex >= m_grid->xsize()-1) {
+    if (xindex < 2 || xindex >= m_grid->xsize()-2) {
         throw std::out_of_range(Formatter()
             << "Celm(xindex=" << this->xindex() << ")::move_at(offset=" << offset
             << "): xindex = " << xindex
-            << " outside the interval [1, " << m_grid->xsize()-1 << ")"
+            << " outside the interval [2, " << m_grid->xsize()-2 << ")"
         );
     }
     return move(offset);
@@ -266,10 +283,10 @@ inline Celm Grid::celm(size_t ielm, bool odd_plane)
 inline Celm Grid::celm_at(size_t ielm)
 {
     const Celm elm = celm(ielm);
-    if (elm.xindex() < 1 || elm.xindex() >= this->xsize()-1) {
+    if (elm.xindex() < 2 || elm.xindex() >= this->xsize()-2) {
         throw std::out_of_range(Formatter()
             << "Grid::celm_at(ielm=" << ielm << "): xindex = " << elm.xindex()
-            << " outside the interval [1, " << this->xsize()-1 << ")"
+            << " outside the interval [2, " << this->xsize()-2 << ")"
         );
     }
     return elm;
@@ -278,11 +295,11 @@ inline Celm Grid::celm_at(size_t ielm)
 inline Celm Grid::celm_at(size_t ielm, bool odd_plane)
 {
     const Celm elm = celm(ielm, odd_plane);
-    if (elm.xindex() < 1 || elm.xindex() >= this->xsize()-1) {
+    if (elm.xindex() < 2 || elm.xindex() >= this->xsize()-2) {
         throw std::out_of_range(Formatter()
             << "Grid::celm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
             << "): xindex = " << elm.xindex()
-            << " outside the interval [1, " << this->xsize()-1 << ")"
+            << " outside the interval [2, " << this->xsize()-2 << ")"
         );
     }
     return elm;
@@ -292,7 +309,7 @@ inline Celm Grid::celm_at(size_t ielm, bool odd_plane)
  * A solution element.
  */
 class Selm
-  : public ElementBase<Celm>
+  : public ElementBase<Selm>
 {
 
 public:
@@ -314,14 +331,45 @@ public:
     /**
      * Selm index.
      */
-    index_type index() const { return xindex() >> 1; }
+    index_type index() const { return (xindex() - 1) >> 1; }
 
     /**
      * Return true for even plane, false for odd plane (temporal).
      */
-    bool on_even_plane() const { return !bool(xindex() & 1); }
+    bool on_even_plane() const { return !bool((xindex() - 1) & 1); }
+
+    Selm & move(ssize_t offset)
+    {
+        m_xptr += offset;
+        return *static_cast<Selm *>(this);
+    }
+
+    Selm & move_at(ssize_t offset);
+
+    Selm & move_left() { return move(-2); }
+    Selm & move_right() { return move(2); }
+    Selm & move_neg() { return move(-1); }
+    Selm & move_pos() { return move(1); }
+
+    Selm & move_left_at() { return move_at(-2); }
+    Selm & move_right_at() { return move_at(2); }
+    Selm & move_neg_at() { return move_at(-1); }
+    Selm & move_pos_at() { return move_at(1); }
 
 }; /* end class Selm */
+
+Selm & Selm::move_at(ssize_t offset)
+{
+    const ssize_t xindex = this->xindex() + offset;
+    if (xindex < 1 || xindex >= m_grid->xsize()-1) {
+        throw std::out_of_range(Formatter()
+            << "Selm(xindex=" << this->xindex() << ")::move_at(offset=" << offset
+            << "): xindex = " << xindex
+            << " outside the interval [1, " << m_grid->xsize()-1 << ")"
+        );
+    }
+    return move(offset);
+}
 
 inline Selm Grid::selm(size_t ielm)
 {
@@ -336,10 +384,10 @@ inline Selm Grid::selm(size_t ielm, bool odd_plane)
 inline Selm Grid::selm_at(size_t ielm)
 {
     const Selm elm = selm(ielm);
-    if (static_cast<ssize_t>(elm.xindex()) < 0 || elm.xindex() >= this->xsize()) {
+    if (elm.xindex() < 1 || elm.xindex() >= this->xsize()-1) {
         throw std::out_of_range(Formatter()
             << "Grid::selm_at(ielm=" << ielm << "): xindex = " << elm.xindex()
-            << " outside the interval [0, " << this->xsize() << ")"
+            << " outside the interval [1, " << this->xsize()-1 << ")"
         );
     }
     return elm;
@@ -348,11 +396,11 @@ inline Selm Grid::selm_at(size_t ielm)
 inline Selm Grid::selm_at(size_t ielm, bool odd_plane)
 {
     const Selm elm = selm(ielm, odd_plane);
-    if (static_cast<ssize_t>(elm.xindex()) < 0 || elm.xindex() >= this->xsize()) {
+    if (elm.xindex() < 1 || elm.xindex() >= this->xsize()-1) {
         throw std::out_of_range(Formatter()
             << "Grid::selm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
             << "): xindex = " << elm.xindex()
-            << " outside the interval [0, " << this->xsize() << ")"
+            << " outside the interval [1, " << this->xsize()-1 << ")"
         );
     }
     return elm;
