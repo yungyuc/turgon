@@ -18,9 +18,9 @@ std::ostream& operator<<(std::ostream& os, const Grid & grid)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Element & elm)
+std::ostream& operator<<(std::ostream& os, const Celm & elm)
 {
-    os << "Element(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
+    os << "Celm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
     os << "index=" << elm.index() << ", x=" << elm.x() << ", xneg=" << elm.xneg() << ", xpos=" << elm.xpos() << ")";
     return os;
 }

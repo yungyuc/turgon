@@ -18,7 +18,7 @@
 namespace spacetime
 {
 
-class Element;
+class Celm;
 
 class Grid
   : public std::enable_shared_from_this<Grid>
@@ -54,10 +54,10 @@ public:
     real_type xmax() const { return m_xmax; }
     size_t nelement() const { return m_nelement; }
 
-    Element element(size_t ielm);
-    Element element(size_t ielm, bool odd_plane);
-    Element element_at(size_t ielm);
-    Element element_at(size_t ielm, bool odd_plane);
+    Celm element(size_t ielm);
+    Celm element(size_t ielm, bool odd_plane);
+    Celm element_at(size_t ielm);
+    Celm element_at(size_t ielm, bool odd_plane);
 
     real_type x(size_t ielm) const { return m_xcoord[index_e2c(ielm,0)]; }
     real_type xleft(size_t ielm) const { return m_xcoord[index_e2c(ielm,-2)]; }
@@ -98,7 +98,7 @@ private:
 
     array_type m_xcoord;
 
-    friend Element;
+    friend Celm;
     friend std::ostream& operator<<(std::ostream& os, const Grid & grid);
 
 }; /* end class Grid */
@@ -126,22 +126,22 @@ Grid::Grid(real_type xmin, real_type xmax, size_t nelement, ctor_passkey const &
 /**
  * A compound conservation element.
  */
-class Element
+class Celm
 {
 
 public:
 
-    Element(Grid & grid, size_t index)
+    Celm(Grid & grid, size_t index)
       : m_grid(&grid)
       , m_xptr(grid.xptr(index, 0))
     {}
 
-    Element(Grid & grid, size_t index, bool odd_plane)
+    Celm(Grid & grid, size_t index, bool odd_plane)
       : m_grid(&grid)
       , m_xptr(grid.xptr(index, 0, odd_plane))
     {}
  
-    Element duplicate() const { return *this; }
+    Celm duplicate() const { return *this; }
     std::shared_ptr<Grid> grid() const { return m_grid->shared_from_this(); }
     index_type index() const { return m_grid->index_c2e(coord_index()); }
     /**
@@ -153,23 +153,23 @@ public:
     real_type xneg() const { return m_grid->m_xcoord(coord_index()-1); }
     real_type xpos() const { return m_grid->m_xcoord(coord_index()+1); }
 
-    Element & move(ssize_t offset)
+    Celm & move(ssize_t offset)
     {
         m_xptr += offset;
         return *this;
     }
 
-    Element & move_at(ssize_t offset);
+    Celm & move_at(ssize_t offset);
 
-    Element & move_left() { return move(-2); }
-    Element & move_right() { return move(2); }
-    Element & move_neg() { return move(-1); }
-    Element & move_pos() { return move(1); }
+    Celm & move_left() { return move(-2); }
+    Celm & move_right() { return move(2); }
+    Celm & move_neg() { return move(-1); }
+    Celm & move_pos() { return move(1); }
 
-    Element & move_left_at() { return move_at(-2); }
-    Element & move_right_at() { return move_at(2); }
-    Element & move_neg_at() { return move_at(-1); }
-    Element & move_pos_at() { return move_at(1); }
+    Celm & move_left_at() { return move_at(-2); }
+    Celm & move_right_at() { return move_at(2); }
+    Celm & move_neg_at() { return move_at(-1); }
+    Celm & move_pos_at() { return move_at(1); }
 
 private:
 
@@ -180,21 +180,21 @@ private:
 
     friend Grid;
 
-}; /* end class Element */
+}; /* end class Celm */
 
-inline Element Grid::element(size_t ielm)
+inline Celm Grid::element(size_t ielm)
 {
-    return Element(*this, ielm);
+    return Celm(*this, ielm);
 }
 
-inline Element Grid::element(size_t ielm, bool odd_plane)
+inline Celm Grid::element(size_t ielm, bool odd_plane)
 {
-    return Element(*this, ielm, odd_plane);
+    return Celm(*this, ielm, odd_plane);
 }
  
-inline Element Grid::element_at(size_t ielm)
+inline Celm Grid::element_at(size_t ielm)
 {
-    const Element elm = element(ielm);
+    const Celm elm = element(ielm);
     if (elm.coord_index() < 1 || elm.coord_index() >= this->m_xcoord.size()-1) {
         throw std::out_of_range(Formatter()
             << "Grid::element_at(ielm=" << ielm << ") icrd = " << elm.coord_index()
@@ -204,9 +204,9 @@ inline Element Grid::element_at(size_t ielm)
     return elm;
 }
 
-inline Element Grid::element_at(size_t ielm, bool odd_plane)
+inline Celm Grid::element_at(size_t ielm, bool odd_plane)
 {
-    const Element elm = element(ielm, odd_plane);
+    const Celm elm = element(ielm, odd_plane);
     if (elm.coord_index() < 1 || elm.coord_index() >= this->m_xcoord.size()-1) {
         throw std::out_of_range(Formatter()
             << "Grid::element_at(ielm=" << ielm << ", odd_plane=" << odd_plane
@@ -217,18 +217,22 @@ inline Element Grid::element_at(size_t ielm, bool odd_plane)
     return elm;
 }
 
-inline Element & Element::move_at(ssize_t offset)
+inline Celm & Celm::move_at(ssize_t offset)
 {
     const ssize_t icrd = coord_index() + offset;
     if (icrd < 1 || icrd >= m_grid->m_xcoord.size()-1) {
         throw std::out_of_range(Formatter()
-            << "Element::move_at() (coord_index = " << coord_index()
+            << "Celm::move_at() (coord_index = " << coord_index()
             << ", offset = " << offset << ") icrd = " << icrd
             << " outside the interval [1, " << m_grid->m_xcoord.size()-1 << ")"
         );
     }
     return move(offset);
 }
+
+class SolutionElement
+{
+}; /* end class SolutionElement */
 
 } /* end namespace spacetime */
 

@@ -10,13 +10,13 @@ element (CESE) method
 
 from ._libst import (
     Grid,
-    Element,
+    Celm,
 )
 
 
 __all__ = [
     'Grid',
-    'Element',
+    'Celm',
 ]
 
 # vim: set et sw=4 ts=4:

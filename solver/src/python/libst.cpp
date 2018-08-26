@@ -29,7 +29,7 @@ PyObject * ModuleInitializer::initialize_spacetime(pybind11::module & mod)
     mod.doc() = "_libst: One-dimensional space-time CESE method code";
 
     WrapGrid::commit(mod, "Grid", "Spatial grid");
-    WrapElement::commit(mod, "Element", "Conservation element");
+    WrapCelm::commit(mod, "Celm", "Conservation element");
 
     return mod.ptr();
 }

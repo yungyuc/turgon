@@ -38,7 +38,7 @@ WrapGrid
             .def_property_readonly("nelement", &wrapped_type::nelement)
             .def(
                 "element",
-                static_cast<Element (wrapped_type::*)(size_t, bool)>(&wrapped_type::element_at),
+                static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::element_at),
                 pybind11::arg("ielm"), pybind11::arg("odd_plane")=false
             )
         ;
@@ -69,13 +69,13 @@ WrapGrid
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapElement
-  : public WrapBase< WrapElement, Element >
+WrapCelm
+  : public WrapBase< WrapCelm, Celm >
 {
 
     friend base_type;
 
-    WrapElement(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
         : base_type(mod, pyname, clsdoc)
     {
         (*this)
@@ -102,7 +102,7 @@ WrapElement
             "__str__",
             [](wrapped_type & self) {
                 return Formatter()
-                    << "Element(" << (self.on_even_plane() ? "even" : "odd") << ", "
+                    << "Celm(" << (self.on_even_plane() ? "even" : "odd") << ", "
                     << "index=" << self.index() << ", x=" << self.x() << ", "
                     << "xneg=" << self.xneg() << ", xpos=" << self.xpos() << ")"
                     >> Formatter::to_str;
@@ -110,7 +110,7 @@ WrapElement
         );
     }
 
-}; /* end class WrapElement */
+}; /* end class WrapCelm */
 
 } /* end namespace python */
 

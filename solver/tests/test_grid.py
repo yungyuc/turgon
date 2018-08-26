@@ -23,17 +23,17 @@ class GridTC(unittest.TestCase):
             self.grid10.element(-1)
 
         self.assertEqual(
-            "Element(even, index=0, x=0.5, xneg=0, xpos=1)",
+            "Celm(even, index=0, x=0.5, xneg=0, xpos=1)",
             str(self.grid10.element(0)),
         )
 
         self.assertEqual(
-            "Element(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
+            "Celm(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
             str(self.grid10.element(0, odd_plane=True)),
         )
 
         self.assertEqual(
-            "Element(even, index=9, x=9.5, xneg=9, xpos=10)",
+            "Celm(even, index=9, x=9.5, xneg=9, xpos=10)",
             str(self.grid10.element(9, odd_plane=False)),
         )
 
@@ -52,7 +52,7 @@ class GridTC(unittest.TestCase):
             self.grid10.element(10)
 
 
-class ElementTC(unittest.TestCase):
+class CelmTC(unittest.TestCase):
 
     def setUp(self):
 
@@ -63,7 +63,7 @@ class ElementTC(unittest.TestCase):
     def test_str(self):
 
         self.assertEqual(
-            "Element(even, index=0, x=0.5, xneg=0, xpos=1)",
+            "Celm(even, index=0, x=0.5, xneg=0, xpos=1)",
             str(self.elm0),
         )
 
@@ -73,7 +73,7 @@ class ElementTC(unittest.TestCase):
 
     def test_duplicate(self):
 
-        golden = "Element(even, index=0, x=0.5, xneg=0, xpos=1)"
+        golden = "Celm(even, index=0, x=0.5, xneg=0, xpos=1)"
         self.assertEqual(golden, str(self.elm0))
         self.assertEqual(golden, str(self.elm0.duplicate()))
         # "dup" attribute is a shorthand for duplicate() function.
@@ -83,11 +83,11 @@ class ElementTC(unittest.TestCase):
         elm = self.elm0.dup
         elm.move(1)
         self.assertEqual(
-            "Element(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
+            "Celm(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
             str(elm),
         )
         self.assertEqual(
-            "Element(even, index=0, x=0.5, xneg=0, xpos=1)",
+            "Celm(even, index=0, x=0.5, xneg=0, xpos=1)",
             str(self.elm0),
         )
 
@@ -116,7 +116,7 @@ class ElementTC(unittest.TestCase):
         # Movement is in-place.
         self.elm0.move(1)
         self.assertEqual(
-            "Element(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
+            "Celm(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
             str(self.elm0),
         )
 
@@ -134,14 +134,14 @@ class ElementTC(unittest.TestCase):
         elm0d = self.elm0.dup
         with self.assertRaisesRegexp(
             IndexError,
-            "Element::move_at\(\) \(coord_index = 1, offset = -1\) icrd = 0 "
+            "Celm::move_at\(\) \(coord_index = 1, offset = -1\) icrd = 0 "
             "outside the interval \[1, 20\)",
         ):
             elm0d.move_neg()
         elm9d = self.elm9.dup
         with self.assertRaisesRegexp(
             IndexError,
-            "Element::move_at\(\) \(coord_index = 19, offset = 1\) icrd = 20 "
+            "Celm::move_at\(\) \(coord_index = 19, offset = 1\) icrd = 20 "
             "outside the interval \[1, 20\)",
         ):
             elm9d.move_pos()
