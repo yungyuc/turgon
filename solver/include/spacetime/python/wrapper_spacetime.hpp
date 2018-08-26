@@ -36,6 +36,7 @@ WrapGrid
             .def_property_readonly("xmin", &wrapped_type::xmin)
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("ncelm", &wrapped_type::ncelm)
+            .def_property_readonly("nselm", &wrapped_type::nselm)
             .def(
                 "celm",
                 static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at),

@@ -8,17 +8,28 @@ element (CESE) method
 """
 
 
-from ._libst import (
+from ._core import (
     Grid,
     Celm,
     Selm,
+    celm_in,
+    selm_in,
+)
+
+from ._pstcanvas import (
+    PstCanvas,
 )
 
 
 __all__ = [
+    # _core
     'Grid',
     'Celm',
     'Selm',
+    'celm_in',
+    'selm_in',
+    # _pstcanvas
+    'PstCanvas',
 ]
 
 # vim: set et sw=4 ts=4:

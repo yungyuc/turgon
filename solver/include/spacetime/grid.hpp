@@ -55,6 +55,7 @@ public:
     real_type xmin() const { return m_xmin; }
     real_type xmax() const { return m_xmax; }
     size_t ncelm() const { return m_ncelm; }
+    size_t nselm() const { return m_ncelm+1; }
 
     Celm celm(size_t ielm);
     Celm celm(size_t ielm, bool odd_plane);

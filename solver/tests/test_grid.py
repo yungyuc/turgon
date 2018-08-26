@@ -35,6 +35,11 @@ class GridTC(unittest.TestCase):
         ):
             libst.Grid(11, 10, 10)
 
+    def test_number(self):
+
+        self.assertEqual(10, self.grid10.ncelm)
+        self.assertEqual(11, self.grid10.nselm)
+
     def test_str(self):
 
         self.assertEqual("Grid(xmin=0, xmax=10, ncelm=10)",
@@ -108,6 +113,18 @@ class GridTC(unittest.TestCase):
             "outside the interval \[1, 22\)",
         ):
             self.grid10.selm(11)
+
+    def test_celm_in(self):
+
+        for it, ce in enumerate(libst.celm_in(self.grid10)):
+            self.assertEqual(str(self.grid10.celm(it)), str(ce))
+        for it, ce in enumerate(libst.celm_in(self.grid10, odd_plane=True)):
+            self.assertEqual(str(self.grid10.celm(it, odd_plane=True)), str(ce))
+
+        for it, se in enumerate(libst.selm_in(self.grid10)):
+            self.assertEqual(str(self.grid10.selm(it)), str(se))
+        for it, se in enumerate(libst.selm_in(self.grid10, odd_plane=True)):
+            self.assertEqual(str(self.grid10.selm(it, odd_plane=True)), str(se))
 
 
 class CelmTC(unittest.TestCase):
