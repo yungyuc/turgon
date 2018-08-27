@@ -111,10 +111,10 @@ Write the general form of a conservation law in one-dimensional space
   \,.
 \end{align*}
 In the equation, $u$ is the dependent variable, $f(u)$ a function of the
-dependent variable, and $(x, t)$ the space-time coordinate.  Let $\mathbf{h}
-\defeq (f(u),u)^t$ (the superscript ${}^t$ here denotes transpose) in the
-two-dimensional space-time Euclidean space, in which $x_1=x, x_2=t$.  The
-equation is then written as $\nabla\cdot\mathbf{h} = 0$.  Assume the equation
+dependent variable, and $(x, t)$ the independent variables for the space-time
+coordinate.  Let $\mathbf{h} \defeq (f(u),u)^t$ (the superscript ${}^t$ here
+denotes transpose) in the two-dimensional space-time Euclidean space, and we
+can write the equation to $\nabla\cdot\mathbf{h} = 0$.  Assume the equation
 applies everywhere in the control volume $V$, and write
 \begin{align*}
   \int_V\nabla\cdot\mathbf{h}\dif v = 0
@@ -212,9 +212,9 @@ $S(\mathrm{CE}_{\pm})$ is the boundary surface surrounding $\mathrm{CE}_{\pm}$.
 After conservation elements, solution elements are defined to consistently
 evaluate approximated value of variables and functions.  There is more than one
 way to define SE.  An effective approach is to use the cross mark around a mesh
-point $(j,n)$, as shown in \figurename~\ref{f:crossse}.  Let $\mathrm{SE}(j,n)$
-denote the SE locating at the mesh point.  The value of variable $u$ within the
-SE, written as $u(x,t;j,n)$, is approximated as
+point $(j,n)$, as shown in \figurename~\ref{f:cese_marching}.  Let
+$\mathrm{SE}(j,n)$ denote the SE locating at the mesh point.  The value of
+variable $u$ within the SE, written as $u(x,t;j,n)$, is approximated as
 \begin{align*}
   u^*(x,t;j,n) = u_j^n + (u_x)_j^n(x-x_j) + (u_t)_j^n(t-t^n)
 \end{align*}
@@ -222,9 +222,10 @@ $u_j^n$, $(u_x)_j^n$, $(u_t)_j^n$ hold constant in $\mathrm{SE}(j,n)$.
 
 \begin{figure}[hbtp]
   \centering
-  \includegraphics{crossse.eps}
-  \caption{Cross-shaped solution element.}
-  \label{f:crossse}
+  \includegraphics{cese_marching.eps}
+  \caption{Time-marching the solution by using the cross-shaped solution
+  elements.}
+  \label{f:cese_marching}
 \end{figure}
 
 It should be noted that each CE is surrounded by SEs, so the evaluation of

@@ -9,6 +9,9 @@ else
 endif
 PSTAKE := ./pstake.py
 
+PYTHONPATH := $(abspath ../solver):$(PYTHONPATH)
+export PYTHONPATH
+
 # tool binaries
 LATEX := latex -halt-on-error -interaction=nonstopmode
 BIBTEX := bibtex
@@ -29,15 +32,18 @@ SCHEMATIC_DIR := schematic
 
 HANDOVER_DIR := handover
 NOWDATE := $(shell date +"%Y%m%d")
+CURRENTBRANCH := $(shell git rev-parse --abbrev-ref HEAD 2> /dev/null || echo "nobranch")
 NOWID := $(shell git rev-parse --short HEAD 2> /dev/null || echo "nogit")
-HANDOVER_FN = $(HANDOVER_DIR)/$(basename $<).$(NOWID).$(NOWDATE).pdf
+HANDOVER_FN = $(HANDOVER_DIR)/$(basename $<).$(CURRENTBRANCH).$(NOWID).$(NOWDATE).pdf
 
 TRUNK := turgon
 
 MAKEFILES := Makefile
 
 ALL_TEX := $(wildcard $(SCHEMATIC_DIR)/*.tex)
-ALL_EPS := $(patsubst $(SCHEMATIC_DIR)/%.tex,$(EPS_DIR)/%.eps,$(ALL_TEX))
+ALL_SCHPY := $(wildcard $(SCHEMATIC_DIR)/*.py)
+ALL_EPS := $(patsubst $(SCHEMATIC_DIR)/%.tex,$(EPS_DIR)/%.eps,$(ALL_TEX)) \
+	$(patsubst $(SCHEMATIC_DIR)/%.py,$(EPS_DIR)/%.eps,$(ALL_SCHPY))
 
 .PHONY: default
 default: note mesh
@@ -52,6 +58,16 @@ $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
 	mkdir -p $(LOG_DIR) ; \
 	$(DO_PSTAKE) 2>&1 | \
 		tee $(LOG_DIR)/pstake-$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
+
+$(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.py
+	mkdir -p $(LOG_DIR) ; \
+	python3 $< $@ 2>&1 | \
+		tee $(LOG_DIR)/$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
+
+$(EPS_DIR)/%.png: $(SCHEMATIC_DIR)/%.py
+	mkdir -p $(LOG_DIR) ; \
+	python3 $< $@ 2>&1 | \
+		tee $(LOG_DIR)/$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
 %.dvi: %.tex $(TRUNK)_main.bib $(TRUNK).cls $(ALL_EPS) $(MAKEFILES)
 	@echo "Having EPS files: $(ALL_EPS)"
