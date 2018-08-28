@@ -1,3 +1,4 @@
+PYTHON ?= python3
 SHELL = /bin/bash
 NUM ?= 3 # For LaTeX to correctly cross-reference.  To save time, use 1.
 VERBOSE ?= 0
@@ -19,8 +20,10 @@ DVIPS := dvips
 PS2PDF := ps2pdf
 ifeq ($(DOEPS),0)
 	DO_PSTAKE = mkdir -p $(EPS_DIR) ; touch $@
+	DO_PSPY = mkdir -p $(EPS_DIR) ; touch $@
 else
-	DO_PSTAKE = mkdir -p $(EPS_DIR) ; $(PSTAKE) $< $@
+	DO_PSTAKE = mkdir -p $(EPS_DIR) ; $(PYTHON) $(PSTAKE) $< $@
+	DO_PSPY = mkdir -p $(EPS_DIR) ; $(PYTHON) $< $@
 endif
 
 # tool binaries
@@ -61,12 +64,12 @@ $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.tex pstake.py
 
 $(EPS_DIR)/%.eps: $(SCHEMATIC_DIR)/%.py
 	mkdir -p $(LOG_DIR) ; \
-	python3 $< $@ 2>&1 | \
+	$(DO_PSPY) 2>&1 | \
 		tee $(LOG_DIR)/$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
 $(EPS_DIR)/%.png: $(SCHEMATIC_DIR)/%.py
 	mkdir -p $(LOG_DIR) ; \
-	python3 $< $@ 2>&1 | \
+	$(DO_PSPY) 2>&1 | \
 		tee $(LOG_DIR)/$(notdir $<).log $(CMDLOG_DIR_REDIRECT)
 
 %.dvi: %.tex $(TRUNK)_main.bib $(TRUNK).cls $(ALL_EPS) $(MAKEFILES)
