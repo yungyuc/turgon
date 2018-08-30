@@ -198,6 +198,7 @@ Eq.~(\ref{e:conserv_of_approx_h}) should also hold in a BCE.  In other words,
 \begin{align*}
   \oint_{S(\mathrm{CE}_-)}\mathbf{h}^*\cdot d\hat{\sigma} = 0; \quad
   \oint_{S(\mathrm{CE}_+)}\mathbf{h}^*\cdot d\hat{\sigma} = 0
+  \,.
 \end{align*}
 $S(\mathrm{CE}_{\pm})$ is the boundary surface surrounding $\mathrm{CE}_{\pm}$.
 
@@ -218,37 +219,43 @@ variable $u$ within the SE, written as $u(x,t;j,n)$, is approximated as
 \begin{align*}
   u^*(x,t;j,n) = u_j^n + (u_x)_j^n(x-x_j) + (u_t)_j^n(t-t^n)
 \end{align*}
-$u_j^n$, $(u_x)_j^n$, $(u_t)_j^n$ hold constant in $\mathrm{SE}(j,n)$.
+$u_j^n$, $(u_x)_j^n$, $(u_t)_j^n$ hold constant in $\mathrm{SE}(j,n)$.  It
+should be noted that every CE is surrounded by SEs.  The evaluation of fluxes
+through the CE boundary depends only on the approximation of variables within
+SEs.
 
 \begin{figure}[hbtp]
   \centering
   \includegraphics{cese_marching.eps}
   \caption{Time-marching the solution by using the cross-shaped solution
-  elements.}
+  elements.  The {\color{red} red} dotted crosses mark the SEs at $t=t^0$.  The
+  {\color{blue} blue} dotted crosses mark the SEs at $t=t^{1/2}$.  The
+  {\color{orange} orange} dotted crosses mark the SEs at $t=t^1$.  The bigger
+  dots at the horizontal middle points of the crosses are the solution points.
+  The arrows show how the solution variables, that are defined at the solution
+  points, at the previous half time step propagate to those at the next half
+  time step.  The solution points at the boundary, $x=x_0$ and $x=x_4$, need to
+  be updated by boundary-condition treatments, rather than the CESE method
+  scheme.}
   \label{f:cese_marching}
 \end{figure}
 
-It should be noted that each CE is surrounded by SEs, so the evaluation of
-fluxes through boundary of CE depends only on the approximation of variables
-within SEs.
-
-By using the definition of $u^*$, the approximation for $u$
-we write
+By using the definition of $u^*$, the approximation for $u$ is written as
 \begin{align*}
   \frac{\partial u^*(x,t;j,n)}{\partial x} = (u_x)_j^n, \quad
-  \frac{\partial u^*(x,t;j,n)}{\partial t} = (u_t)_j^n
+  \frac{\partial u^*(x,t;j,n)}{\partial t} = (u_t)_j^n \,.
 \end{align*}
 Substitute them back to the original differential equation
 (Eq.~(\ref{e:conv_diff_govern})), the relation between $(u_x)_j^n$ and
 $(u_t)_j^n$ is obtained
 \begin{align*}
               (u_t)_j^n + a(u_x)_j^n = 0
-  \Rightarrow (u_t)_j^n = -a(u_x)_j^n
+  \Rightarrow (u_t)_j^n = -a(u_x)_j^n \,.
 \end{align*}
 The approximated $u^*$ is then rewritten as
 \begin{gather*}
-  u^*(x,t;j,n) = u_j^n + (u_x)_j^n[(x-x_j) - a(t-t^n)] \\
-  (x,t) \in \mathrm{SE}(j,n)
+  u^*(x,t;j,n) = u_j^n + (u_x)_j^n[(x-x_j) - a(t-t^n)] \,, \\
+  (x,t) \in \mathrm{SE}(j,n) \,.
 \end{gather*}
 The approximation of $\mathbf{h}$ is then written as
 \begin{align*}
@@ -256,10 +263,12 @@ The approximation of $\mathbf{h}$ is then written as
   \left(
     au^*(x,t;j,n)-\mu\frac{\partial u^*(x,t;j,n)}{\partial x}, u^*(x,t;j,n)
   \right)
+  \,.
 \end{align*}
 
 The time-marching formula of the CESE method for the convection-diffusion
-equation will be obtained by $\mathbf{h}^*$ into the integral equation
+equation will be obtained by substituting $\mathbf{h}^*$ into the integral
+equation
 \begin{align*}
   \oint_{S(\mathrm{CE}_{\pm})}\mathbf{h}^*\cdot \dif\hat{\sigma}=0
 \end{align*}
@@ -276,14 +285,15 @@ By the convention of flux flowing outward CE, the flux vector is written as
     \end{array}\right)
   = (\dif t, -\dif x)
 \end{align*}
+Consider $\mathrm{CE}_-(j,n)$ defined by $\square\mathrm{ABCD}$ in
+Fig.~\ref{f:cce}.  Evaluate $\mathbf{h}^*\cdot \dif\hat{\sigma}$ on each of the
+four sides $\overline{AB}, \overline{BC}, \overline{CD}, \overline{DA}$.
 To simplify, define flux function
 \begin{align*}
   F_{\pm} \defeq
     \oint_{S(\mathrm{CE}_{\pm})}\mathbf{h}^*\cdot \dif\hat{\sigma}
+  \,,
 \end{align*}
-Consider $\mathrm{CE}_-(j,n)$ defined by $\square\mathrm{ABCD}$ in
-Fig.~\ref{f:cce}.  Evaluate $\mathbf{h}^*\cdot \dif\hat{\sigma}$ on each of the
-four sides $\overline{AB}, \overline{BC}, \overline{CD}, \overline{DA}$,
 and then the flux function $F_-$ is written as
 \begin{alignat*}{2}
   F_-(j,n) &= \frac{\Delta x^2}{4}\Big\{

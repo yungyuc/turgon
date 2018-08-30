@@ -79,8 +79,10 @@ $(EPS_DIR)/%.png: $(SCHEMATIC_DIR)/%.py
 		echo -n "latex $@ #$$num ... " ; \
 		$(LATEX) $< 2>&1 | \
 			tee $$latex_logfile $(CMDLOG_DIR_REDIRECT) ; \
-		if [ -z "`grep 'LaTeX Error:' $$latex_logfile`" ] ; \
-		then \
+		if [[ \
+			   ( -z "`grep 'LaTeX Error:' $$latex_logfile`" ) \
+			&& ( -z "`grep 'Runaway argument\?' $$latex_logfile`" ) \
+		]] ; then \
 			echo "done" ; \
 		else \
 			echo "tail $$latex_logfile:" ; \
