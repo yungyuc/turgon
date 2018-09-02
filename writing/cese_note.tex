@@ -176,8 +176,8 @@ are constant.  Write the matrix-vector integral form of the equation
 \begin{align}
   \oint_{S(V)}\mathbf{h}\cdot d\hat{\sigma}=0 \label{e:conservation}
 \end{align}
-where $\mathbf{h} \defeq (au-\mu\partial u/\partial x,u)$ and $d\hat{\sigma} =
-(dx, dt)$.
+where $\mathbf{h} \defeq (au-\mu\partial u/\partial x, u)^t$ and $d\hat{\sigma}
+= (\dif x, \dif t)^t$.
 
 As the name suggests, the CESE method is built upon two entities defined in
 space-time: the conservation elements (CEs) and solution elements (SEs).  In
@@ -205,24 +205,42 @@ $S(\mathrm{CE}_{\pm})$ is the boundary surface surrounding $\mathrm{CE}_{\pm}$.
 \begin{figure}[htbp]
 \centering
   \includegraphics{cce.eps}
-  \caption{A compounded conservation element (CCE), containing two basic
-  conservation elements (BCEs).}
+  \caption{A compounded conservation element (CCE), the area enclosed by the
+  {\color{red} red} dots of {\color{red} $\square\mathrm{BCEF}$}, contains two
+  basic conservation elements (BCEs), the area enclosed by the {\color{blue}
+  blue} dots of {\color{blue} $\square\mathrm{ABCD}$} and {\color{blue}
+  $\square\mathrm{ADEF}$}.}
   \label{f:cce}
 \end{figure}
 
-After conservation elements, solution elements are defined to consistently
-evaluate approximated value of variables and functions.  There is more than one
-way to define SE.  An effective approach is to use the cross mark around a mesh
-point $(j,n)$, as shown in \figurename~\ref{f:cese_marching}.  Let
-$\mathrm{SE}(j,n)$ denote the SE locating at the mesh point.  The value of
-variable $u$ within the SE, written as $u(x,t;j,n)$, is approximated as
+Solution elements are defined to approximate variables and functions.  There is
+more than one way to define SE.  An effective and consistent approach is
+described in \figurename~\ref{f:cese_marching}.  Let $\mathrm{SE}(j,n)$ denote
+the SE at the mesh point $(j,n)$, which is the cross-shaped mark enclosed by
+the dotted line.  The value of variable $u$ within the SE, written as
+$u(x,t;j,n)$, is approximated by
 \begin{align*}
   u^*(x,t;j,n) = u_j^n + (u_x)_j^n(x-x_j) + (u_t)_j^n(t-t^n)
 \end{align*}
 $u_j^n$, $(u_x)_j^n$, $(u_t)_j^n$ hold constant in $\mathrm{SE}(j,n)$.  It
 should be noted that every CE is surrounded by SEs.  The evaluation of fluxes
-through the CE boundary depends only on the approximation of variables within
-SEs.
+through the CE boundary depends only on the approximation within SEs.  Write
+\begin{align*}
+  \frac{\partial u^*(x,t;j,n)}{\partial x} = (u_x)_j^n, \quad
+  \frac{\partial u^*(x,t;j,n)}{\partial t} = (u_t)_j^n \,.
+\end{align*}
+Substitute them back to the original differential equation
+(Eq.~(\ref{e:conv_diff_govern})), the relation between $(u_x)_j^n$ and
+$(u_t)_j^n$ is obtained as
+\begin{align*}
+              (u_t)_j^n + a(u_x)_j^n = 0
+  \Rightarrow (u_t)_j^n = -a(u_x)_j^n \,.
+\end{align*}
+The approximated $u^*$ is then rewritten as
+\begin{gather*}
+  u^*(x,t;j,n) = u_j^n + (u_x)_j^n[(x-x_j) - a(t-t^n)] \,, \\
+  (x,t) \in \mathrm{SE}(j,n) \,.
+\end{gather*}
 
 \begin{figure}[hbtp]
   \centering
@@ -240,37 +258,19 @@ SEs.
   \label{f:cese_marching}
 \end{figure}
 
-By using the definition of $u^*$, the approximation for $u$ is written as
-\begin{align*}
-  \frac{\partial u^*(x,t;j,n)}{\partial x} = (u_x)_j^n, \quad
-  \frac{\partial u^*(x,t;j,n)}{\partial t} = (u_t)_j^n \,.
-\end{align*}
-Substitute them back to the original differential equation
-(Eq.~(\ref{e:conv_diff_govern})), the relation between $(u_x)_j^n$ and
-$(u_t)_j^n$ is obtained
-\begin{align*}
-              (u_t)_j^n + a(u_x)_j^n = 0
-  \Rightarrow (u_t)_j^n = -a(u_x)_j^n \,.
-\end{align*}
-The approximated $u^*$ is then rewritten as
-\begin{gather*}
-  u^*(x,t;j,n) = u_j^n + (u_x)_j^n[(x-x_j) - a(t-t^n)] \,, \\
-  (x,t) \in \mathrm{SE}(j,n) \,.
-\end{gather*}
-The approximation of $\mathbf{h}$ is then written as
-\begin{align*}
-  \mathbf{h}^*(x,t;j,n) =
-  \left(
-    au^*(x,t;j,n)-\mu\frac{\partial u^*(x,t;j,n)}{\partial x}, u^*(x,t;j,n)
-  \right)
-  \,.
-\end{align*}
-
 The time-marching formula of the CESE method for the convection-diffusion
 equation will be obtained by substituting $\mathbf{h}^*$ into the integral
 equation
 \begin{align*}
-  \oint_{S(\mathrm{CE}_{\pm})}\mathbf{h}^*\cdot \dif\hat{\sigma}=0
+  \oint_{S(\mathrm{CE}_{\pm})}\mathbf{h}^*\cdot \dif\hat{\sigma}=0 ,
+\end{align*}
+where
+\begin{align*}
+  \mathbf{h}^*(x,t;j,n) =
+  \left(
+    au^*(x,t;j,n)-\mu\frac{\partial u^*(x,t;j,n)}{\partial x}, u^*(x,t;j,n)
+  \right)^t
+  \,.
 \end{align*}
 By the convention of flux flowing outward CE, the flux vector is written as
 \begin{align*}
@@ -283,18 +283,19 @@ By the convention of flux flowing outward CE, the flux vector is written as
     \end{array}\right)
     \left(\begin{array}{c} \dif x \\ \dif t
     \end{array}\right)
-  = (\dif t, -\dif x)
+  = \left(\begin{array}{c} \dif t \\ - \dif x
+    \end{array}\right)
 \end{align*}
-Consider $\mathrm{CE}_-(j,n)$ defined by $\square\mathrm{ABCD}$ in
-Fig.~\ref{f:cce}.  Evaluate $\mathbf{h}^*\cdot \dif\hat{\sigma}$ on each of the
-four sides $\overline{AB}, \overline{BC}, \overline{CD}, \overline{DA}$.
-To simplify, define flux function
+For simplifying the notation in the next derivation, define the flux function
 \begin{align*}
   F_{\pm} \defeq
     \oint_{S(\mathrm{CE}_{\pm})}\mathbf{h}^*\cdot \dif\hat{\sigma}
   \,,
 \end{align*}
-and then the flux function $F_-$ is written as
+Evaluate $\mathbf{h}^*\cdot \dif\hat{\sigma}$ on each of the four sides
+$\overline{AB}, \overline{BC}, \overline{CD}, \overline{DA}$ for the space-time
+conservation around $\mathrm{CE}_-(j,n)$ defined by $\square\mathrm{ABCD}$ in
+Fig.~\ref{f:cce}, and the flux function $F_-$ is straight-forwardly obtained as
 \begin{alignat*}{2}
   F_-(j,n) &= \frac{\Delta x^2}{4}\Big\{
     &&\frac{2}{\Delta x}\left(\frac{a\Delta t}{\Delta x}+1\right)
@@ -309,7 +310,7 @@ and then the flux function $F_-$ is written as
         \right](u_x)_{j-1/2}^{n-1/2}
     \Big\}
 \end{alignat*}
-Simplify it by
+Write
 \begin{align}
   \nu &\defeq \frac{a\Delta t}{\Delta x} \label{e:nu} \\
   \xi &\defeq \frac{4\mu\Delta t}{(\Delta x)^2} \label{e:xi}
@@ -323,8 +324,8 @@ such that
   &\quad\quad
   + \frac{2(\nu+1)}{\Delta x}\left(u_j^n-u_{j-1/2}^{n-1/2}\right)
 \end{align*}
-$F_+$ for $\mathrm{CE}_+(j,n)$ is evaluated in the same way.  They can be
-written together as
+$F_+$ for $\mathrm{CE}_+(j,n)$ ($\square\mathrm{ADEF}$) is evaluated in the
+same way.  They can be written together as
 \begin{align}
   \frac{2}{\Delta x}F_{\pm}(j,n) &=
     \pm\left[
@@ -336,20 +337,21 @@ written together as
     \label{e:both_conserv_func}
 \end{align}
 
-There are two equations for two unknowns $u_j^n, (u_x)_j^n$.  A formula for the
-unknowns can be obtained by solving this system of equations.  Let
+Equation (\ref{e:both_conserv_func}) are two equations for two unknowns $u_j^n,
+(u_x)_j^n$.  A formula for the unknowns can be obtained by solving this system
+of equations.  Let
 \begin{alignat*}{2}
-  \alpha_1 &= 1-\nu^2+\xi,\quad &\alpha_2 &= 1-\nu^2-\xi \\
-  \beta_1 &= 1-\nu, &\beta_2 &= 1+\nu \\
-  q_1 &= x_j^n, &q_2 &= \frac{\Delta x}{4}(u_x)_j^n \\
-  a_1 &= x_{j-1/2}^{n-1/2}
- &a_2 &= \frac{\Delta x}{4}(x_n)_{j-1/2}^{n-1/2} \\
-  b_1 &= x_{j+1/2}^{n-1/2}
- &b_2 &= \frac{\Delta x}{4}(x_n)_{j+1/2}^{n-1/2}
+  \alpha_1 &= 1-\nu^2+\xi, \quad &\alpha_2 &= 1-\nu^2-\xi, \\
+  \beta_1 &= 1-\nu, &\beta_2 &= 1+\nu, \\
+  q_1 &= x_j^n, &q_2 &= \frac{\Delta x}{4}(u_x)_j^n, \\
+  a_1 &= x_{j-1/2}^{n-1/2},
+ &a_2 &= \frac{\Delta x}{4}(x_n)_{j-1/2}^{n-1/2}, \\
+  b_1 &= x_{j+1/2}^{n-1/2},
+ &b_2 &= \frac{\Delta x}{4}(x_n)_{j+1/2}^{n-1/2},
 \end{alignat*}
 and Eq.~(\ref{e:both_conserv_func}) becomes
 \begin{align*}
-  \beta_2q_1 - \alpha_1q_2 &= \beta_2a_1 + \alpha_2a_2 \\
+  \beta_2q_1 - \alpha_1q_2 &= \beta_2a_1 + \alpha_2a_2, \\
   \beta_1q_1 + \alpha_1q_2 &= \beta_1b_1 - \alpha_2b_2
 \end{align*}
 The solution can be rewritten in a matrix-vector form
@@ -369,7 +371,7 @@ where
       1-\nu^2-\xi                               \\
       \dfrac{-(1-\nu^2)}{1-\nu^2+\xi}            &
       \dfrac{-(1-\nu)(1-\nu^2-\xi)}{1-\nu^2+\xi}
-    \end{array}\right) \\
+    \end{array}\right), \\
   Q_- &\defeq
     \frac{1}{2}
     \left(
@@ -379,17 +381,17 @@ where
       -(1-\nu^2-\xi)                            \\
       \dfrac{(1-\nu^2)}{1-\nu^2+\xi}             &
       \dfrac{-(1+\nu)(1-\nu^2-\xi)}{1-\nu^2+\xi}
-    \end{array}\right) \\
+    \end{array}\right), \\
   \mathbf{q}(j,n) &\defeq
     \left(
     \arraycolsep=1.4pt\def\arraystretch{2.2}
     \begin{array}{c}
       u_j^n \\ \dfrac{\Delta x}{4}(u_x)_j^n
-    \end{array}\right)
+    \end{array}\right) \,.
 \end{align*}
 
-By expanding the vector form of solution, the time-marching formula can be
-written as
+By expanding the vector form of solution, a simpler form of the time-marching
+formula can be written as
 \begin{alignat}{2}
   u_j^n &= &\frac{1}{2}\Big[
     &(1+\nu)u_{j-\frac{1}{2}}^{n-\frac{1}{2}}
@@ -408,10 +410,8 @@ written as
     -  (1+\nu)(1-\nu^2-\xi)(u_{\bar{x}})_{j+\frac{1}{2}}^{n-\frac{1}{2}}
                        \Big] \label{e:amuux}
 \end{alignat}
-where $u_{\bar{x}} \defeq \frac{\Delta x}{4}u_x$.  Remind that $\nu =
-\frac{a\Delta t}{\Delta x}$, $\xi \defeq \frac{4\nu\Delta t}{\Delta x^2}$.
-This set of equations is referred as $a$-$\mu$ scheme in
-\citep{chang_method_1995}.
+where $u_{\bar{x}} \defeq \frac{\Delta x}{4}u_x$ \citep[$a$-$\mu$
+scheme]{chang_method_1995}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -1081,7 +1081,7 @@ In a SE, $u_m, f_m$ are approximated by
                        + (f_{mt})_j^n(t-t^n)
 \end{align*}
 Write two equations for BCEs $\mathrm{CE}_-$ and $\mathrm{CE}_+$, respectively
-(see the CCE $\square BCEF$ in \figurename~\ref{f:cce})
+(see the CCE $\square\mathrm{BCEF}$ in \figurename~\ref{f:cce})
 \begin{alignat*}{2}
   \oint_{S(\mathrm{CE}_-)} \mathbf{h}_m^*\cdot \dif\hat{\sigma} &=
     -&&\frac{\varepsilon(1-\nu^2)\Delta x^2}{4}(du_{mx})_j^n \\

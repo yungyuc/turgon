@@ -14,7 +14,7 @@ PYTHONPATH := $(abspath ../solver):$(PYTHONPATH)
 export PYTHONPATH
 
 # tool binaries
-LATEX := latex -halt-on-error -interaction=nonstopmode
+LATEX := latex -halt-on-error -interaction=nonstopmode -synctex=1
 BIBTEX := bibtex
 DVIPS := dvips
 PS2PDF := ps2pdf
@@ -82,6 +82,7 @@ $(EPS_DIR)/%.png: $(SCHEMATIC_DIR)/%.py
 		if [[ \
 			   ( -z "`grep 'LaTeX Error:' $$latex_logfile`" ) \
 			&& ( -z "`grep 'Runaway argument\?' $$latex_logfile`" ) \
+			&& ( -z "`grep \! $$latex_logfile | head -c 1 | grep \!`" ) \
 		]] ; then \
 			echo "done" ; \
 		else \

@@ -37,7 +37,7 @@ def draw():
     c.line((grid.selm(0).x, -hdt*1.2), (grid.selm(grid.ncelm).x, -hdt*1.2),
            linewidth=linewidth)
     c.uput(sep, 'l', (grid.xmin-sep,-hdt*1.2), r'$j$')
-    c.uput(sep, 'r', (grid.xmax+sep,-hdt*1.2), r'$x_j$')
+    c.uput(sep, 'r', (grid.xmax+sep,-hdt*1.2), r'$x$')
     for se in libst.selm_in(grid):
         c.line((se.x, -hdt*1.2-sep), (se.x, -hdt*1.2+sep))
         c.uput(sep, 'd', (se.x,-hdt*1.2-sep), r'$%d$'%se.index)
@@ -49,7 +49,7 @@ def draw():
     x = grid.xmin - dx*0.6
     c.line((x, 0), (x, dt), linewidth=linewidth)
     c.uput(sep, 'd', (x, 0-sep), r'$n$')
-    c.uput(sep, 'u', (x, dt+sep), r'$t^n$')
+    c.uput(sep, 'u', (x, dt+sep), r'$t$')
     c.line((x-sep, 0), (x+sep, 0))
     c.uput(sep, 'l', (x-sep, 0), r'$0$')
     c.line((x-sep/2, hdt), (x+sep/2, hdt))
@@ -114,7 +114,14 @@ def main():
     filename = os.path.splitext(os.path.basename(sys.argv[0]))[0] + '.eps'
     if len(sys.argv) > 1: filename = sys.argv[1]
 
-    draw().to_filename(filename)
+    drawn = draw()
+    drawn.to_filename(filename)
+
+    if len(sys.argv) > 2:
+        filename = sys.argv[2]
+        with open(filename, 'w') as fobj:
+            fobj.write(str(drawn))
+        print("Wrote tex file to", filename)
 
 if __name__ == '__main__':
     main()
