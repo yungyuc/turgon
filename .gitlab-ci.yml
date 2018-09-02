@@ -6,9 +6,12 @@ before_script:
 
 build:
   script:
-  - cd ${CI_PROJECT_DIR}/solver
+  - cd ${CI_PROJECT_DIR}/spacetime
   - mkdir build ; cd build
-  - cmake -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/solver ..
+  - cmake \
+      -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}/spacetime \
+      -DCMAKE_BUILD_TYPE=Release \
+      ..
   - make install VERBOSE=${VERBOSITY:-0}
   - cd ${CI_PROJECT_DIR}/writing
   - make VERBOSE=${VERBOSITY:-0}

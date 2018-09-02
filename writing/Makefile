@@ -10,7 +10,7 @@ else
 endif
 PSTAKE := ./pstake.py
 
-PYTHONPATH := $(abspath ../solver):$(PYTHONPATH)
+PYTHONPATH := $(abspath ../spacetime):$(PYTHONPATH)
 export PYTHONPATH
 
 # tool binaries
