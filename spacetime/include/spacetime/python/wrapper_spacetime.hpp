@@ -158,14 +158,19 @@ WrapSolution
         namespace py = pybind11;
         (*this)
             .def(
-                py::init([](std::shared_ptr<Grid> const & grid, size_t nvar) {
-                    return Solution::construct(grid, nvar);
+                py::init([](std::shared_ptr<Grid> const & grid, size_t nvar, wrapped_type::value_type time_increment) {
+                    return Solution::construct(grid, nvar, time_increment);
                 }),
-                py::arg("grid"), py::arg("nvar")
+                py::arg("grid"), py::arg("nvar"), py::arg("time_increment")
             )
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
             .def_property_readonly("nvar", &wrapped_type::nvar)
+            .def_property(
+                "time_increment",
+                [](wrapped_type & self) { return self.time_increment(); },
+                [](wrapped_type & self, wrapped_type::value_type val) { return self.time_increment() = val; }
+            )
             .def(
                 "selm",
                 static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),

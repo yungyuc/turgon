@@ -42,9 +42,11 @@ public:
         return std::make_shared<Solution>(std::forward<Args>(args) ..., ctor_passkey());
     }
 
-    Solution(std::shared_ptr<Grid> const & grid, size_t nvar, ctor_passkey const &)
+    Solution(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
       : m_grid(grid)
-      , m_vars(array_type(std::vector<size_t>{grid->xsize(), nvar}))
+      , m_so0(array_type(std::vector<size_t>{grid->xsize(), nvar}))
+      , m_so1(array_type(std::vector<size_t>{grid->xsize(), nvar}))
+      , m_time_increment(time_increment)
     {}
 
     Solution() = delete;
@@ -56,7 +58,10 @@ public:
     Grid const & grid() const { return *m_grid; }
     Grid       & grid()       { return *m_grid; }
 
-    size_t   nvar() const { return m_vars.shape()[1]; }
+    size_t   nvar() const { return m_so0.shape()[1]; }
+
+    real_type   time_increment() const { return m_time_increment; }
+    real_type & time_increment()       { return m_time_increment; }
 
     Selm selm(size_t ielm);
     Selm selm(size_t ielm, bool odd_plane);
@@ -66,7 +71,9 @@ public:
 private:
 
     std::shared_ptr<Grid> m_grid;
-    array_type m_vars;
+    array_type m_so0;
+    array_type m_so1;
+    real_type m_time_increment;
 
 }; /* end class Solution */
 

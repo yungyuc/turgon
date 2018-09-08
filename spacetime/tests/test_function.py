@@ -11,7 +11,8 @@ class FunctionTC(unittest.TestCase):
     def setUp(self):
 
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.Solution(grid=self.grid10, nvar=1)
+        self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
+                                    time_increment=0.2)
 
     def test_celm_in(self):
 

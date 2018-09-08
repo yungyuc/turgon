@@ -11,7 +11,8 @@ class SolutionTC(unittest.TestCase):
     def setUp(self):
 
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.Solution(grid=self.grid10, nvar=1)
+        self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
+                                    time_increment=0.2)
 
     def test_str(self):
 
@@ -25,6 +26,12 @@ class SolutionTC(unittest.TestCase):
     def test_nvar(self):
 
         self.assertEqual(1, self.sol10.nvar)
+
+    def test_time_increment(self):
+
+        self.assertEqual(0.2, self.sol10.time_increment)
+        self.sol10.time_increment = 42
+        self.assertEqual(42, self.sol10.time_increment)
 
     def test_selm(self):
 

@@ -7,7 +7,7 @@ import libst
 def draw():
 
     grid = libst.Grid(0, 6, 4)
-    sol = libst.Solution(grid=grid, nvar=1)
+    sol = libst.Solution(grid=grid, nvar=1, time_increment=0.2)
 
     dx = (grid.xmax-grid.xmin)/grid.ncelm
     dt = dx
