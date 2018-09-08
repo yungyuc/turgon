@@ -85,13 +85,13 @@ protected:
             .def("__str__", &detail::to_str<wrapped_type>)
             .def("duplicate", &wrapped_type::duplicate)
             .def_property_readonly("dup", &wrapped_type::duplicate)
-            .def_property_readonly("grid", &wrapped_type::grid)
             .def_property_readonly("x", &wrapped_type::x)
             .def_property_readonly("xneg", &wrapped_type::xneg)
             .def_property_readonly("xpos", &wrapped_type::xpos)
-            // On the template derivation.
             .def_property_readonly("index", &wrapped_type::index)
             .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
+            .def_property_readonly("on_odd_plane", &wrapped_type::on_odd_plane)
+            .def_property_readonly("grid", &wrapped_type::grid)
             .def("move", &wrapped_type::move_at)
             .def("move_left", &wrapped_type::move_left_at)
             .def("move_right", &wrapped_type::move_right_at)
@@ -136,7 +136,11 @@ WrapSelm
 
     WrapSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
-    {}
+    {
+        (*this)
+            .def_property_readonly("sol", &wrapped_type::sol)
+        ;
+    }
 
 }; /* end class WrapSelm */
 

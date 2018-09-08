@@ -23,9 +23,16 @@ set(SPACETIME_HEADERS
     # Overall.
     include/spacetime.hpp
     # Others.
+    include/spacetime/Celm.hpp
+    include/spacetime/Celm_decl.hpp
     include/spacetime/ElementBase.hpp
+    include/spacetime/ElementBase_decl.hpp
     include/spacetime/Grid.hpp
+    include/spacetime/Grid_decl.hpp
     include/spacetime/Solution.hpp
+    include/spacetime/Solution_decl.hpp
+    include/spacetime/Selm.hpp
+    include/spacetime/Selm_decl.hpp
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp

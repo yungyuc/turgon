@@ -152,6 +152,7 @@ class CelmTC(unittest.TestCase):
     def test_on_even_plane(self):
 
         self.assertTrue(self.ce0.on_even_plane)
+        self.assertFalse(self.ce0.on_odd_plane)
         self.assertFalse(self.ce0.dup.move_pos().on_even_plane)
         self.assertTrue(self.ce0.dup.move_right().on_even_plane)
 
@@ -312,6 +313,7 @@ class SelmTC(unittest.TestCase):
     def test_on_even_plane(self):
 
         self.assertTrue(self.se0.on_even_plane)
+        self.assertFalse(self.se0.on_odd_plane)
         self.assertFalse(self.se0.dup.move_pos().on_even_plane)
         self.assertTrue(self.se0.dup.move_right().on_even_plane)
 

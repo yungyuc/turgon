@@ -7,9 +7,10 @@
 
 #include <iostream>
 
-#include "spacetime/ElementBase.hpp"
 #include "spacetime/Grid.hpp"
+#include "spacetime/Celm.hpp"
 #include "spacetime/Solution.hpp"
+#include "spacetime/Selm.hpp"
 
 namespace spacetime
 {

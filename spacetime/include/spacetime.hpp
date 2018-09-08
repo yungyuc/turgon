@@ -9,7 +9,9 @@
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase.hpp"
 #include "spacetime/Grid.hpp"
+#include "spacetime/Celm.hpp"
 #include "spacetime/Solution.hpp"
+#include "spacetime/Selm.hpp"
 #include "spacetime/io.hpp"
 
 /* vim: set et ts=4 sw=4: */
