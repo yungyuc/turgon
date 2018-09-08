@@ -14,11 +14,11 @@
 
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
+#include "spacetime/ElementBase.hpp"
 
 namespace spacetime
 {
 
-template<class ET> class ElementBase;
 class Celm;
 class Selm;
 
@@ -40,8 +40,7 @@ public:
     template<class ... Args>
     static std::shared_ptr<Grid> construct(Args&& ... args)
     {
-        std::shared_ptr<Grid> instance = std::make_shared<Grid>(std::forward<Args>(args) ..., ctor_passkey());
-        return instance;
+        return std::make_shared<Grid>(std::forward<Args>(args) ..., ctor_passkey());
     }
 
     Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &);
@@ -61,11 +60,6 @@ public:
     Celm celm(size_t ielm, bool odd_plane);
     Celm celm_at(size_t ielm);
     Celm celm_at(size_t ielm, bool odd_plane);
-
-    Selm selm(size_t ielm);
-    Selm selm(size_t ielm, bool odd_plane);
-    Selm selm_at(size_t ielm);
-    Selm selm_at(size_t ielm, bool odd_plane);
 
     size_t xsize() const { return m_xcoord.size(); }
 
@@ -136,6 +130,18 @@ private:
 
 }; /* end class Grid */
 
+template< class ET >
+inline ElementBase<ET>::ElementBase(Grid & grid, real_type * xptr)
+  : m_grid(&grid), m_xptr(xptr)
+{}
+
+template< class ET >
+inline Grid const & ElementBase<ET>::grid() const { return *m_grid; }
+
+
+template< class ET >
+inline size_t ElementBase<ET>::xindex() const { return m_xptr - m_grid->xptr(); }
+
 inline
 Grid::Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &)
   : m_xmin(xmin), m_xmax(xmax), m_ncelm(ncelm)
@@ -172,38 +178,6 @@ Grid::Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &)
     m_xcoord[0] = m_xcoord[1] + m_xcoord[1] - m_xcoord[2];
     m_xcoord[nx-1] = m_xcoord[nx-2] + m_xcoord[nx-2] - m_xcoord[nx-3];
 }
-
-template< class ET >
-class ElementBase
-{
-
-public:
-
-    using base_type = ElementBase;
-    using element_type = ET;
-
-    ElementBase(Grid & grid, real_type * xptr)
-      : m_grid(&grid), m_xptr(xptr)
-    {}
-
-    element_type duplicate() { return *static_cast<element_type *>(this); }
-
-    Grid const & grid() const { return *m_grid; }
-
-    real_type x() const { return *m_xptr; }
-    real_type xneg() const { return *(m_xptr-1); }
-    real_type xpos() const { return *(m_xptr+1); }
-
-protected:
-
-    size_t xindex() const { return m_xptr - m_grid->xptr(); }
-
-    Grid * m_grid;
-    real_type * m_xptr;
-
-    friend Grid;
-
-}; /* end class ElementBase */
 
 /**
  * A compound conservation celm.
@@ -301,107 +275,6 @@ inline Celm Grid::celm_at(size_t ielm, bool odd_plane)
             << "Grid::celm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
             << "): xindex = " << elm.xindex()
             << " outside the interval [2, " << this->xsize()-2 << ")"
-        );
-    }
-    return elm;
-}
-
-/**
- * A solution element.
- */
-class Selm
-  : public ElementBase<Selm>
-{
-
-public:
-
-    Selm(Grid & grid, size_t index)
-      : base_type(
-            grid
-          , grid.xptr_selm(index, Grid::SelmPK())
-        )
-    {}
-
-    Selm(Grid & grid, size_t index, bool odd_plane)
-      : base_type(
-            grid
-          , grid.xptr_selm(index, odd_plane, Grid::SelmPK())
-        )
-    {}
-
-    /**
-     * Selm index.
-     */
-    index_type index() const { return (xindex() - 1) >> 1; }
-
-    /**
-     * Return true for even plane, false for odd plane (temporal).
-     */
-    bool on_even_plane() const { return !bool((xindex() - 1) & 1); }
-
-    Selm & move(ssize_t offset)
-    {
-        m_xptr += offset;
-        return *static_cast<Selm *>(this);
-    }
-
-    Selm & move_at(ssize_t offset);
-
-    Selm & move_left() { return move(-2); }
-    Selm & move_right() { return move(2); }
-    Selm & move_neg() { return move(-1); }
-    Selm & move_pos() { return move(1); }
-
-    Selm & move_left_at() { return move_at(-2); }
-    Selm & move_right_at() { return move_at(2); }
-    Selm & move_neg_at() { return move_at(-1); }
-    Selm & move_pos_at() { return move_at(1); }
-
-}; /* end class Selm */
-
-Selm & Selm::move_at(ssize_t offset)
-{
-    const ssize_t xindex = this->xindex() + offset;
-    if (xindex < 1 || xindex >= m_grid->xsize()-1) {
-        throw std::out_of_range(Formatter()
-            << "Selm(xindex=" << this->xindex() << ")::move_at(offset=" << offset
-            << "): xindex = " << xindex
-            << " outside the interval [1, " << m_grid->xsize()-1 << ")"
-        );
-    }
-    return move(offset);
-}
-
-inline Selm Grid::selm(size_t ielm)
-{
-    return Selm(*this, ielm);
-}
-
-inline Selm Grid::selm(size_t ielm, bool odd_plane)
-{
-    return Selm(*this, ielm, odd_plane);
-}
-
-inline Selm Grid::selm_at(size_t ielm)
-{
-    const Selm elm = selm(ielm);
-    if (elm.xindex() < 1 || elm.xindex() >= this->xsize()-1) {
-        throw std::out_of_range(Formatter()
-            << "Grid::selm_at(ielm=" << ielm << "): xindex = " << elm.xindex()
-            << " outside the interval [1, " << this->xsize()-1 << ")"
-        );
-    }
-    return elm;
-}
-
-inline Selm Grid::selm_at(size_t ielm, bool odd_plane)
-{
-    const Selm elm = selm(ielm, odd_plane);
-    if (elm.xindex() < 1 || elm.xindex() >= this->xsize()-1) {
-        throw std::out_of_range(Formatter()
-            << "Grid::selm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
-            << "): xindex = " << elm.xindex()
-            << " outside the interval [1, " << this->xsize()-1 << ")"
         );
     }
     return elm;

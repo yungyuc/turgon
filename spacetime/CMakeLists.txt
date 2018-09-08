@@ -23,7 +23,9 @@ set(SPACETIME_HEADERS
     # Overall.
     include/spacetime.hpp
     # Others.
-    include/spacetime/grid.hpp
+    include/spacetime/ElementBase.hpp
+    include/spacetime/Grid.hpp
+    include/spacetime/Solution.hpp
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp

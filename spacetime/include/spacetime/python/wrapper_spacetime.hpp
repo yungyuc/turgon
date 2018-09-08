@@ -19,6 +19,12 @@ namespace spacetime
 namespace python
 {
 
+namespace detail {
+
+template<class T> std::string to_str(T const & self) { return Formatter() << self >> Formatter::to_str; }
+
+} /* end namespace detail */
+
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapGrid
@@ -30,9 +36,15 @@ WrapGrid
     WrapGrid(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
+        namespace py = pybind11;
         (*this)
-            .init()
-            .str()
+            .def(
+                py::init([](real_type xmin, real_type xmax, size_t nelm) {
+                    return Grid::construct(xmin, xmax, nelm);
+                }),
+                py::arg("xmin"), py::arg("xmax"), py::arg("nelm")
+            )
+            .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("xmin", &wrapped_type::xmin)
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("ncelm", &wrapped_type::ncelm)
@@ -40,35 +52,9 @@ WrapGrid
             .def(
                 "celm",
                 static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at),
-                pybind11::arg("ielm"), pybind11::arg("odd_plane")=false
-            )
-            .def(
-                "selm",
-                static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),
-                pybind11::arg("ielm"), pybind11::arg("odd_plane")=false
+                py::arg("ielm"), py::arg("odd_plane")=false
             )
         ;
-    }
-
-    wrapper_type & init()
-    {
-        return def(pybind11::init([](real_type xmin, real_type xmax, size_t nelm) {
-            std::shared_ptr<Grid> grid = Grid::construct(xmin, xmax, nelm);
-            return grid;
-        }));
-    }
-
-    wrapper_type & str()
-    {
-        return def(
-            "__str__",
-            [](wrapped_type & self) {
-                return Formatter()
-                    << "Grid(" << "xmin=" << self.xmin() << ", xmax=" << self.xmax() << ", "
-                    << "ncelm=" << self.ncelm() << ")"
-                    >> Formatter::to_str;
-            }
-        );
     }
 
 }; /* end class WrapGrid */
@@ -96,6 +82,7 @@ protected:
       : base_type(mod, pyname, clsdoc)
     {
         (*this)
+            .def("__str__", &detail::to_str<wrapped_type>)
             .def("duplicate", &wrapped_type::duplicate)
             .def_property_readonly("dup", &wrapped_type::duplicate)
             .def_property_readonly("grid", &wrapped_type::grid)
@@ -130,25 +117,7 @@ WrapCelm
 
     WrapCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
-    {
-        (*this)
-            .str()
-        ;
-    }
-
-    wrapper_type & str()
-    {
-        return def(
-            "__str__",
-            [](wrapped_type & self) {
-                return Formatter()
-                    << "Celm(" << (self.on_even_plane() ? "even" : "odd") << ", "
-                    << "index=" << self.index() << ", x=" << self.x() << ", "
-                    << "xneg=" << self.xneg() << ", xpos=" << self.xpos() << ")"
-                    >> Formatter::to_str;
-            }
-        );
-    }
+    {}
 
 }; /* end class WrapCelm */
 
@@ -167,29 +136,41 @@ WrapSelm
 
     WrapSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
+    {}
+
+}; /* end class WrapSelm */
+
+class
+SPACETIME_PYTHON_WRAPPER_VISIBILITY
+WrapSolution
+  : public WrapBase< WrapSolution, Solution, std::shared_ptr<Solution> >
+{
+
+    friend base_type;
+
+    WrapSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
     {
+        namespace py = pybind11;
         (*this)
-            .str()
-            .def_property_readonly("index", &wrapped_type::index)
-            .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
+            .def(
+                py::init([](std::shared_ptr<Grid> const & grid, size_t nvar) {
+                    return Solution::construct(grid, nvar);
+                }),
+                py::arg("grid"), py::arg("nvar")
+            )
+            .def("__str__", &detail::to_str<wrapped_type>)
+            .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+            .def_property_readonly("nvar", &wrapped_type::nvar)
+            .def(
+                "selm",
+                static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),
+                py::arg("ielm"), py::arg("odd_plane")=false
+            )
         ;
     }
 
-    wrapper_type & str()
-    {
-        return def(
-            "__str__",
-            [](wrapped_type & self) {
-                return Formatter()
-                    << "Selm(" << (self.on_even_plane() ? "even" : "odd") << ", "
-                    << "index=" << self.index() << ", x=" << self.x() << ", "
-                    << "xneg=" << self.xneg() << ", xpos=" << self.xpos() << ")"
-                    >> Formatter::to_str;
-            }
-        );
-    }
-
-}; /* end class WrapSelm */
+}; /* end class WrapSolution */
 
 } /* end namespace python */
 
