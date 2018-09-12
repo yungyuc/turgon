@@ -12,6 +12,7 @@ from ._core import (
     Grid,
     Celm,
     Selm,
+    Solution,
     celm_in,
     selm_in,
 )
@@ -26,6 +27,7 @@ __all__ = [
     'Grid',
     'Celm',
     'Selm',
+    'Solution',
     'celm_in',
     'selm_in',
     # _pstcanvas

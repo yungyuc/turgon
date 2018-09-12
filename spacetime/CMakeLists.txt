@@ -9,11 +9,12 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(pybind11 REQUIRED)
+find_package(NumPy REQUIRED)
 find_package(xtl REQUIRED)
 find_package(xsimd REQUIRED)
 find_package(xtensor REQUIRED)
-find_package(pybind11 REQUIRED)
-find_package(NumPy REQUIRED)
+find_package(xtensor-python REQUIRED)
 
 include_directories(${xtensor_INCLUDE_DIRS})
 include_directories(${NUMPY_INCLUDE_DIR})
@@ -23,7 +24,16 @@ set(SPACETIME_HEADERS
     # Overall.
     include/spacetime.hpp
     # Others.
-    include/spacetime/grid.hpp
+    include/spacetime/Celm.hpp
+    include/spacetime/Celm_decl.hpp
+    include/spacetime/ElementBase.hpp
+    include/spacetime/ElementBase_decl.hpp
+    include/spacetime/Grid.hpp
+    include/spacetime/Grid_decl.hpp
+    include/spacetime/Solution.hpp
+    include/spacetime/Solution_decl.hpp
+    include/spacetime/Selm.hpp
+    include/spacetime/Selm_decl.hpp
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
