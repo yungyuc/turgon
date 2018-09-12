@@ -3,6 +3,8 @@
 
 import unittest
 
+import numpy as np
+
 import libst
 
 
@@ -34,6 +36,24 @@ class GridTC(unittest.TestCase):
             "xmin >= xmax",
         ):
             libst.Grid(11, 10, 10)
+
+        # Simply test for passing.
+        libst.Grid(xloc=np.arange(2) * 0.1)
+
+        for s in [0, 1]:
+            with self.assertRaisesRegexp(
+                ValueError,
+                "Grid::init_from_array\(xloc\) invalid arguments: "
+                "xloc.size\(\)=%d smaller than 2" % s
+            ):
+                libst.Grid(xloc=np.arange(s) * 0.1)
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            "Grid::init_from_array\(xloc\) invalid arguments: "
+            "xloc\[0\]=1 >= xloc\[1\]=0.9"
+        ):
+            libst.Grid(xloc=np.arange(10, -1, -1) * 0.1)
 
     def test_number(self):
 

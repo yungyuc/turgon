@@ -47,6 +47,8 @@ public:
     Grid const & grid() const { return sol().grid(); }
     Solution const & sol() const { return *m_sol; }
 
+    real_type xctr() const { return (xneg()+xpos())/2; }
+
     Selm & move_at(ssize_t offset);
 
 private:

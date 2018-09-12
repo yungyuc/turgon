@@ -45,6 +45,8 @@ public:
 
     Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &);
 
+    Grid(array_type const & xloc, ctor_passkey const &) { init_from_array(xloc); }
+
     Grid() = delete;
     Grid(Grid const & ) = delete;
     Grid(Grid       &&) = delete;
@@ -118,6 +120,8 @@ private:
     real_type const * xptr() const { return m_xcoord.data(); }
     real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; }
     real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; }
+
+    void init_from_array(array_type const & xloc);
 
     real_type m_xmin;
     real_type m_xmax;

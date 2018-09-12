@@ -44,6 +44,8 @@ public:
 
     Grid const & grid() const { return *m_grid; }
 
+    real_type xctr() const { return x(); }
+
     Celm & move_at(ssize_t offset);
 
 private:

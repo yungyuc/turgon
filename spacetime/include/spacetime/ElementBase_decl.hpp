@@ -25,13 +25,14 @@ public:
 
     ElementBase(real_type * xptr) : m_xptr(xptr) {}
 
-    element_type duplicate() { return *static_cast<element_type *>(this); }
+    ET duplicate() { return *static_cast<ET *>(this); }
 
     Grid const & grid() const { return static_cast<ET const *>(this)->grid(); }
 
     real_type x() const { return *m_xptr; }
     real_type xneg() const { return *(m_xptr-1); }
     real_type xpos() const { return *(m_xptr+1); }
+    real_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
     ET & move(ssize_t offset)
     {

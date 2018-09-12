@@ -7,8 +7,9 @@
 
 #include <sstream>
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
+#include "xtensor-python/pyarray.hpp"
 
 #include "spacetime.hpp"
 #include "spacetime/python/WrapBase.hpp"
@@ -43,6 +44,12 @@ WrapGrid
                     return Grid::construct(xmin, xmax, nelm);
                 }),
                 py::arg("xmin"), py::arg("xmax"), py::arg("nelm")
+            )
+            .def(
+                py::init([](xt::pyarray<wrapped_type::value_type> & xloc) {
+                    return Grid::construct(xloc);
+                }),
+                py::arg("xloc")
             )
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("xmin", &wrapped_type::xmin)
@@ -88,6 +95,7 @@ protected:
             .def_property_readonly("x", &wrapped_type::x)
             .def_property_readonly("xneg", &wrapped_type::xneg)
             .def_property_readonly("xpos", &wrapped_type::xpos)
+            .def_property_readonly("xctr", &wrapped_type::xctr)
             .def_property_readonly("index", &wrapped_type::index)
             .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
             .def_property_readonly("on_odd_plane", &wrapped_type::on_odd_plane)
