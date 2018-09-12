@@ -5,6 +5,8 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include "xtensor/xarray.hpp"
+
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 
@@ -20,6 +22,8 @@ class ElementBase
 
 public:
 
+    using value_type = real_type;
+    using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
     using base_type = ElementBase;
     using element_type = ET;
 

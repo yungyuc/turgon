@@ -11,6 +11,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xview.hpp"
+#include "xtensor/xstrided_view.hpp"
 
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
@@ -28,6 +29,7 @@ class Grid
 
 public:
 
+    // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
     using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
 
@@ -64,6 +66,8 @@ public:
     Celm celm_at(size_t ielm, bool odd_plane);
 
     size_t xsize() const { return m_xcoord.size(); }
+
+    array_type xcoord() { return m_xcoord; }
 
 public:
 
@@ -130,7 +134,6 @@ private:
     array_type m_xcoord;
 
     template<class ET> friend class ElementBase;
-    friend std::ostream& operator<<(std::ostream& os, const Grid & grid);
 
 }; /* end class Grid */
 

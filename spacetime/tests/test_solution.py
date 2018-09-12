@@ -3,6 +3,8 @@
 
 import unittest
 
+import numpy as np
+
 import libst
 
 
@@ -13,6 +15,8 @@ class SolutionTC(unittest.TestCase):
         self.grid10 = libst.Grid(0, 10, 10)
         self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
                                     time_increment=0.2)
+        self.sol10.so0.fill(-1)
+        self.sol10.so1.fill(-2)
 
     def test_str(self):
 
@@ -32,6 +36,20 @@ class SolutionTC(unittest.TestCase):
         self.assertEqual(0.2, self.sol10.time_increment)
         self.sol10.time_increment = 42
         self.assertEqual(42, self.sol10.time_increment)
+
+    def test_so0_so1(self):
+
+        # shape
+        self.assertEqual((23,1), self.sol10.so0.shape)
+        self.assertEqual((23,1), self.sol10.so1.shape)
+        # type
+        self.assertEqual(np.float64, self.sol10.so0.dtype)
+        self.assertEqual(np.float64, self.sol10.so1.dtype)
+        # content
+        self.sol10.so0.fill(0)
+        self.assertEqual([0.0]*23, self.sol10.so0.flatten().tolist())
+        self.sol10.so1.fill(1)
+        self.assertEqual([1.0]*23, self.sol10.so1.flatten().tolist())
 
     def test_selm(self):
 
@@ -53,14 +71,14 @@ class SolutionTC(unittest.TestCase):
             str(self.sol10.selm(10, odd_plane=False)),
         )
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Grid::selm_at\(ielm=10, odd_plane=1\): xindex = 22 "
             "outside the interval \[1, 22\)",
         ):
             self.sol10.selm(10, odd_plane=True)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Grid::selm_at\(ielm=11, odd_plane=0\): xindex = 23 "
             "outside the interval \[1, 22\)",

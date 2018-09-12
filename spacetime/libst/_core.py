@@ -9,17 +9,17 @@ Core entities for :py:mod:`libst` library.
 
 from ._libst import (
     Grid,
+    Solution,
     Celm,
     Selm,
-    Solution,
 )
 
 
 __all__ = [
     'Grid',
+    'Solution',
     'Celm',
     'Selm',
-    'Solution',
     'celm_in',
     'selm_in',
 ]

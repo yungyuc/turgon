@@ -68,12 +68,19 @@ public:
     Selm selm_at(size_t ielm);
     Selm selm_at(size_t ielm, bool odd_plane);
 
+    array_type const & so0() const { return m_so0; }
+    array_type       & so0()       { return m_so0; }
+    array_type const & so1() const { return m_so1; }
+    array_type       & so1()       { return m_so1; }
+
 private:
 
     std::shared_ptr<Grid> m_grid;
     array_type m_so0;
     array_type m_so1;
     real_type m_time_increment;
+
+    friend class Selm;
 
 }; /* end class Solution */
 

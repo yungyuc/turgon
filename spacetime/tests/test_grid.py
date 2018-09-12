@@ -16,21 +16,21 @@ class GridTC(unittest.TestCase):
 
     def test_construction(self):
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "Grid::Grid\(xmin=0, xmax=10, ncelm=0\) invalid argument: "
             "ncelm smaller than 1",
         ):
             libst.Grid(0, 10, 0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "Grid::Grid\(xmin=10, xmax=10, ncelm=10\) invalid arguments: "
             "xmin >= xmax",
         ):
             libst.Grid(10, 10, 10)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "Grid::Grid\(xmin=11, xmax=10, ncelm=10\) invalid arguments: "
             "xmin >= xmax",
@@ -41,19 +41,24 @@ class GridTC(unittest.TestCase):
         libst.Grid(xloc=np.arange(2) * 0.1)
 
         for s in [0, 1]:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 ValueError,
                 "Grid::init_from_array\(xloc\) invalid arguments: "
                 "xloc.size\(\)=%d smaller than 2" % s
             ):
                 libst.Grid(xloc=np.arange(s) * 0.1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "Grid::init_from_array\(xloc\) invalid arguments: "
             "xloc\[0\]=1 >= xloc\[1\]=0.9"
         ):
             libst.Grid(xloc=np.arange(10, -1, -1) * 0.1)
+
+    def test_xcoord(self):
+
+        self.assertEqual(np.arange(-0.5, 10.6, 0.5).tolist(),
+                         self.grid10.xcoord.tolist())
 
     def test_number(self):
 
@@ -85,14 +90,14 @@ class GridTC(unittest.TestCase):
             str(self.grid10.celm(9, odd_plane=False)),
         )
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Grid::celm_at\(ielm=9, odd_plane=1\): xindex = 21 "
             "outside the interval \[2, 21\)",
         ):
             self.grid10.celm(9, odd_plane=True)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Grid::celm_at\(ielm=10, odd_plane=0\): xindex = 22 "
             "outside the interval \[2, 21\)",

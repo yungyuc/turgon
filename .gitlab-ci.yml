@@ -18,6 +18,8 @@ build:
     -DCMAKE_BUILD_TYPE=Release
     ..
   - make install VERBOSE=${VERBOSITY:-0}
+  - cd ${CI_PROJECT_DIR}/spacetime
+  - nosetests3 -v tests/*
   - cd ${CI_PROJECT_DIR}/writing
   - make VERBOSE=${VERBOSITY:-0}
   artifacts:

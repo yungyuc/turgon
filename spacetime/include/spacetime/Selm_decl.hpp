@@ -46,10 +46,17 @@ public:
 
     Grid const & grid() const { return sol().grid(); }
     Solution const & sol() const { return *m_sol; }
+    Solution       & sol()       { return *m_sol; }
 
     real_type xctr() const { return (xneg()+xpos())/2; }
 
     Selm & move_at(ssize_t offset);
+
+    value_type const & so0(size_t it) const { return sol().so0()[it]; }
+    value_type       & so0(size_t it)       { return sol().so0()[it]; }
+
+    value_type const & so1(size_t it) const { return sol().so1()[it]; }
+    value_type       & so1(size_t it)       { return sol().so1()[it]; }
 
 private:
 

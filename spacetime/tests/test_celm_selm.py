@@ -89,14 +89,14 @@ class CelmTC(unittest.TestCase):
 
        # Out of bound.
         ce0d = self.ce0.dup
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Celm\(xindex=2\)::move_at\(offset=-1\): xindex = 1 "
             "outside the interval \[2, 21\)",
         ):
             ce0d.move_neg()
         ce9d = self.ce9.dup
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Celm\(xindex=20\)::move_at\(offset=1\): xindex = 21 "
             "outside the interval \[2, 21\)",
@@ -199,14 +199,14 @@ class SelmTC(unittest.TestCase):
 
        # Out of bound.
         se0d = self.se0.dup
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Selm\(xindex=1\)::move_at\(offset=-1\): xindex = 0 "
             "outside the interval \[1, 22\)",
         ):
             se0d.move_neg()
         se10d = self.se10.dup
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             IndexError,
             "Selm\(xindex=21\)::move_at\(offset=1\): xindex = 22 "
             "outside the interval \[1, 22\)",
