@@ -15,6 +15,9 @@ from ._core import (
     Selm,
     celm_in,
     selm_in,
+    felm_in,
+    InviscidBurgersSolution,
+    InviscidBurgersFelm,
 )
 
 from ._pstcanvas import (
@@ -30,6 +33,9 @@ __all__ = [
     'Selm',
     'celm_in',
     'selm_in',
+    'felm_in',
+    'InviscidBurgersSolution',
+    'InviscidBurgersFelm',
     # _pstcanvas
     'PstCanvas',
 ]

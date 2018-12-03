@@ -12,7 +12,17 @@ namespace spacetime
 {
 
 template< class ET >
-inline size_t ElementBase<ET>::xindex() const { return m_xptr - grid().xptr(); }
+Grid const & ElementBase<ET>::grid() const { return m_field->grid(); }
+
+template< class ET >
+size_t ElementBase<ET>::xindex() const { return m_xptr - grid().xptr(); }
+
+template< class ET >
+ET & ElementBase<ET>::move(ssize_t offset)
+{
+    m_xptr += offset;
+    return *static_cast<ET *>(this);
+}
 
 } /* end namespace spacetime */
 

@@ -57,8 +57,11 @@ class GridTC(unittest.TestCase):
 
     def test_xcoord(self):
 
+        self.assertEqual(23, len(self.grid10.xcoord))
         self.assertEqual(np.arange(-0.5, 10.6, 0.5).tolist(),
                          self.grid10.xcoord.tolist())
+        self.grid10.xcoord.fill(10)
+        self.assertEqual([10]*23, self.grid10.xcoord.tolist())
 
     def test_number(self):
 
@@ -69,39 +72,5 @@ class GridTC(unittest.TestCase):
 
         self.assertEqual("Grid(xmin=0, xmax=10, ncelm=10)",
                          str(self.grid10))
-
-    def test_celm(self):
-
-        with self.assertRaises(TypeError):
-            self.grid10.celm(-1)
-
-        self.assertEqual(
-            "Celm(even, index=0, x=0.5, xneg=0, xpos=1)",
-            str(self.grid10.celm(0)),
-        )
-
-        self.assertEqual(
-            "Celm(odd, index=0, x=1, xneg=0.5, xpos=1.5)",
-            str(self.grid10.celm(ielm=0, odd_plane=True)),
-        )
-
-        self.assertEqual(
-            "Celm(even, index=9, x=9.5, xneg=9, xpos=10)",
-            str(self.grid10.celm(9, odd_plane=False)),
-        )
-
-        with self.assertRaisesRegex(
-            IndexError,
-            "Grid::celm_at\(ielm=9, odd_plane=1\): xindex = 21 "
-            "outside the interval \[2, 21\)",
-        ):
-            self.grid10.celm(9, odd_plane=True)
-
-        with self.assertRaisesRegex(
-            IndexError,
-            "Grid::celm_at\(ielm=10, odd_plane=0\): xindex = 22 "
-            "outside the interval \[2, 21\)",
-        ):
-            self.grid10.celm(10)
 
 # vim: set et sw=4 ts=4:

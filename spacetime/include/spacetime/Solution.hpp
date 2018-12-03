@@ -5,46 +5,26 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "spacetime/Solution_decl.hpp"
-#include "spacetime/Selm_decl.hpp"
+#include "spacetime/SolutionBase_decl.hpp"
+#include "spacetime/Field.hpp"
 
 namespace spacetime
 {
 
-inline Selm Solution::selm(size_t ielm)
+class Solution
+  : public SolutionBase<Solution>
 {
-    return Selm(*this, ielm);
-}
 
-inline Selm Solution::selm(size_t ielm, bool odd_plane)
-{
-    return Selm(*this, ielm, odd_plane);
-}
+public:
 
-inline Selm Solution::selm_at(size_t ielm)
-{
-    const Selm elm = selm(ielm);
-    if (elm.xindex() < 1 || elm.xindex() >= grid().xsize()-1) {
-        throw std::out_of_range(Formatter()
-            << "Grid::selm_at(ielm=" << ielm << "): xindex = " << elm.xindex()
-            << " outside the interval [1, " << grid().xsize()-1 << ")"
-        );
+    using SolutionBase<Solution>::SolutionBase;
+
+    static std::shared_ptr<Solution> construct(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment)
+    {
+        return construct_impl(grid, nvar, time_increment);
     }
-    return elm;
-}
 
-inline Selm Solution::selm_at(size_t ielm, bool odd_plane)
-{
-    const Selm elm = selm(ielm, odd_plane);
-    if (elm.xindex() < 1 || elm.xindex() >= grid().xsize()-1) {
-        throw std::out_of_range(Formatter()
-            << "Grid::selm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
-            << "): xindex = " << elm.xindex()
-            << " outside the interval [1, " << grid().xsize()-1 << ")"
-        );
-    }
-    return elm;
-}
+}; /* end class Solution */
 
 } /* end namespace spacetime */
 

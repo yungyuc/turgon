@@ -13,8 +13,10 @@ class CelmTC(unittest.TestCase):
     def setUp(self):
 
         self.grid10 = libst.Grid(0, 10, 10)
-        self.ce0 = self.grid10.celm(ielm=0)
-        self.ce9 = self.grid10.celm(ielm=9)
+        self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
+                                    time_increment=0.2)
+        self.ce0 = self.sol10.celm(ielm=0)
+        self.ce9 = self.sol10.celm(ielm=9)
 
     def test_str(self):
 
@@ -67,6 +69,7 @@ class CelmTC(unittest.TestCase):
         self.assertEqual(0.5, self.ce0.x)
         self.assertEqual(0, self.ce0.xneg)
         self.assertEqual(1, self.ce0.xpos)
+        self.assertEqual(self.ce0.xpos - self.ce0.xneg, self.ce0.dx)
 
     def test_move_is_inplace(self):
 
@@ -87,7 +90,7 @@ class CelmTC(unittest.TestCase):
         self.assertEqual(1, self.ce0.dup.move_pos().x)
         self.assertEqual(0.5, self.ce0.dup.move_pos().move_neg().x)
 
-       # Out of bound.
+        # Out of bound.
         ce0d = self.ce0.dup
         with self.assertRaisesRegex(
             IndexError,
@@ -103,17 +106,32 @@ class CelmTC(unittest.TestCase):
         ):
             ce9d.move_pos()
 
+    def test_bounding_se(self):
+
+        self.assertEqual(0, self.ce0.selm_xn.index)
+        self.assertTrue(self.ce0.selm_xn.on_even_plane)
+        self.assertEqual(1, self.ce0.selm_xp.index)
+        self.assertTrue(self.ce0.selm_xp.on_even_plane)
+        self.assertEqual(0, self.ce0.selm_tp.index)
+        self.assertTrue(self.ce0.selm_tp.on_odd_plane)
+        self.assertEqual(0, self.ce0.selm_tn.index)
+        self.assertTrue(self.ce0.selm_tn.on_odd_plane)
+
 
 class SelmTC(unittest.TestCase):
 
     def setUp(self):
 
+        self.dt = 0.2
         self.grid10 = libst.Grid(0, 10, 10)
         self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
-                                    time_increment=0.2)
+                                    time_increment=self.dt)
         self.se0 = self.sol10.selm(0)
         self.se9 = self.sol10.selm(9)
         self.se10 = self.sol10.selm(10)
+        # Set trivial solution.
+        self.sol10.so0.fill(1)
+        self.sol10.so1.fill(0)
 
     def test_str(self):
 
@@ -177,6 +195,10 @@ class SelmTC(unittest.TestCase):
         self.assertEqual(0, self.se0.x)
         self.assertEqual(-0.5, self.se0.xneg)
         self.assertEqual(0.5, self.se0.xpos)
+        self.assertEqual(self.se0.xpos - self.se0.xneg, self.se0.dx)
+        self.assertEqual(self.dt, self.se0.dt)
+        self.assertEqual(self.dt/2, self.se0.hdt)
+        self.assertEqual(self.dt/4, self.se0.qdt)
 
     def test_move_is_inplace(self):
 
@@ -197,7 +219,7 @@ class SelmTC(unittest.TestCase):
         self.assertEqual(0.5, self.se0.dup.move_pos().x)
         self.assertEqual(0, self.se0.dup.move_pos().move_neg().x)
 
-       # Out of bound.
+        # Out of bound.
         se0d = self.se0.dup
         with self.assertRaisesRegex(
             IndexError,
@@ -220,10 +242,10 @@ class NonUniformTC(unittest.TestCase):
 
         xloc = np.array([0, 1, 3, 10])
         self.grid3 = libst.Grid(xloc=xloc)
-        self.ce0 = self.grid3.celm(ielm=0)
-        self.ce1 = self.grid3.celm(ielm=1)
-        self.ce2 = self.grid3.celm(ielm=2)
         self.sol3 = libst.Solution(grid=self.grid3, nvar=1, time_increment=0.1)
+        self.ce0 = self.sol3.celm(ielm=0)
+        self.ce1 = self.sol3.celm(ielm=1)
+        self.ce2 = self.sol3.celm(ielm=2)
         self.se0 = self.sol3.selm(ielm=0)
         self.se1 = self.sol3.selm(ielm=1)
         self.se2 = self.sol3.selm(ielm=2)

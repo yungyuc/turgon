@@ -85,40 +85,8 @@ protected:
 
 }; /* end class WrapBase */
 
-class ModuleInitializer {
-
-public:
-
-    static ModuleInitializer & get_instance() {
-        static ModuleInitializer inst;
-        return inst;
-    }
-
-    void initialize(pybind11::module & topmod) {
-        if (!m_initialized) {
-            initialize_spacetime(topmod);
-        }
-        m_initialized = true;
-    }
-
-    bool is_initialized() const { return m_initialized; }
-
-private:
-
-    PyObject * initialize_spacetime(pybind11::module & topmod);
-
-    ModuleInitializer() = default;
-    ModuleInitializer(ModuleInitializer const & ) = delete;
-    ModuleInitializer(ModuleInitializer       &&) = delete;
-    ModuleInitializer & operator=(ModuleInitializer const & ) = delete;
-    ModuleInitializer & operator=(ModuleInitializer       &&) = delete;
-
-    bool m_initialized = false;
-
-}; /* end class ModuleInitializer */
-
 } /* end namespace python */
 
 } /* end namespace spacetime */
 
-// vim: set ff=unix fenc=utf8 nobomb et sw=4 ts=4:
+/* vim: set et ts=4 sw=4: */

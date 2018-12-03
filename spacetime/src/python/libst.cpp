@@ -26,9 +26,27 @@ PyObject * ModuleInitializer::initialize_spacetime(pybind11::module & mod)
     mod.doc() = "_libst: One-dimensional space-time CESE method code";
 
     WrapGrid::commit(mod, "Grid", "Spatial grid");
+    WrapSolution::commit(mod, "Solution", "Solution field");
     WrapCelm::commit(mod, "Celm", "Conservation element");
     WrapSelm::commit(mod, "Selm", "Solution element");
-    WrapSolution::commit(mod, "Solution", "Solution field");
+
+    return mod.ptr();
+}
+
+PyObject * ModuleInitializer::initialize_burgers(pybind11::module & mod)
+{
+    xt::import_numpy(); // or numpy c api segfault.
+
+    WrapInviscidBurgersSolution::commit(
+        mod
+      , "InviscidBurgersSolution"
+      , "Solution for the inviscid Burgers equation"
+    );
+    WrapInviscidBurgersFelm::commit(
+        mod
+      , "InviscidBurgersFelm"
+      , "Flux calculator for the solution element of the inviscid Burgers equation"
+    );
 
     return mod.ptr();
 }

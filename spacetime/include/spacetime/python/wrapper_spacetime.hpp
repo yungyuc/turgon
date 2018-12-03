@@ -5,26 +5,13 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include <sstream>
-
-#include "pybind11/pybind11.h"
-#include "pybind11/stl.h"
-#include "xtensor-python/pyarray.hpp"
-
-#include "spacetime.hpp"
-#include "spacetime/python/WrapBase.hpp"
+#include "spacetime/python/common.hpp"
 
 namespace spacetime
 {
 
 namespace python
 {
-
-namespace detail {
-
-template<class T> std::string to_str(T const & self) { return Formatter() << self >> Formatter::to_str; }
-
-} /* end namespace detail */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
@@ -56,27 +43,67 @@ WrapGrid
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("ncelm", &wrapped_type::ncelm)
             .def_property_readonly("nselm", &wrapped_type::nselm)
-            .def(
-                "celm",
-                static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at),
-                py::arg("ielm"), py::arg("odd_plane")=false
-            )
             .def_property_readonly(
                 "xcoord",
-                [](wrapped_type & self) { return xt::pyarray<wrapped_type::value_type>(self.xcoord()); }
+                static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::xcoord)
             )
         ;
     }
 
 }; /* end class WrapGrid */
 
+
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapSolution
-  : public WrapBase< WrapSolution, Solution, std::shared_ptr<Solution> >
+WrapField
+  : public WrapBase< WrapField, Field, std::shared_ptr<Field> >
 {
 
     friend base_type;
+
+    WrapField(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {
+        namespace py = pybind11;
+        (*this)
+            .def("__str__", &detail::to_str<wrapped_type>)
+            .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+            .def_property_readonly("nvar", &wrapped_type::nvar)
+            .def_property(
+                "time_increment",
+                &wrapped_type::time_increment,
+                &wrapped_type::set_time_increment
+             )
+            .def_property_readonly("dt", &wrapped_type::dt)
+            .def_property_readonly("hdt", &wrapped_type::hdt)
+            .def_property_readonly("qdt", &wrapped_type::qdt)
+            .def(
+                "celm",
+                static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at),
+                py::arg("ielm"), py::arg("odd_plane")=false
+            )
+            .def(
+                "selm",
+                static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),
+                py::arg("ielm"), py::arg("odd_plane")=false
+            )
+        ;
+    }
+
+}; /* end class WrapField */
+
+class
+SPACETIME_PYTHON_WRAPPER_VISIBILITY
+WrapSolution
+  : public WrapSolutionBase< WrapSolution, Solution >
+{
+    
+    using base_type = WrapSolutionBase< WrapSolution, Solution >;
+    using wrapper_type = typename base_type::wrapper_type;
+    using wrapped_type = typename base_type::wrapped_type;
+
+    friend base_type;
+    friend base_type::base_type;
 
     WrapSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
@@ -84,80 +111,15 @@ WrapSolution
         namespace py = pybind11;
         (*this)
             .def(
-                py::init([](std::shared_ptr<Grid> const & grid, size_t nvar, wrapped_type::value_type time_increment) {
-                    return Solution::construct(grid, nvar, time_increment);
+                py::init([](std::shared_ptr<Grid> const & grid, size_t nvar, typename wrapped_type::value_type time_increment) {
+                    return wrapped_type::construct(grid, nvar, time_increment);
                 }),
                 py::arg("grid"), py::arg("nvar"), py::arg("time_increment")
-            )
-            .def("__str__", &detail::to_str<wrapped_type>)
-            .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
-            .def_property_readonly("nvar", &wrapped_type::nvar)
-            .def_property(
-                "time_increment",
-                [](wrapped_type & self) { return self.time_increment(); },
-                [](wrapped_type & self, wrapped_type::value_type val) { return self.time_increment() = val; }
-            )
-            .def(
-                "selm",
-                static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),
-                py::arg("ielm"), py::arg("odd_plane")=false
-            )
-            .def_property_readonly(
-                "so0",
-                static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so0)
-            )
-            .def_property_readonly(
-                "so1",
-                static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so1)
             )
         ;
     }
 
 }; /* end class WrapSolution */
-
-template<class WT, class ET>
-class
-SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapElementBase
-  : public WrapBase< WT, ET >
-{
-
-public:
-
-    using base_type = WrapBase< WT, ET >;
-    using wrapper_type = typename base_type::wrapper_type;
-    using wrapped_type = typename base_type::wrapped_type;
-
-    friend base_type;
-
-protected:
-
-    using base_type::base_type;
-
-    WrapElementBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
-      : base_type(mod, pyname, clsdoc)
-    {
-        (*this)
-            .def("__str__", &detail::to_str<wrapped_type>)
-            .def("duplicate", &wrapped_type::duplicate)
-            .def_property_readonly("dup", &wrapped_type::duplicate)
-            .def_property_readonly("x", &wrapped_type::x)
-            .def_property_readonly("xneg", &wrapped_type::xneg)
-            .def_property_readonly("xpos", &wrapped_type::xpos)
-            .def_property_readonly("xctr", &wrapped_type::xctr)
-            .def_property_readonly("index", &wrapped_type::index)
-            .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
-            .def_property_readonly("on_odd_plane", &wrapped_type::on_odd_plane)
-            .def_property_readonly("grid", &wrapped_type::grid)
-            .def("move", &wrapped_type::move_at)
-            .def("move_left", &wrapped_type::move_left_at)
-            .def("move_right", &wrapped_type::move_right_at)
-            .def("move_neg", &wrapped_type::move_neg_at)
-            .def("move_pos", &wrapped_type::move_pos_at)
-        ;
-    }
-
-}; /* end class WrapElementBase */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
@@ -174,7 +136,14 @@ WrapCelm
 
     WrapCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
-    {}
+    {
+        (*this)
+            .def_property_readonly("selm_xn", &wrapped_type::selm_xn)
+            .def_property_readonly("selm_xp", &wrapped_type::selm_xp)
+            .def_property_readonly("selm_tn", &wrapped_type::selm_tp)
+            .def_property_readonly("selm_tp", &wrapped_type::selm_tp)
+        ;
+    }
 
 }; /* end class WrapCelm */
 
@@ -195,10 +164,6 @@ WrapSelm
       : base_type(mod, pyname, clsdoc)
     {
         (*this)
-            .def_property_readonly(
-                "sol",
-                [](wrapped_type const & self) { return self.sol().shared_from_this(); }
-            )
             .def(
                 "so0",
                 static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)

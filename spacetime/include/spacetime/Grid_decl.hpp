@@ -60,14 +60,10 @@ public:
     size_t ncelm() const { return m_ncelm; }
     size_t nselm() const { return m_ncelm+1; }
 
-    Celm celm(size_t ielm);
-    Celm celm(size_t ielm, bool odd_plane);
-    Celm celm_at(size_t ielm);
-    Celm celm_at(size_t ielm, bool odd_plane);
-
     size_t xsize() const { return m_xcoord.size(); }
 
-    array_type xcoord() { return m_xcoord; }
+    array_type const & xcoord() const { return m_xcoord; }
+    array_type       & xcoord()       { return m_xcoord; }
 
 public:
 
