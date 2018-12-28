@@ -7,10 +7,10 @@
 % Geometry.
 \usepackage{geometry}
 \geometry{a4paper,
-left=2cm,
-right=2cm,
-top=2cm,
-bottom=2cm,
+left=1.2cm,
+right=1.2cm,
+top=1.5cm,
+bottom=1.5cm,
 }
 % Global functionalities.
 \usepackage[authoryear,round,sort]{natbib}

@@ -37,24 +37,21 @@ Yung-Yu Chen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Numerical computation, facilitated by the advancement of digital computers,
-enables all kinds of simulation that only existed in imagination.  Among them,
-hyperbolic partial differential equations (PDEs) are one significant
-application, because they demand huge amount of computing power, and alternate
-approaches to detailed knowledge of the physical process are few.  The
-importance keeps increasing when we deal with non-linear equations, which come
-from conservation laws \citep{lax_hyperbolic_1973}.  Except numerical
-simulation, there is not an effective way to solve real-world problems governed
-by non-linear hyperbolic PDEs.
+enables all kinds of simulation, and solving non-linear hyperbolic partial
+differential equations (PDEs) is an important one.  Hyperbolic PDEs come from
+conservation laws \citep{lax_hyperbolic_1973}.  Except numerical simulation,
+there is not a cost-effective way to analyze real-world problems governed by
+non-linear hyperbolic PDEs.
 
-The physics, mathematics, and computer code are all key to the solution.  The
-physical insight guides us what we want from the problems.  The mathematical
-expression gives us tools.  The computer code materializes the numerical
-solution.  In between mathematics and computer program, there is a staging area
-called numerical method.  It uses mathematics to describe how the computer
-program should solve the problems, but is formulated to enable the most
-efficient programming.  It must be emphasized that the numerical simulation
-demands utmost runtime performance.  An efficient numerical formulation is a
-decisive factor for the usefulness of a code.
+Physics, mathematics, and computer code are the three keys to the solution.
+The physical insight guides us what we want from the problems.  The
+mathematical expression gives us tools.  The computer code materializes the
+numerical solution.  In between mathematics and computer program, there is a
+staging area called numerical method.  It uses mathematics to describe how the
+computer program should solve the problems, but is formulated to enable the
+most efficient programming.  It must be emphasized that the numerical
+simulation demands utmost runtime performance.  An efficient numerical
+formulation is a decisive factor for the usefulness of a code.
 
 This note takes a practical approach for numerical solution of hyperbolic PDEs.
 The performance demand significantly restricts how the computer program may be
