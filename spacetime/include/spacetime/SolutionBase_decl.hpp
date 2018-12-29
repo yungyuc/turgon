@@ -1,0 +1,91 @@
+#pragma once
+
+/*
+ * Copyright (c) 2018, Yung-Yu Chen <yyc@solvcon.net>
+ * BSD 3-Clause License, see COPYING
+ */
+
+#include <memory>
+#include <vector>
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xview.hpp"
+
+#include "spacetime/system.hpp"
+#include "spacetime/type.hpp"
+#include "spacetime/Grid_decl.hpp"
+#include "spacetime/Field_decl.hpp"
+
+namespace spacetime
+{
+
+class Selm;
+
+template< typename ST >
+class SolutionBase
+  : public std::enable_shared_from_this<ST>
+{
+
+public:
+
+    using value_type = Field::value_type;
+    using array_type = Field::array_type;
+
+protected:
+
+    class ctor_passkey {};
+
+    template<class ... Args> static std::shared_ptr<ST> construct_impl(Args&& ... args)
+    {
+        return std::make_shared<ST>(std::forward<Args>(args) ..., ctor_passkey());
+    }
+
+public:
+
+    SolutionBase(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
+      : m_field(grid, nvar, time_increment) {}
+
+    SolutionBase() = delete;
+    SolutionBase(SolutionBase const & ) = delete;
+    SolutionBase(SolutionBase       &&) = delete;
+    SolutionBase & operator=(SolutionBase const & ) = delete;
+    SolutionBase & operator=(SolutionBase       &&) = delete;
+
+    Grid const & grid() const { return m_field.grid(); }
+    Grid       & grid()       { return m_field.grid(); }
+
+    array_type const & so0() const { return m_field.so0(); }
+    array_type       & so0()       { return m_field.so0(); }
+    array_type const & so1() const { return m_field.so1(); }
+    array_type       & so1()       { return m_field.so1(); }
+
+    size_t nvar() const { return m_field.nvar(); }
+
+    void set_time_increment(value_type time_increment) { m_field.set_time_increment(time_increment); }
+
+    real_type time_increment() const { return m_field.time_increment(); }
+    real_type dt() const { return m_field.dt(); }
+    real_type hdt() const { return m_field.hdt(); }
+    real_type qdt() const { return m_field.qdt(); }
+
+    Celm celm(size_t ielm);
+    Celm celm(size_t ielm, bool odd_plane);
+    Celm celm_at(size_t ielm);
+    Celm celm_at(size_t ielm, bool odd_plane);
+
+    Selm selm(size_t ielm);
+    Selm selm(size_t ielm, bool odd_plane);
+    Selm selm_at(size_t ielm);
+    Selm selm_at(size_t ielm, bool odd_plane);
+
+private:
+
+    Field m_field;
+
+}; /* end class SolutionBase */
+
+} /* end namespace spacetime */
+
+/* vim: set et ts=4 sw=4: */

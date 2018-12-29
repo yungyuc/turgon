@@ -16,10 +16,10 @@ class FunctionTC(unittest.TestCase):
 
     def test_celm_in(self):
 
-        for it, ce in enumerate(libst.celm_in(self.grid10)):
-            self.assertEqual(str(self.grid10.celm(it)), str(ce))
-        for it, ce in enumerate(libst.celm_in(self.grid10, odd_plane=True)):
-            self.assertEqual(str(self.grid10.celm(it, odd_plane=True)), str(ce))
+        for it, ce in enumerate(libst.celm_in(self.sol10)):
+            self.assertEqual(str(self.sol10.celm(it)), str(ce))
+        for it, ce in enumerate(libst.celm_in(self.sol10, odd_plane=True)):
+            self.assertEqual(str(self.sol10.celm(it, odd_plane=True)), str(ce))
 
     def test_selm_in(self):
 

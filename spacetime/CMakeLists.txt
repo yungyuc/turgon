@@ -23,20 +23,26 @@ include_directories("include")
 set(SPACETIME_HEADERS
     # Overall.
     include/spacetime.hpp
-    # Others.
+    # Framework.
     include/spacetime/Celm.hpp
     include/spacetime/Celm_decl.hpp
     include/spacetime/ElementBase.hpp
     include/spacetime/ElementBase_decl.hpp
     include/spacetime/Grid.hpp
     include/spacetime/Grid_decl.hpp
+    include/spacetime/Field.hpp
+    include/spacetime/Field_decl.hpp
+    include/spacetime/SolutionBase.hpp
+    include/spacetime/SolutionBase_decl.hpp
     include/spacetime/Solution.hpp
-    include/spacetime/Solution_decl.hpp
     include/spacetime/Selm.hpp
     include/spacetime/Selm_decl.hpp
+    include/spacetime/FelmBase.hpp
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
+    # Physical kernels.
+    include/spacetime/kernel/inviscid_burgers.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
        SPACETIME_HEADERS "${SPACETIME_HEADERS}")
@@ -48,8 +54,10 @@ add_executable(example ${EXAMPLE_SOURCES} ${SPACETIME_HEADERS})
 
 set(SPACETIME_PY_HEADERS
     include/spacetime/python.hpp
+    include/spacetime/python/common.hpp
     include/spacetime/python/WrapBase.hpp
     include/spacetime/python/wrapper_spacetime.hpp
+    include/spacetime/python/wrapper_inviscid_burgers.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
        SPACETIME_PY_HEADERS "${SPACETIME_PY_HEADERS}")

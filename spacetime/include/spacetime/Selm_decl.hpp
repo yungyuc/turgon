@@ -9,7 +9,7 @@
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase_decl.hpp"
 #include "spacetime/Grid_decl.hpp"
-#include "spacetime/Solution_decl.hpp"
+#include "spacetime/Field_decl.hpp"
 
 namespace spacetime
 {
@@ -23,14 +23,12 @@ class Selm
 
 public:
 
-    Selm(Solution & sol, size_t index)
-      : base_type(sol.grid().xptr_selm(index, Grid::SelmPK()))
-      , m_sol(&sol)
+    Selm(Field & field, size_t index)
+      : base_type(&field, field.grid().xptr_selm(index, Grid::SelmPK()))
     {}
 
-    Selm(Solution & sol, size_t index, bool odd_plane)
-      : base_type(sol.grid().xptr_selm(index, odd_plane, Grid::SelmPK()))
-      , m_sol(&sol)
+    Selm(Field & field, size_t index, bool odd_plane)
+      : base_type(&field, field.grid().xptr_selm(index, odd_plane, Grid::SelmPK()))
     {}
 
     /**
@@ -44,16 +42,15 @@ public:
     bool on_even_plane() const { return !on_odd_plane(); }
     bool on_odd_plane() const { return bool((xindex() - 1) & 1); }
 
-    Grid const & grid() const { return sol().grid(); }
-    Solution const & sol() const { return *m_sol; }
-
     real_type xctr() const { return (xneg()+xpos())/2; }
 
     Selm & move_at(ssize_t offset);
 
-private:
+    value_type const & so0(size_t it) const { return field().so0()[it]; }
+    value_type       & so0(size_t it)       { return field().so0()[it]; }
 
-    Solution * m_sol;
+    value_type const & so1(size_t it) const { return field().so1()[it]; }
+    value_type       & so1(size_t it)       { return field().so1()[it]; }
 
 }; /* end class Selm */
 

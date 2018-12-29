@@ -5,6 +5,8 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include "xtensor/xarray.hpp"
+
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 
@@ -12,7 +14,7 @@ namespace spacetime
 {
 
 class Grid;
-class Solution;
+class Field;
 
 template< class ET >
 class ElementBase
@@ -20,26 +22,33 @@ class ElementBase
 
 public:
 
+    using value_type = real_type;
+    using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
     using base_type = ElementBase;
     using element_type = ET;
 
-    ElementBase(real_type * xptr) : m_xptr(xptr) {}
+    ElementBase(Field * field, real_type * xptr) : m_field(field), m_xptr(xptr) {}
+
+    ElementBase() = delete;
 
     ET duplicate() { return *static_cast<ET *>(this); }
 
-    Grid const & grid() const { return static_cast<ET const *>(this)->grid(); }
+    Grid const & grid() const;
+    Field const & field() const { return *m_field; }
+    Field       & field()       { return *m_field; }
+
+    real_type time_increment() const { return field().time_increment(); }
+    real_type dt() const { return field().dt(); }
+    real_type hdt() const { return field().hdt(); }
+    real_type qdt() const { return field().qdt(); }
 
     real_type x() const { return *m_xptr; }
+    real_type dx() const { return xpos() - xneg(); }
     real_type xneg() const { return *(m_xptr-1); }
     real_type xpos() const { return *(m_xptr+1); }
     real_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
-    ET & move(ssize_t offset)
-    {
-        m_xptr += offset;
-        return *static_cast<ET *>(this);
-    }
-
+    ET & move(ssize_t offset);
     ET & move_at(ssize_t offset) { return static_cast<ET *>(this)->move_at(offset); }
 
     ET & move_left() { return move(-2); }
@@ -56,10 +65,11 @@ protected:
 
     size_t xindex() const;
 
+    Field * m_field;
     real_type * m_xptr;
 
     friend Grid;
-    friend Solution;
+    friend Field;
 
 }; /* end class ElementBase */
 

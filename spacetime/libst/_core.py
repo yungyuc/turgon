@@ -9,31 +9,43 @@ Core entities for :py:mod:`libst` library.
 
 from ._libst import (
     Grid,
+    Solution,
     Celm,
     Selm,
-    Solution,
+    InviscidBurgersSolution,
+    InviscidBurgersFelm,
 )
 
 
 __all__ = [
     'Grid',
+    'Solution',
     'Celm',
     'Selm',
-    'Solution',
     'celm_in',
     'selm_in',
+    'felm_in',
+    'InviscidBurgersSolution',
+    'InviscidBurgersFelm',
 ]
 
 
-def celm_in(grid, odd_plane=False):
+def celm_in(sol, odd_plane=False):
+    grid = sol.grid
     ncelm = grid.ncelm-1 if odd_plane else grid.ncelm
     for it in range(ncelm):
-        yield grid.celm(it, odd_plane=odd_plane)
+        yield sol.celm(it, odd_plane=odd_plane)
 
 def selm_in(sol, odd_plane=False):
     grid = sol.grid
     nselm = grid.nselm-1 if odd_plane else grid.nselm
     for it in range(nselm):
         yield sol.selm(it, odd_plane=odd_plane)
+
+def felm_in(sol, odd_plane=False):
+    grid = sol.grid
+    nselm = grid.nselm-1 if odd_plane else grid.nselm
+    for it in range(nselm):
+        yield sol.felm(it, odd_plane=odd_plane)
 
 # vim: set et sw=4 ts=4:

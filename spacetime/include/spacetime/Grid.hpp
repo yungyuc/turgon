@@ -84,41 +84,6 @@ void Grid::init_from_array(array_type const & xloc)
     m_xcoord[nx-1] = m_xcoord[nx-2] + m_xcoord[nx-2] - m_xcoord[nx-3];
 }
 
-inline Celm Grid::celm(size_t ielm)
-{
-    return Celm(*this, ielm);
-}
-
-inline Celm Grid::celm(size_t ielm, bool odd_plane)
-{
-    return Celm(*this, ielm, odd_plane);
-}
-
-inline Celm Grid::celm_at(size_t ielm)
-{
-    const Celm elm = celm(ielm);
-    if (elm.xindex() < 2 || elm.xindex() >= this->xsize()-2) {
-        throw std::out_of_range(Formatter()
-            << "Grid::celm_at(ielm=" << ielm << "): xindex = " << elm.xindex()
-            << " outside the interval [2, " << this->xsize()-2 << ")"
-        );
-    }
-    return elm;
-}
-
-inline Celm Grid::celm_at(size_t ielm, bool odd_plane)
-{
-    const Celm elm = celm(ielm, odd_plane);
-    if (elm.xindex() < 2 || elm.xindex() >= this->xsize()-2) {
-        throw std::out_of_range(Formatter()
-            << "Grid::celm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
-            << "): xindex = " << elm.xindex()
-            << " outside the interval [2, " << this->xsize()-2 << ")"
-        );
-    }
-    return elm;
-}
-
 } /* end namespace spacetime */
 
 /* vim: set et ts=4 sw=4: */
