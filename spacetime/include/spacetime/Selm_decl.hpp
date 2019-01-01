@@ -42,7 +42,9 @@ public:
     bool on_even_plane() const { return !on_odd_plane(); }
     bool on_odd_plane() const { return bool((xindex() - 1) & 1); }
 
-    real_type xctr() const { return (xneg()+xpos())/2; }
+    value_type dxneg() const { return x()-xneg(); }
+    value_type dxpos() const { return xpos()-x(); }
+    value_type xctr() const { return (xneg()+xpos())/2; }
 
     Selm & move_at(ssize_t offset);
 

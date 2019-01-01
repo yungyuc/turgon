@@ -27,7 +27,7 @@ public:
     using base_type = ElementBase;
     using element_type = ET;
 
-    ElementBase(Field * field, real_type * xptr) : m_field(field), m_xptr(xptr) {}
+    ElementBase(Field * field, value_type * xptr) : m_field(field), m_xptr(xptr) {}
 
     ElementBase() = delete;
 
@@ -37,16 +37,16 @@ public:
     Field const & field() const { return *m_field; }
     Field       & field()       { return *m_field; }
 
-    real_type time_increment() const { return field().time_increment(); }
-    real_type dt() const { return field().dt(); }
-    real_type hdt() const { return field().hdt(); }
-    real_type qdt() const { return field().qdt(); }
+    value_type time_increment() const { return field().time_increment(); }
+    value_type dt() const { return field().dt(); }
+    value_type hdt() const { return field().hdt(); }
+    value_type qdt() const { return field().qdt(); }
 
-    real_type x() const { return *m_xptr; }
-    real_type dx() const { return xpos() - xneg(); }
-    real_type xneg() const { return *(m_xptr-1); }
-    real_type xpos() const { return *(m_xptr+1); }
-    real_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
+    value_type x() const { return *m_xptr; }
+    value_type dx() const { return xpos() - xneg(); }
+    value_type xneg() const { return *(m_xptr-1); }
+    value_type xpos() const { return *(m_xptr+1); }
+    value_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
     ET & move(ssize_t offset);
     ET & move_at(ssize_t offset) { return static_cast<ET *>(this)->move_at(offset); }
@@ -66,7 +66,7 @@ protected:
     size_t xindex() const;
 
     Field * m_field;
-    real_type * m_xptr;
+    value_type * m_xptr;
 
     friend Grid;
     friend Field;

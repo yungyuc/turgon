@@ -42,6 +42,7 @@ set(SPACETIME_HEADERS
     include/spacetime/system.hpp
     include/spacetime/type.hpp
     # Physical kernels.
+    include/spacetime/kernel/convection.hpp
     include/spacetime/kernel/inviscid_burgers.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
@@ -57,6 +58,7 @@ set(SPACETIME_PY_HEADERS
     include/spacetime/python/common.hpp
     include/spacetime/python/WrapBase.hpp
     include/spacetime/python/wrapper_spacetime.hpp
+    include/spacetime/python/wrapper_convection.hpp
     include/spacetime/python/wrapper_inviscid_burgers.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"

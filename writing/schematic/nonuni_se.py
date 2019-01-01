@@ -1,12 +1,15 @@
 import sys
 import os
 
+import numpy as np
+
 import libst
 
 
 def draw():
 
-    grid = libst.Grid(0, 6, 4)
+    xloc = np.array([-1, 0, 2, 3.5])
+    grid = libst.Grid(xloc=xloc)
     sol = libst.Solution(grid=grid, nvar=1, time_increment=6/4)
 
     dx = (grid.xmax-grid.xmin)/grid.ncelm
@@ -27,11 +30,6 @@ def draw():
            linewidth=linewidth)
     c.line((sol.selm(0).x, dt), (sol.selm(grid.ncelm).x, dt),
            linewidth=linewidth)
-    for se in libst.selm_in(sol):
-        c.line((se.x, dt), (se.x, dt*1.65), arrows='->',
-               linewidth=linewidth, linestyle='dashed')
-    c.line((sol.selm(0).x, dt*1.5), (sol.selm(grid.ncelm).x, dt*1.5),
-           linewidth=linewidth, linestyle='dashed')
 
     # x-axis.
     sep = 0.05
@@ -65,24 +63,9 @@ def draw():
     for se in libst.selm_in(sol):
         c.selm(se, 0,
                sep=sep, linestyle='dotted', dotsep='1pt', linecolor='red')
-        if se.index != grid.ncelm: # left to right.
-            c.line((se.x+sepx, 0+sept), (se.xpos-sepx, hdt-sept),
-                   arrows='->', linecolor='red')
-        if se.index != 0: # right to left.
-            c.line((se.x-sepx, 0+sept), (se.xneg+sepx, hdt-sept),
-                   arrows='->', linecolor='red')
     for se in libst.selm_in(sol, odd_plane=True):
         c.selm(se, hdt,
                sep=sep, linestyle='dotted', dotsep='1pt', linecolor='blue')
-        if se.index != grid.ncelm-1: # left to right.
-            c.line((se.x+sepx, hdt+sept), (se.xpos-sepx, dt-sept),
-                   arrows='->', linecolor='blue')
-        if se.index != 0: # right to left.
-            c.line((se.x-sepx, hdt+sept), (se.xneg+sepx, dt-sept),
-                   arrows='->', linecolor='blue')
-    for se in libst.selm_in(sol):
-        c.selm(se, dt,
-               sep=sep, linestyle='dotted', dotsep='1pt', linecolor='orange')
 
     return c
 

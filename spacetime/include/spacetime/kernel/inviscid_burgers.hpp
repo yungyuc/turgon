@@ -5,6 +5,10 @@
  * BSD 3-Clause License, see COPYING
  */
 
+/**
+ * Inviscid Burgers' equation.
+ */
+
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase_decl.hpp"
@@ -45,7 +49,8 @@ public:
 /**
  * Flux calculator for the solution element for the inviscid Burgers equation.
  */
-class InviscidBurgersFelm : public FelmBase<InviscidBurgersFelm, InviscidBurgersSolution>
+class InviscidBurgersFelm
+  : public FelmBase<InviscidBurgersFelm, InviscidBurgersSolution>
 {
 
 public:

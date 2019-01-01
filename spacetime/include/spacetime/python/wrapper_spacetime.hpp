@@ -164,6 +164,8 @@ WrapSelm
       : base_type(mod, pyname, clsdoc)
     {
         (*this)
+            .def_property_readonly("dxneg", &wrapped_type::dxneg)
+            .def_property_readonly("dxpos", &wrapped_type::dxpos)
             .def(
                 "so0",
                 static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)

@@ -43,14 +43,14 @@ public:
     bool on_even_plane() const { return !on_odd_plane(); }
     bool on_odd_plane() const { return bool((xindex() - 2) & 1); }
 
-    real_type xctr() const { return x(); }
+    value_type xctr() const { return x(); }
 
     Celm & move_at(ssize_t offset);
 
-    real_type time_increment() const { return field().time_increment(); }
-    real_type dt() const { return field().dt(); }
-    real_type hdt() const { return field().hdt(); }
-    real_type qdt() const { return field().qdt(); }
+    value_type time_increment() const { return field().time_increment(); }
+    value_type dt() const { return field().dt(); }
+    value_type hdt() const { return field().hdt(); }
+    value_type qdt() const { return field().qdt(); }
 
     Selm selm_xn() { return Selm(field(), index(), on_odd_plane()); }
     Selm selm_xp() { return Selm(field(), index()+1, on_odd_plane()); }
