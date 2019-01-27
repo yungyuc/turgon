@@ -52,7 +52,6 @@ WrapGrid
 
 }; /* end class WrapGrid */
 
-
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapField
@@ -97,7 +96,7 @@ SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapSolution
   : public WrapSolutionBase< WrapSolution, Solution >
 {
-    
+
     using base_type = WrapSolutionBase< WrapSolution, Solution >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;

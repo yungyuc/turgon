@@ -5,6 +5,9 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include <list>
+#include <functional>
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "xtensor-python/pyarray.hpp"
@@ -61,8 +64,8 @@ protected:
             .def_property_readonly("on_odd_plane", &wrapped_type::on_odd_plane)
             .def_property_readonly("grid", &wrapped_type::grid)
             .def_property_readonly(
-                "field",
-                static_cast<Field & (wrapped_type::*)()>(&wrapped_type::field)
+                "field"
+              , static_cast<Field & (wrapped_type::*)()>(&wrapped_type::field)
             )
             .def_property_readonly("time_increment", &wrapped_type::time_increment)
             .def_property_readonly("dt", &wrapped_type::dt)
@@ -103,31 +106,33 @@ protected:
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
             .def_property_readonly("nvar", &wrapped_type::nvar)
             .def_property(
-                "time_increment",
-                &wrapped_type::time_increment,
-                &wrapped_type::set_time_increment
+                "time_increment"
+              , &wrapped_type::time_increment
+              , &wrapped_type::set_time_increment
              )
             .def_property_readonly("dt", &wrapped_type::dt)
             .def_property_readonly("hdt", &wrapped_type::hdt)
             .def_property_readonly("qdt", &wrapped_type::qdt)
             .def(
-                "celm",
-                static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at),
-                py::arg("ielm"), py::arg("odd_plane")=false
+                "celm"
+              , static_cast<typename wrapped_type::celm_type (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at)
+              , py::arg("ielm"), py::arg("odd_plane")=false
             )
             .def(
-                "selm",
-                static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),
-                py::arg("ielm"), py::arg("odd_plane")=false
+                "selm"
+              , static_cast<typename wrapped_type::selm_type (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at)
+              , py::arg("ielm"), py::arg("odd_plane")=false
             )
             .def_property_readonly(
-                "so0",
-                static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so0)
+                "so0"
+              , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so0)
             )
             .def_property_readonly(
-                "so1",
-                static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so1)
+                "so1"
+              , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so1)
             )
+            .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
+            .def("march_half_so1", &wrapped_type::march_half_so1, py::arg("odd_plane"))
         ;
     }
 
@@ -137,25 +142,35 @@ class ModuleInitializer {
 
 public:
 
-    static ModuleInitializer & get_instance() {
+    using init_type = std::function<PyObject*(pybind11::module&)>;
+
+    static ModuleInitializer & get_instance()
+    {
         static ModuleInitializer inst;
         return inst;
     }
 
-    void initialize(pybind11::module & topmod) {
-        if (!m_initialized) {
-            initialize_spacetime(topmod);
-            initialize_burgers(topmod);
+    void initialize(pybind11::module & topmod)
+    {
+        if (!m_initialized)
+        {
+            for (init_type initializer: m_initializers)
+            {
+                initializer(topmod);
+            }
         }
         m_initialized = true;
     }
 
     bool is_initialized() const { return m_initialized; }
 
-private:
+    ModuleInitializer & add(init_type init)
+    {
+        m_initializers.push_back(init);
+        return *this;
+    }
 
-    PyObject * initialize_spacetime(pybind11::module & topmod);
-    PyObject * initialize_burgers(pybind11::module & topmod);
+private:
 
     ModuleInitializer() = default;
     ModuleInitializer(ModuleInitializer const & ) = delete;
@@ -164,6 +179,7 @@ private:
     ModuleInitializer & operator=(ModuleInitializer       &&) = delete;
 
     bool m_initialized = false;
+    std::list<init_type> m_initializers;
 
 }; /* end class ModuleInitializer */
 

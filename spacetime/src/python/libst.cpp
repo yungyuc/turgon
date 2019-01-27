@@ -13,14 +13,13 @@
 
 #include "spacetime.hpp"
 
-namespace spacetime
+namespace
 {
 
-namespace python
+PyObject * initialize_spacetime(pybind11::module & mod)
 {
+    using namespace spacetime::python;
 
-PyObject * ModuleInitializer::initialize_spacetime(pybind11::module & mod)
-{
     xt::import_numpy(); // or numpy c api segfault.
 
     mod.doc() = "_libst: One-dimensional space-time CESE method code";
@@ -33,8 +32,30 @@ PyObject * ModuleInitializer::initialize_spacetime(pybind11::module & mod)
     return mod.ptr();
 }
 
-PyObject * ModuleInitializer::initialize_burgers(pybind11::module & mod)
+PyObject * initialize_linear_scalar(pybind11::module & mod)
 {
+    using namespace spacetime::python;
+
+    xt::import_numpy(); // or numpy c api segfault.
+
+    WrapLinearScalarSolution::commit(
+        mod
+      , "LinearScalarSolution"
+      , "Solution for a linear scalar equation"
+    );
+    WrapLinearScalarSelm::commit(
+        mod
+      , "LinearScalarSelm"
+      , "Solution element of a linear scalar equation"
+    );
+
+    return mod.ptr();
+}
+
+PyObject * initialize_inviscid_burgers(pybind11::module & mod)
+{
+    using namespace spacetime::python;
+
     xt::import_numpy(); // or numpy c api segfault.
 
     WrapInviscidBurgersSolution::commit(
@@ -42,7 +63,7 @@ PyObject * ModuleInitializer::initialize_burgers(pybind11::module & mod)
       , "InviscidBurgersSolution"
       , "Solution for the inviscid Burgers equation"
     );
-    WrapInviscidBurgersFelm::commit(
+    WrapInviscidBurgersSelm::commit(
         mod
       , "InviscidBurgersFelm"
       , "Flux calculator for the solution element of the inviscid Burgers equation"
@@ -51,12 +72,15 @@ PyObject * ModuleInitializer::initialize_burgers(pybind11::module & mod)
     return mod.ptr();
 }
 
-} /* end namespace python */
-
-} /* end namespace march */
+} /* end namespace */
 
 PYBIND11_MODULE(_libst, mod) {
-    ::spacetime::python::ModuleInitializer::get_instance().initialize(mod);
+    ::spacetime::python::ModuleInitializer::get_instance()
+        .add(initialize_spacetime)
+        .add(initialize_linear_scalar)
+        .add(initialize_inviscid_burgers)
+        .initialize(mod)
+    ;
 }
 
 // vim: set et sw=4 ts=4:

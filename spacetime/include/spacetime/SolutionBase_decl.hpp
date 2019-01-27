@@ -23,7 +23,11 @@ namespace spacetime
 
 class Selm;
 
-template< typename ST >
+/**
+ * Algorithmic definition for solution.  It holds the type information for the
+ * CE and SE.
+ */
+template< typename ST, typename CE, typename SE >
 class SolutionBase
   : public std::enable_shared_from_this<ST>
 {
@@ -32,6 +36,8 @@ public:
 
     using value_type = Field::value_type;
     using array_type = Field::array_type;
+    using celm_type = CE;
+    using selm_type = SE;
 
 protected:
 
@@ -70,15 +76,14 @@ public:
     real_type hdt() const { return m_field.hdt(); }
     real_type qdt() const { return m_field.qdt(); }
 
-    Celm celm(size_t ielm);
-    Celm celm(size_t ielm, bool odd_plane);
-    Celm celm_at(size_t ielm);
-    Celm celm_at(size_t ielm, bool odd_plane);
+    CE celm(size_t ielm, bool odd_plane) { return m_field.celm<CE>(ielm, odd_plane); }
+    CE celm_at(size_t ielm, bool odd_plane) { return m_field.celm_at<CE>(ielm, odd_plane); }
 
-    Selm selm(size_t ielm);
-    Selm selm(size_t ielm, bool odd_plane);
-    Selm selm_at(size_t ielm);
-    Selm selm_at(size_t ielm, bool odd_plane);
+    SE selm(size_t ielm, bool odd_plane) { return m_field.selm<SE>(ielm, odd_plane); }
+    SE selm_at(size_t ielm, bool odd_plane) { return m_field.selm_at<SE>(ielm, odd_plane); }
+
+    void march_half_so0(bool odd_plane);
+    void march_half_so1(bool odd_plane);
 
 private:
 

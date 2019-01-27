@@ -18,6 +18,8 @@ from ._core import (
     felm_in,
     InviscidBurgersSolution,
     InviscidBurgersFelm,
+    LinearScalarSolution,
+    LinearScalarSelm,
 )
 
 from ._pstcanvas import (
@@ -36,6 +38,8 @@ __all__ = [
     'felm_in',
     'InviscidBurgersSolution',
     'InviscidBurgersFelm',
+    'LinearScalarSolution',
+    'LinearScalarSelm',
     # _pstcanvas
     'PstCanvas',
 ]

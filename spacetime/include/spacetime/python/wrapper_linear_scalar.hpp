@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2018, Yung-Yu Chen <yyc@solvcon.net>
+ * Copyright (c) 2019, Yung-Yu Chen <yyc@solvcon.net>
  * BSD 3-Clause License, see COPYING
  */
 
@@ -15,23 +15,24 @@ namespace python
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapInviscidBurgersSolution
-  : public WrapSolutionBase< WrapInviscidBurgersSolution, InviscidBurgersSolution >
+WrapLinearScalarSolution
+  : public WrapSolutionBase< WrapLinearScalarSolution, LinearScalarSolution >
 {
 
-    using base_type = WrapSolutionBase< WrapInviscidBurgersSolution, InviscidBurgersSolution >;
+    using base_type = WrapSolutionBase< WrapLinearScalarSolution, LinearScalarSolution >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
     friend base_type;
     friend base_type::base_type;
 
-    WrapInviscidBurgersSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapLinearScalarSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
         (*this)
-            .def(
+            .def
+            (
                 py::init([](std::shared_ptr<Grid> const & grid, typename wrapped_type::value_type time_increment) {
                     return wrapped_type::construct(grid, time_increment);
                 })
@@ -40,42 +41,46 @@ WrapInviscidBurgersSolution
         ;
     }
 
-}; /* end class WrapInviscidBurgersSolution */
+}; /* end class WrapLinearScalarSolution */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapInviscidBurgersSelm
-  : public WrapElementBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >
+WrapLinearScalarSelm
+  : public WrapElementBase< WrapLinearScalarSelm, LinearScalarSelm >
 {
 
-    using base_type = WrapElementBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >;
+    using base_type = WrapElementBase< WrapLinearScalarSelm, LinearScalarSelm >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
     friend base_type;
     friend base_type::base_type;
 
-    WrapInviscidBurgersSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapLinearScalarSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         (*this)
-            .def(
-                "so0",
-                static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)
+            .def
+            (
+                "so0"
+              , static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)
             )
-            .def(
-                "set_so0",
-                [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
+            .def
+            (
+                "set_so0"
+              , [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
                     self.so0(it) = val;
                 }
             )
-            .def(
-                "so1",
-                static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so1)
+            .def
+            (
+                "so1"
+              , static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so1)
             )
-            .def(
-                "set_so1",
-                [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
+            .def
+            (
+                "set_so1"
+              , [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
                     self.so1(it) = val;
                 }
             )
@@ -86,7 +91,7 @@ WrapInviscidBurgersSelm
         ;
     }
 
-}; /* end class WrapInviscidBurgersSelm */
+}; /* end class WrapLinearScalarSelm */
 
 } /* end namespace python */
 

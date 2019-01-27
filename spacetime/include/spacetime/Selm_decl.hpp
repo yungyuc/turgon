@@ -23,10 +23,6 @@ class Selm
 
 public:
 
-    Selm(Field & field, size_t index)
-      : base_type(&field, field.grid().xptr_selm(index, Grid::SelmPK()))
-    {}
-
     Selm(Field & field, size_t index, bool odd_plane)
       : base_type(&field, field.grid().xptr_selm(index, odd_plane, Grid::SelmPK()))
     {}
@@ -48,11 +44,18 @@ public:
 
     Selm & move_at(ssize_t offset);
 
-    value_type const & so0(size_t it) const { return field().so0()[it]; }
-    value_type       & so0(size_t it)       { return field().so0()[it]; }
+    value_type const & so0(size_t iv) const { return field().so0(xindex(), iv); }
+    value_type       & so0(size_t iv)       { return field().so0(xindex(), iv); }
 
-    value_type const & so1(size_t it) const { return field().so1()[it]; }
-    value_type       & so1(size_t it)       { return field().so1()[it]; }
+    value_type const & so1(size_t iv) const { return field().so1(xindex(), iv); }
+    value_type       & so1(size_t iv)       { return field().so1(xindex(), iv); }
+
+    value_type xn(size_t iv) const { return 0.0; }
+    value_type xp(size_t iv) const { return 0.0; }
+    value_type tn(size_t iv) const { return 0.0; }
+    value_type tp(size_t iv) const { return 0.0; }
+
+    value_type so0p(size_t iv) const { return so0(iv); }
 
 }; /* end class Selm */
 

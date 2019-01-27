@@ -24,10 +24,6 @@ class Celm
 
 public:
 
-    Celm(Field & field, size_t index)
-      : base_type(&field, field.grid().xptr_celm(index, Grid::CelmPK()))
-    {}
-
     Celm(Field & field, size_t index, bool odd_plane)
       : base_type(&field, field.grid().xptr_celm(index, odd_plane, Grid::CelmPK()))
     {}
@@ -57,7 +53,31 @@ public:
     Selm selm_tn() { return Selm(field(), index(), !on_odd_plane()); }
     Selm selm_tp() { return Selm(field(), index(), !on_odd_plane()); }
 
+    value_type calc_so0(size_t iv) { return 0.0; }
+    value_type calc_so1(size_t iv) { return 0.0; }
+
 }; /* end class Celm */
+
+template< typename SE >
+class CelmBase
+  : public Celm
+{
+
+public:
+
+    using base_type = Celm;
+    using base_type::base_type;
+    using selm_type = SE;
+
+    SE selm_xn() { return SE(field(), index(), on_odd_plane()); }
+    SE selm_xp() { return SE(field(), index()+1, on_odd_plane()); }
+    SE selm_tn() { return SE(field(), index(), !on_odd_plane()); }
+    SE selm_tp() { return SE(field(), index(), !on_odd_plane()); }
+
+    value_type calc_so0(size_t iv);
+    value_type calc_so1(size_t iv);
+
+}; /* end class CelmBase */
 
 } /* end namespace spacetime */
 

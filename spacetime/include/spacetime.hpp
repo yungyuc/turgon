@@ -14,7 +14,7 @@
 #include "spacetime/SolutionBase.hpp"
 #include "spacetime/Solution.hpp"
 #include "spacetime/Selm.hpp"
-#include "spacetime/FelmBase.hpp"
+#include "spacetime/kernel/linear_scalar.hpp"
 #include "spacetime/kernel/inviscid_burgers.hpp"
 #include "spacetime/io.hpp"
 

@@ -12,12 +12,13 @@ namespace spacetime
 {
 
 class Solution
-  : public SolutionBase<Solution>
+  : public SolutionBase<Solution, Celm, Selm>
 {
 
 public:
 
-    using SolutionBase<Solution>::SolutionBase;
+    using base_type = SolutionBase<Solution, Celm, Selm>;
+    using base_type::base_type;
 
     static std::shared_ptr<Solution> construct(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment)
     {
