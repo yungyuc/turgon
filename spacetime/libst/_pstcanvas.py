@@ -25,7 +25,7 @@ class PstCanvas:
             if 2 == len(padding):
                 padding = padding[0], padding[1], padding[0], padding[1]
             elif 4 == len(padding):
-                padding = tuple(*padding)
+                padding = tuple(padding)
             else:
                 raise ValueError('invalid padding length: %s' % padding)
         else:
@@ -69,7 +69,6 @@ class PstCanvas:
             xmin - pxmin, ymin - pymin,
             xmax + pxmax, ymax + pymax,
         )
-
 
     def to_filename(self, filename):
 
@@ -171,6 +170,20 @@ class PstCanvas:
             self._cmdbody.append(cmd)
         return cmd
 
+    def brace(self, p0, p1, text='', **kw):
+
+        append = kw.pop('append', True)
+        o = self._options(**kw)
+        if o:
+            o = '[%s]' % o
+        if text:
+            text = '{%s}' % text
+        cmd = r"\psbrace%s%s%s%s" % (
+            o, self._points(p0), self._points(p1), text)
+        if append:
+            self._cmdbody.append(cmd)
+        return cmd
+
     def dots(self, *args, **kw):
 
         return self._crdcmd("psdots", *args, **kw)
@@ -186,20 +199,24 @@ class PstCanvas:
     def uput(self, sep, rot, crd, text, **kw):
 
         append = kw.pop('append', True)
-        cmd = r"\uput{%g}[%s](%g,%g){%s}" % (sep, rot, crd[0], crd[1], text)
+        if not isinstance(sep, str):
+            sep = '%g' % sep
+        cmd = r"\uput{%s}[%s](%g,%g){%s}" % (sep, rot, crd[0], crd[1], text)
         if append:
             self._cmdbody.append(cmd)
         return cmd
 
-    def selm(self, se, time, dt, **kw):
+    def selm(self, se, time, **kw):
 
+        dt = kw.pop('dt', se.dt)
         x, xn, xp = se.x, se.xneg, se.xpos
         y, yn, yp = time, time-dt/2, time+dt/2
+        xctr = se.xctr
 
         append = kw.pop('append', True)
 
         sep = kw.pop('sep', 0.05)
-        sep *= xp - xn
+        sep *= dt
         sep2 = sep * 0.5
         sep3 = sep * 0.75
         sep4 = sep2 + sep3
@@ -209,7 +226,7 @@ class PstCanvas:
         kw = options
 
         cmds = list()
-        cmds.append(self.dots((x, y), **kw))
+        cmds.append(self.dots((xctr, y), **kw))
         # Upside.
         cmds.append(self.line((x+sep2,y+sep3), (x+sep2,yp-sep4), **kw))
         cmds.append(self.line((x-sep2,y+sep3), (x-sep2,yp-sep4), **kw))

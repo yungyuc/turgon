@@ -14,6 +14,8 @@ from ._libst import (
     Selm,
     InviscidBurgersSolution,
     InviscidBurgersFelm,
+    LinearScalarSolution,
+    LinearScalarSelm,
 )
 
 
@@ -27,6 +29,8 @@ __all__ = [
     'felm_in',
     'InviscidBurgersSolution',
     'InviscidBurgersFelm',
+    'LinearScalarSolution',
+    'LinearScalarSelm',
 ]
 
 

@@ -13,6 +13,7 @@
 
 #include "spacetime/python/WrapBase.hpp"
 #include "spacetime/python/wrapper_spacetime.hpp"
+#include "spacetime/python/wrapper_linear_scalar.hpp"
 #include "spacetime/python/wrapper_inviscid_burgers.hpp"
 
 /* vim: set et ts=4 sw=4: */

@@ -52,7 +52,6 @@ WrapGrid
 
 }; /* end class WrapGrid */
 
-
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapField
@@ -97,7 +96,7 @@ SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapSolution
   : public WrapSolutionBase< WrapSolution, Solution >
 {
-    
+
     using base_type = WrapSolutionBase< WrapSolution, Solution >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
@@ -164,6 +163,8 @@ WrapSelm
       : base_type(mod, pyname, clsdoc)
     {
         (*this)
+            .def_property_readonly("dxneg", &wrapped_type::dxneg)
+            .def_property_readonly("dxpos", &wrapped_type::dxpos)
             .def(
                 "so0",
                 static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)

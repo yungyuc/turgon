@@ -40,9 +40,9 @@ class InviscidBurgersSolutionTC(unittest.TestCase):
     def test_march_half_so1(self):
 
         self.sol10.march_half_so1(odd_plane=False)
-        res = [s.so0(0) for s in libst.selm_in(self.sol10, odd_plane=True)]
+        res = [s.so1(0) for s in libst.selm_in(self.sol10, odd_plane=True)]
         self.assertEqual(10, len(res))
-        self.assertEqual([3]*10, res)
+        self.assertEqual([0]*10, res)
 
 
 class InviscidBurgersSelm(unittest.TestCase):
@@ -52,18 +52,18 @@ class InviscidBurgersSelm(unittest.TestCase):
         self.grid10 = libst.Grid(0, 10, 10)
         self.sol10 = libst.InviscidBurgersSolution(
             grid=self.grid10, time_increment=self.dt)
-        self.fe0 = self.sol10.felm(0)
-        self.fe9 = self.sol10.felm(9)
-        self.fe10 = self.sol10.felm(10)
+        self.se0 = self.sol10.selm(0)
+        self.se9 = self.sol10.selm(9)
+        self.se10 = self.sol10.selm(10)
         # Set trivial solution.
         self.sol10.so0.fill(1)
         self.sol10.so1.fill(0)
 
     def test_flux(self):
 
-        self.assertEqual(0.5, self.fe0.xn(0))
-        self.assertEqual(0.5, self.fe0.xp(0))
-        self.assertEqual(0.05, self.fe0.tn(0))
-        self.assertEqual(0.05, self.fe0.tp(0))
+        self.assertEqual(0.5, self.se0.xn(0))
+        self.assertEqual(0.5, self.se0.xp(0))
+        self.assertEqual(0.05, self.se0.tn(0))
+        self.assertEqual(0.05, self.se0.tp(0))
 
 # vim: set et sw=4 ts=4:

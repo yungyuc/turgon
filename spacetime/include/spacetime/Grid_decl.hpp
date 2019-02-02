@@ -72,8 +72,6 @@ public:
     /**
      * Get pointer to an coordinate value using conservation-element index.
      */
-    real_type       * xptr_celm(size_t ielm, CelmPK const &)       { return xptr(xindex_celm(ielm)); }
-    real_type const * xptr_celm(size_t ielm, CelmPK const &) const { return xptr(xindex_celm(ielm)); }
     real_type       * xptr_celm(size_t ielm, bool odd_plane, CelmPK const &)       { return xptr(xindex_celm(ielm, odd_plane)); }
     real_type const * xptr_celm(size_t ielm, bool odd_plane, CelmPK const &) const { return xptr(xindex_celm(ielm, odd_plane)); }
 
@@ -84,8 +82,6 @@ public:
     /**
      * Get pointer to an coordinate value using conservation-element index.
      */
-    real_type       * xptr_selm(size_t ielm, SelmPK const &)       { return xptr(xindex_selm(ielm)); }
-    real_type const * xptr_selm(size_t ielm, SelmPK const &) const { return xptr(xindex_selm(ielm)); }
     real_type       * xptr_selm(size_t ielm, bool odd_plane, SelmPK const &)       { return xptr(xindex_selm(ielm, odd_plane)); }
     real_type const * xptr_selm(size_t ielm, bool odd_plane, SelmPK const &) const { return xptr(xindex_selm(ielm, odd_plane)); }
 

@@ -24,7 +24,8 @@ class Celm;
 class Selm;
 
 /**
- * Data class for solution.
+ * Data class for solution.  It doesn't contain type information for the CE and
+ * SE.
  */
 class Field
 {
@@ -50,6 +51,11 @@ public:
     array_type const & so1() const { return m_so1; }
     array_type       & so1()       { return m_so1; }
 
+    value_type const & so0(size_t it, size_t iv) const { return m_so0(it, iv); }
+    value_type       & so0(size_t it, size_t iv)       { return m_so0(it, iv); }
+    value_type const & so1(size_t it, size_t iv) const { return m_so1(it, iv); }
+    value_type       & so1(size_t it, size_t iv)       { return m_so1(it, iv); }
+
     size_t nvar() const { return m_so0.shape()[1]; }
 
     void set_time_increment(value_type time_increment);
@@ -59,15 +65,11 @@ public:
     real_type hdt() const { return m_half_time_increment; }
     real_type qdt() const { return m_quarter_time_increment; }
 
-    Celm celm(size_t ielm);
-    Celm celm(size_t ielm, bool odd_plane);
-    Celm celm_at(size_t ielm);
-    Celm celm_at(size_t ielm, bool odd_plane);
+    template< typename CE > CE celm(size_t ielm, bool odd_plane) { return CE(*this, ielm, odd_plane); }
+    template< typename CE > CE celm_at(size_t ielm, bool odd_plane);
 
-    Selm selm(size_t ielm);
-    Selm selm(size_t ielm, bool odd_plane);
-    Selm selm_at(size_t ielm);
-    Selm selm_at(size_t ielm, bool odd_plane);
+    template< typename SE > SE selm(size_t ielm, bool odd_plane) { return SE(*this, ielm, odd_plane); }
+    template< typename SE > SE selm_at(size_t ielm, bool odd_plane);
 
 private:
 

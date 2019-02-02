@@ -37,11 +37,11 @@ set(SPACETIME_HEADERS
     include/spacetime/Solution.hpp
     include/spacetime/Selm.hpp
     include/spacetime/Selm_decl.hpp
-    include/spacetime/FelmBase.hpp
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
     # Physical kernels.
+    include/spacetime/kernel/linear_scalar.hpp
     include/spacetime/kernel/inviscid_burgers.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
@@ -57,6 +57,7 @@ set(SPACETIME_PY_HEADERS
     include/spacetime/python/common.hpp
     include/spacetime/python/WrapBase.hpp
     include/spacetime/python/wrapper_spacetime.hpp
+    include/spacetime/python/wrapper_linear_scalar.hpp
     include/spacetime/python/wrapper_inviscid_burgers.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"

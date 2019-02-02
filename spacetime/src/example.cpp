@@ -12,11 +12,11 @@ int main(int argc, char ** argv)
     std::cout << *grid << std::endl;
     std::cout << *sol << std::endl;
 
-    st::Celm ce0 = sol->celm(0);
-    st::Celm ce99 = sol->celm(99);
+    st::Celm ce0 = sol->celm(0, false);
+    st::Celm ce99 = sol->celm(99, false);
     std::cout << ce0 << " " << ce99 << std::endl;
 
-    st::Celm ce = sol->celm(0);
+    st::Celm ce = sol->celm(0, false);
     ce.move_pos();
     std::cout << "Moved: " << ce << std::endl;
     ce.move_pos();

@@ -11,6 +11,7 @@
 #include "spacetime/Celm.hpp"
 #include "spacetime/Solution.hpp"
 #include "spacetime/Selm.hpp"
+#include "spacetime/kernel/linear_scalar.hpp"
 #include "spacetime/kernel/inviscid_burgers.hpp"
 
 namespace spacetime
@@ -54,9 +55,36 @@ std::ostream& operator<<(std::ostream& os, const InviscidBurgersSolution & sol)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const InviscidBurgersFelm & elm)
+std::ostream& operator<<(std::ostream& os, const InviscidBurgersCelm & elm)
 {
-    os << "InviscidBurgersFelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
+    os << "InviscidBurgersCelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
+    os << "index=" << elm.index() << ", x=" << elm.x() << ", xneg=" << elm.xneg() << ", xpos=" << elm.xpos() << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const InviscidBurgersSelm & elm)
+{
+    os << "InviscidBurgersSelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
+    os << "index=" << elm.index() << ", x=" << elm.x() << ", xneg=" << elm.xneg() << ", xpos=" << elm.xpos() << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const LinearScalarSolution & sol)
+{
+    os << "LinearScalarSolution(grid=" << sol.grid() << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const LinearScalarCelm & elm)
+{
+    os << "LinearScalarCelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
+    os << "index=" << elm.index() << ", x=" << elm.x() << ", xneg=" << elm.xneg() << ", xpos=" << elm.xpos() << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const LinearScalarSelm & elm)
+{
+    os << "LinearScalarSelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
     os << "index=" << elm.index() << ", x=" << elm.x() << ", xneg=" << elm.xneg() << ", xpos=" << elm.xpos() << ")";
     return os;
 }
