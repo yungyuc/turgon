@@ -12,11 +12,9 @@ from ._core import (
     Grid,
     Celm,
     Selm,
-    Solution,
-    InviscidBurgersSolution,
-    InviscidBurgersFelm,
-    LinearScalarSolution,
-    LinearScalarSelm,
+    Solver,
+    InviscidBurgersSolver,
+    LinearScalarSolver,
 )
 
 from ._pstcanvas import (
@@ -29,11 +27,9 @@ __all__ = [
     'Grid',
     'Celm',
     'Selm',
-    'Solution',
-    'InviscidBurgersSolution',
-    'InviscidBurgersFelm',
-    'LinearScalarSolution',
-    'LinearScalarSelm',
+    'Solver',
+    'InviscidBurgersSolver',
+    'LinearScalarSolver',
     # _pstcanvas
     'PstCanvas',
 ]

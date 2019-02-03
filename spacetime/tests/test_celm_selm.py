@@ -13,8 +13,8 @@ class CelmTC(unittest.TestCase):
     def setUp(self):
 
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
-                                    time_increment=0.2)
+        self.sol10 = libst.Solver(grid=self.grid10, nvar=1,
+                                  time_increment=0.2)
         self.ce0 = self.sol10.celm(ielm=0)
         self.ce9 = self.sol10.celm(ielm=9)
 
@@ -127,8 +127,8 @@ class SelmTC(unittest.TestCase):
 
         self.dt = 0.2
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
-                                    time_increment=self.dt)
+        self.sol10 = libst.Solver(grid=self.grid10, nvar=1,
+                                  time_increment=self.dt)
         self.se0 = self.sol10.selm(0)
         self.se9 = self.sol10.selm(9)
         self.se10 = self.sol10.selm(10)
@@ -248,7 +248,7 @@ class NonUniformTC(unittest.TestCase):
 
         xloc = np.array([0, 1, 3, 10])
         self.grid3 = libst.Grid(xloc=xloc)
-        self.sol3 = libst.Solution(grid=self.grid3, nvar=1, time_increment=0.1)
+        self.sol3 = libst.Solver(grid=self.grid3, nvar=1, time_increment=0.1)
         self.ce0 = self.sol3.celm(ielm=0)
         self.ce1 = self.sol3.celm(ielm=1)
         self.ce2 = self.sol3.celm(ielm=2)
@@ -293,8 +293,8 @@ class ComparisonTC(unittest.TestCase):
     def setUp(self):
 
         self.grid = libst.Grid(0, 10, 10)
-        self.sol1 = libst.Solution(grid=self.grid, nvar=1, time_increment=0.2)
-        self.sol2 = libst.Solution(grid=self.grid, nvar=1, time_increment=0.2)
+        self.sol1 = libst.Solver(grid=self.grid, nvar=1, time_increment=0.2)
+        self.sol2 = libst.Solver(grid=self.grid, nvar=1, time_increment=0.2)
 
         self.ce0s1 = self.sol1.celm(ielm=0)
         self.ce0s1p = self.sol1.celm(ielm=0)

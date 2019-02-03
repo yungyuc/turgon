@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, const Field & sol)
 
 std::ostream& operator<<(std::ostream& os, const Solution & sol)
 {
-    os << "Solution(grid=" << sol.grid() << ")";
+    os << "Solver(grid=" << sol.grid() << ")";
     return os;
 }
 
@@ -51,7 +51,7 @@ std::ostream& operator<<(std::ostream& os, const Selm & elm)
 
 std::ostream& operator<<(std::ostream& os, const InviscidBurgersSolution & sol)
 {
-    os << "InviscidBurgersSolution(grid=" << sol.grid() << ")";
+    os << "InviscidBurgersSolver(grid=" << sol.grid() << ")";
     return os;
 }
 
@@ -71,7 +71,7 @@ std::ostream& operator<<(std::ostream& os, const InviscidBurgersSelm & elm)
 
 std::ostream& operator<<(std::ostream& os, const LinearScalarSolution & sol)
 {
-    os << "LinearScalarSolution(grid=" << sol.grid() << ")";
+    os << "LinearScalarSolver(grid=" << sol.grid() << ")";
     return os;
 }
 

@@ -17,18 +17,18 @@ namespace python
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapLinearScalarSolution
-  : public WrapSolutionBase< WrapLinearScalarSolution, LinearScalarSolution >
+WrapLinearScalarSolver
+  : public WrapSolverBase< WrapLinearScalarSolver, LinearScalarSolution >
 {
 
-    using base_type = WrapSolutionBase< WrapLinearScalarSolution, LinearScalarSolution >;
+    using base_type = WrapSolverBase< WrapLinearScalarSolver, LinearScalarSolution >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
     friend base_type;
     friend base_type::base_type;
 
-    WrapLinearScalarSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapLinearScalarSolver(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -45,7 +45,7 @@ WrapLinearScalarSolution
         ;
     }
 
-}; /* end class WrapLinearScalarSolution */
+}; /* end class WrapLinearScalarSolver */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY

@@ -149,7 +149,7 @@ private:
 
 template<class WT, class ST>
 class
-WrapSolutionBase
+WrapSolverBase
   : public WrapBase< WT, ST, std::shared_ptr<ST> >
 {
 
@@ -163,7 +163,7 @@ public:
 
 protected:
 
-    WrapSolutionBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSolverBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -233,7 +233,7 @@ protected:
         ;
     }
 
-}; /* end class WrapSolutionBase */
+}; /* end class WrapSolverBase */
 
 class ModuleInitializer {
 

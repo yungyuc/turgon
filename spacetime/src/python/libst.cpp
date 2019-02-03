@@ -25,7 +25,7 @@ PyObject * initialize_spacetime(pybind11::module & mod)
     mod.doc() = "_libst: One-dimensional space-time CESE method code";
 
     WrapGrid::commit(mod, "Grid", "Spatial grid");
-    WrapSolution::commit(mod, "Solution", "Solution field");
+    WrapSolver::commit(mod, "Solver", "Solving algorithm operating on the field");
     WrapCelm::commit(mod, "Celm", "Conservation element");
     WrapSelm::commit(mod, "Selm", "Solution element");
 
@@ -38,11 +38,11 @@ PyObject * initialize_linear_scalar(pybind11::module & mod)
 
     xt::import_numpy(); // or numpy c api segfault.
 
-    WrapLinearScalarSolution::commit
+    WrapLinearScalarSolver::commit
     (
         mod
-      , "LinearScalarSolution"
-      , "Solution for a linear scalar equation"
+      , "LinearScalarSolver"
+      , "Solving algorithm for a linear scalar equation"
     );
     WrapLinearScalarSelm::commit
     (
@@ -60,11 +60,11 @@ PyObject * initialize_inviscid_burgers(pybind11::module & mod)
 
     xt::import_numpy(); // or numpy c api segfault.
 
-    WrapInviscidBurgersSolution::commit
+    WrapInviscidBurgersSolver::commit
     (
         mod
-      , "InviscidBurgersSolution"
-      , "Solution for the inviscid Burgers equation"
+      , "InviscidBurgersSolver"
+      , "Solving algorithm of the inviscid Burgers equation"
     );
     WrapInviscidBurgersSelm::commit
     (

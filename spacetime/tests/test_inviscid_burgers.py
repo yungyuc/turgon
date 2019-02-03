@@ -8,13 +8,13 @@ import numpy as np
 import libst
 
 
-class InviscidBurgersSolutionTC(unittest.TestCase):
+class InviscidBurgersSolverTC(unittest.TestCase):
 
     def setUp(self):
 
         self.dt = 0.1
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.InviscidBurgersSolution(
+        self.sol10 = libst.InviscidBurgersSolver(
             grid=self.grid10, time_increment=self.dt)
 
         self.sol10.so0.fill(1)
@@ -50,7 +50,7 @@ class InviscidBurgersSelm(unittest.TestCase):
     def setUp(self):
         self.dt = 0.2
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.InviscidBurgersSolution(
+        self.sol10 = libst.InviscidBurgersSolver(
             grid=self.grid10, time_increment=self.dt)
         self.se0 = self.sol10.selm(0)
         self.se9 = self.sol10.selm(9)
