@@ -19,7 +19,7 @@ class LinearScalarTC(unittest.TestCase):
             time_increment=self.dt,
         )
 
-        for elm in libst.selm_in(self.sol10, odd_plane=False):
+        for elm in self.sol10.selms(odd_plane=False):
             r = elm.grid.xmin + elm.xctr / (elm.grid.xmax-elm.grid.xmin)
             v = np.sin(r * np.pi * 2)
             dv = np.cos(r * np.pi * 2) * 2 * np.pi

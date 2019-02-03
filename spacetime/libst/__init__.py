@@ -10,12 +10,9 @@ element (CESE) method
 
 from ._core import (
     Grid,
-    Solution,
     Celm,
     Selm,
-    celm_in,
-    selm_in,
-    felm_in,
+    Solution,
     InviscidBurgersSolution,
     InviscidBurgersFelm,
     LinearScalarSolution,
@@ -30,12 +27,9 @@ from ._pstcanvas import (
 __all__ = [
     # _core
     'Grid',
-    'Solution',
     'Celm',
     'Selm',
-    'celm_in',
-    'selm_in',
-    'felm_in',
+    'Solution',
     'InviscidBurgersSolution',
     'InviscidBurgersFelm',
     'LinearScalarSolution',
