@@ -94,10 +94,10 @@ WrapField
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapSolver
-  : public WrapSolverBase< WrapSolver, Solution >
+  : public WrapSolverBase< WrapSolver, Solver >
 {
 
-    using base_type = WrapSolverBase< WrapSolver, Solution >;
+    using base_type = WrapSolverBase< WrapSolver, Solver >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 

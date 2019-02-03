@@ -9,7 +9,7 @@
 
 #include "spacetime/Grid.hpp"
 #include "spacetime/Celm.hpp"
-#include "spacetime/Solution.hpp"
+#include "spacetime/Solver.hpp"
 #include "spacetime/Selm.hpp"
 #include "spacetime/kernel/linear_scalar.hpp"
 #include "spacetime/kernel/inviscid_burgers.hpp"
@@ -29,7 +29,7 @@ std::ostream& operator<<(std::ostream& os, const Field & sol)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Solution & sol)
+std::ostream& operator<<(std::ostream& os, const Solver & sol)
 {
     os << "Solver(grid=" << sol.grid() << ")";
     return os;
@@ -49,7 +49,7 @@ std::ostream& operator<<(std::ostream& os, const Selm & elm)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const InviscidBurgersSolution & sol)
+std::ostream& operator<<(std::ostream& os, const InviscidBurgersSolver & sol)
 {
     os << "InviscidBurgersSolver(grid=" << sol.grid() << ")";
     return os;
@@ -69,7 +69,7 @@ std::ostream& operator<<(std::ostream& os, const InviscidBurgersSelm & elm)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const LinearScalarSolution & sol)
+std::ostream& operator<<(std::ostream& os, const LinearScalarSolver & sol)
 {
     os << "LinearScalarSolver(grid=" << sol.grid() << ")";
     return os;

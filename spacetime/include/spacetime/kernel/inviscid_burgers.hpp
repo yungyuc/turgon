@@ -14,7 +14,7 @@
 #include "spacetime/ElementBase_decl.hpp"
 #include "spacetime/Grid_decl.hpp"
 #include "spacetime/Field_decl.hpp"
-#include "spacetime/SolutionBase_decl.hpp"
+#include "spacetime/SolverBase_decl.hpp"
 
 namespace spacetime
 {
@@ -103,21 +103,21 @@ InviscidBurgersSelm::value_type InviscidBurgersSelm::so0p(size_t iv) const
 
 using InviscidBurgersCelm = CelmBase<InviscidBurgersSelm>;
 
-class InviscidBurgersSolution
-  : public SolutionBase<InviscidBurgersSolution, InviscidBurgersCelm, InviscidBurgersSelm>
+class InviscidBurgersSolver
+  : public SolverBase<InviscidBurgersSolver, InviscidBurgersCelm, InviscidBurgersSelm>
 {
 
 public:
 
-    using base_type = SolutionBase<InviscidBurgersSolution, InviscidBurgersCelm, InviscidBurgersSelm>;
+    using base_type = SolverBase<InviscidBurgersSolver, InviscidBurgersCelm, InviscidBurgersSelm>;
     using base_type::base_type;
 
-    static std::shared_ptr<InviscidBurgersSolution> construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
+    static std::shared_ptr<InviscidBurgersSolver> construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
     {
         return construct_impl(grid, 1, time_increment);
     }
 
-}; /* end class InviscidBurgersSolution */
+}; /* end class InviscidBurgersSolver */
 
 } /* end namespace spacetime */
 

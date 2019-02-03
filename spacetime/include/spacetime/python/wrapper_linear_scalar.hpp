@@ -18,10 +18,10 @@ namespace python
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapLinearScalarSolver
-  : public WrapSolverBase< WrapLinearScalarSolver, LinearScalarSolution >
+  : public WrapSolverBase< WrapLinearScalarSolver, LinearScalarSolver >
 {
 
-    using base_type = WrapSolverBase< WrapLinearScalarSolver, LinearScalarSolution >;
+    using base_type = WrapSolverBase< WrapLinearScalarSolver, LinearScalarSolver >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 

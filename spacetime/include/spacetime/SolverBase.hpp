@@ -5,13 +5,13 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "spacetime/SolutionBase_decl.hpp"
+#include "spacetime/SolverBase_decl.hpp"
 
 namespace spacetime
 {
 
 template< typename ST, typename CE, typename SE > inline
-void SolutionBase<ST,CE,SE>::march_half_so0(bool odd_plane)
+void SolverBase<ST,CE,SE>::march_half_so0(bool odd_plane)
 {
     size_t ncelm = grid().ncelm();
     if (odd_plane) { ncelm -= 1;}
@@ -23,7 +23,7 @@ void SolutionBase<ST,CE,SE>::march_half_so0(bool odd_plane)
 }
 
 template< typename ST, typename CE, typename SE > inline
-void SolutionBase<ST,CE,SE>::march_half_so1(bool odd_plane)
+void SolverBase<ST,CE,SE>::march_half_so1(bool odd_plane)
 {
     size_t ncelm = grid().ncelm();
     if (odd_plane) { ncelm -= 1;}

@@ -32,11 +32,11 @@ set(SPACETIME_HEADERS
     include/spacetime/Grid_decl.hpp
     include/spacetime/Field.hpp
     include/spacetime/Field_decl.hpp
-    include/spacetime/SolutionBase.hpp
-    include/spacetime/SolutionBase_decl.hpp
-    include/spacetime/Solution.hpp
     include/spacetime/Selm.hpp
     include/spacetime/Selm_decl.hpp
+    include/spacetime/SolverBase.hpp
+    include/spacetime/SolverBase_decl.hpp
+    include/spacetime/Solver.hpp
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp

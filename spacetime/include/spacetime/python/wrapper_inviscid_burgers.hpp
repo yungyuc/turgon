@@ -16,10 +16,10 @@ namespace python
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapInviscidBurgersSolver
-  : public WrapSolverBase< WrapInviscidBurgersSolver, InviscidBurgersSolution >
+  : public WrapSolverBase< WrapInviscidBurgersSolver, InviscidBurgersSolver >
 {
 
-    using base_type = WrapSolverBase< WrapInviscidBurgersSolver, InviscidBurgersSolution >;
+    using base_type = WrapSolverBase< WrapInviscidBurgersSolver, InviscidBurgersSolver >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
