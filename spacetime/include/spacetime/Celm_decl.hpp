@@ -41,7 +41,7 @@ public:
 
     value_type xctr() const { return x(); }
 
-    Celm & move_at(ssize_t offset);
+    void move_at(ssize_t offset);
 
     value_type time_increment() const { return field().time_increment(); }
     value_type dt() const { return field().dt(); }

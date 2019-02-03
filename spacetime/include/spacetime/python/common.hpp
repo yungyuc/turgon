@@ -137,7 +137,7 @@ public:
     }
 
     bool is_selm() const { return m_selm; }
-    bool is_odd_plane() const { return m_odd_plane; }
+    bool on_odd_plane() const { return m_odd_plane; }
     size_t current() const { return m_current; }
     size_t nelem() const
     {
@@ -161,7 +161,7 @@ std::ostream& operator<<(std::ostream& os, const SolverElementIterator<ST> & sei
     os
         << "SolverElementIterator("
         << (seiter.is_selm() ? "selm" : "celm")
-        << ", " << (seiter.is_odd_plane() ? "odd_plane" : "even_plane")
+        << ", " << (seiter.on_odd_plane() ? "on_odd_plane" : "on_even_plane")
         << ", current=" << seiter.current() << ", nelem=" << seiter.nelem() << ")"
     ;
     return os;

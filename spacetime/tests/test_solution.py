@@ -23,6 +23,26 @@ class SolverTC(unittest.TestCase):
         self.assertEqual("Solver(grid=Grid(xmin=0, xmax=10, ncelm=10))",
                          str(self.sol10))
 
+        self.assertEqual(
+            "SolverElementIterator(celm, on_even_plane, current=0, nelem=10)",
+            str(self.sol10.celms(odd_plane=False))
+        )
+
+        self.assertEqual(
+            "SolverElementIterator(celm, on_odd_plane, current=0, nelem=9)",
+            str(self.sol10.celms(odd_plane=True))
+        )
+
+        self.assertEqual(
+            "SolverElementIterator(selm, on_even_plane, current=0, nelem=11)",
+            str(self.sol10.selms(odd_plane=False))
+        )
+
+        self.assertEqual(
+            "SolverElementIterator(selm, on_odd_plane, current=0, nelem=10)",
+            str(self.sol10.selms(odd_plane=True))
+        )
+
     def test_grid(self):
 
         self.assertEqual(self.grid10, self.sol10.grid)

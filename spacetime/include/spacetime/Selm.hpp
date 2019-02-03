@@ -10,7 +10,7 @@
 namespace spacetime
 {
 
-Selm & Selm::move_at(ssize_t offset)
+void Selm::move_at(ssize_t offset)
 {
     const ssize_t xindex = this->xindex() + offset;
     if (xindex < 1 || xindex >= grid().xsize()-1) {
@@ -20,7 +20,7 @@ Selm & Selm::move_at(ssize_t offset)
             << " outside the interval [1, " << grid().xsize()-1 << ")"
         );
     }
-    return move(offset);
+    move(offset);
 }
 
 } /* end namespace spacetime */

@@ -11,7 +11,7 @@ namespace spacetime
 {
 
 inline
-Celm & Celm::move_at(ssize_t offset)
+void Celm::move_at(ssize_t offset)
 {
     const ssize_t xindex = this->xindex() + offset;
     if (xindex < 2 || xindex >= grid().xsize()-2) {
@@ -21,7 +21,7 @@ Celm & Celm::move_at(ssize_t offset)
             << " outside the interval [2, " << grid().xsize()-2 << ")"
         );
     }
-    return move(offset);
+    move(offset);
 }
 
 template< typename SE >

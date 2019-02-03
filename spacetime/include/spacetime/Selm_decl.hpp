@@ -42,7 +42,7 @@ public:
     value_type dxpos() const { return xpos()-x(); }
     value_type xctr() const { return (xneg()+xpos())/2; }
 
-    Selm & move_at(ssize_t offset);
+    void move_at(ssize_t offset);
 
     value_type const & so0(size_t iv) const { return field().so0(xindex(), iv); }
     value_type       & so0(size_t iv)       { return field().so0(xindex(), iv); }
