@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "pybind11/pybind11.h"
+#include "pybind11/operators.h"
 #include "pybind11/stl.h"
 #include "xtensor-python/pyarray.hpp"
 
@@ -50,8 +51,16 @@ protected:
     WrapElementBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
+        namespace py = pybind11;
+
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def(py::self <  py::self)
+            .def(py::self <= py::self)
+            .def(py::self >  py::self)
+            .def(py::self >= py::self)
             .def("duplicate", &wrapped_type::duplicate)
             .def_property_readonly("dup", &wrapped_type::duplicate)
             .def_property_readonly("x", &wrapped_type::x)
@@ -63,7 +72,8 @@ protected:
             .def_property_readonly("on_even_plane", &wrapped_type::on_even_plane)
             .def_property_readonly("on_odd_plane", &wrapped_type::on_odd_plane)
             .def_property_readonly("grid", &wrapped_type::grid)
-            .def_property_readonly(
+            .def_property_readonly
+            (
                 "field"
               , static_cast<Field & (wrapped_type::*)()>(&wrapped_type::field)
             )

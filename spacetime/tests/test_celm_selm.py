@@ -31,11 +31,14 @@ class CelmTC(unittest.TestCase):
 
     def test_duplicate(self):
 
-        golden = "Celm(even, index=0, x=0.5, xneg=0, xpos=1)"
-        self.assertEqual(golden, str(self.ce0))
-        self.assertEqual(golden, str(self.ce0.duplicate()))
+        golden_ce = self.ce0
+        golden_str = "Celm(even, index=0, x=0.5, xneg=0, xpos=1)"
+        self.assertEqual(golden_str, str(self.ce0))
+        self.assertEqual(golden_ce, self.ce0.duplicate())
+        self.assertEqual(golden_str, str(self.ce0.duplicate()))
         # "dup" attribute is a shorthand for duplicate() function.
-        self.assertEqual(golden, str(self.ce0.dup))
+        self.assertEqual(golden_ce, self.ce0.dup)
+        self.assertEqual(golden_str, str(self.ce0.dup))
 
         # Duplicated celm has standalone index.
         elm = self.ce0.dup
@@ -154,11 +157,14 @@ class SelmTC(unittest.TestCase):
 
     def test_duplicate(self):
 
-        golden = "Selm(even, index=0, x=0, xneg=-0.5, xpos=0.5)"
-        self.assertEqual(golden, str(self.se0))
-        self.assertEqual(golden, str(self.se0.duplicate()))
+        golden_se = self.se0
+        golden_str = "Selm(even, index=0, x=0, xneg=-0.5, xpos=0.5)"
+        self.assertEqual(golden_str, str(self.se0))
+        self.assertEqual(golden_se, self.se0.duplicate())
+        self.assertEqual(golden_str, str(self.se0.duplicate()))
         # "dup" attribute is a shorthand for duplicate() function.
-        self.assertEqual(golden, str(self.se0.dup))
+        self.assertEqual(golden_se, self.se0.dup)
+        self.assertEqual(golden_str, str(self.se0.dup))
 
         # Duplicated selm has standalone index.
         se = self.se0.dup
@@ -280,5 +286,149 @@ class NonUniformTC(unittest.TestCase):
         self.assertEqual([1.0, 0.5, 1.25, 2.0], get_xcoord(self.se1))
         self.assertEqual([3.0, 2.0, 4.25, 6.5], get_xcoord(self.se2))
         self.assertEqual([10.0, 6.5, 10.0, 13.5], get_xcoord(self.se3))
+
+
+class ComparisonTC(unittest.TestCase):
+
+    def setUp(self):
+
+        self.grid = libst.Grid(0, 10, 10)
+        self.sol1 = libst.Solution(grid=self.grid, nvar=1, time_increment=0.2)
+        self.sol2 = libst.Solution(grid=self.grid, nvar=1, time_increment=0.2)
+
+        self.ce0s1 = self.sol1.celm(ielm=0)
+        self.ce0s1p = self.sol1.celm(ielm=0)
+        self.ce1s1 = self.sol1.celm(ielm=1)
+        self.ce0s1o = self.sol1.celm(ielm=0, odd_plane=True)
+        self.ce0s2 = self.sol2.celm(ielm=0)
+
+        self.se0s1 = self.sol1.selm(ielm=0)
+        self.se0s1p = self.sol1.selm(ielm=0)
+        self.se1s1 = self.sol1.selm(ielm=1)
+        self.se0s1o = self.sol1.selm(ielm=0, odd_plane=True)
+        self.se0s2 = self.sol2.selm(ielm=0)
+
+    def _check_copy(self, e1, e2):
+
+        self.assertTrue (e1 == e2)
+        self.assertFalse(e1 != e2)
+        self.assertTrue (e1 <= e2)
+        self.assertFalse(e1 <  e2)
+        self.assertTrue (e1 >= e2)
+        self.assertFalse(e1 >  e2)
+
+        self.assertTrue (e2 == e1)
+        self.assertFalse(e2 != e1)
+        self.assertTrue (e2 <= e1)
+        self.assertFalse(e2 <  e1)
+        self.assertTrue (e2 >= e1)
+        self.assertFalse(e2 >  e1)
+
+    def test_celm_copy(self):
+
+        self._check_copy(self.ce0s1, self.ce0s1p)
+
+    def test_selm_copy(self):
+
+        self._check_copy(self.se0s1, self.se0s1p)
+
+    def _check_adjacent(self, e1, e2):
+
+        self.assertFalse(e1 == e2)
+        self.assertTrue (e1 != e2)
+        self.assertTrue (e1 <= e2)
+        self.assertTrue (e1 <  e2)
+        self.assertFalse(e1 >= e2)
+        self.assertFalse(e1 >  e2)
+
+        self.assertFalse(e2 == e1)
+        self.assertTrue (e2 != e1)
+        self.assertFalse(e2 <= e1)
+        self.assertFalse(e2 <  e1)
+        self.assertTrue (e2 >= e1)
+        self.assertTrue (e2 >  e1)
+
+    def test_celm_adjacent(self):
+
+        self._check_adjacent(self.ce0s1, self.ce1s1)
+
+    def test_selm_adjacent(self):
+
+        self._check_adjacent(self.se0s1, self.se1s1)
+
+    def _check_odd_plane(self, e1, e2):
+
+        self.assertFalse(e1 == e2)
+        self.assertTrue (e1 != e2)
+        self.assertTrue (e1 <= e2)
+        self.assertTrue (e1 <  e2)
+        self.assertFalse(e1 >= e2)
+        self.assertFalse(e1 >  e2)
+
+        self.assertFalse(e2 == e1)
+        self.assertTrue (e2 != e1)
+        self.assertFalse(e2 <= e1)
+        self.assertFalse(e2 <  e1)
+        self.assertTrue (e2 >= e1)
+        self.assertTrue (e2 >  e1)
+
+    def test_celm_odd_plane(self):
+
+        self._check_odd_plane(self.ce0s1, self.ce0s1o)
+
+    def test_selm_odd_plane(self):
+
+        self._check_odd_plane(self.se0s1, self.se0s1o)
+
+    def _check_different_solver(self, e1, e2):
+
+        self.assertFalse(e1 == e2)
+        self.assertTrue (e1 != e2)
+        self.assertFalse(e1 <= e2)
+        self.assertFalse(e1 <  e2)
+        self.assertFalse(e1 >= e2)
+        self.assertFalse(e1 >  e2)
+
+        self.assertFalse(e2 == e1)
+        self.assertTrue (e2 != e1)
+        self.assertFalse(e2 <= e1)
+        self.assertFalse(e2 <  e1)
+        self.assertFalse(e2 >= e1)
+        self.assertFalse(e2 >  e1)
+
+    def test_celm_different_solver(self):
+
+        self._check_different_solver(self.ce0s1, self.ce0s2)
+
+    def test_selm_different_solver(self):
+
+        self._check_different_solver(self.se0s1, self.se0s2)
+
+    def test_celm_selm(self):
+
+        e1 = self.ce0s1
+        e2 = self.se0s1
+
+        self.assertFalse(e1 == e2)
+        self.assertTrue (e1 != e2)
+        with self.assertRaises(TypeError):
+            e1 <= e2
+        with self.assertRaises(TypeError):
+            e1 <  e2
+        with self.assertRaises(TypeError):
+            e1 >= e2
+        with self.assertRaises(TypeError):
+            e1 >  e2
+
+        self.assertFalse(e2 == e1)
+        self.assertTrue (e2 != e1)
+        with self.assertRaises(TypeError):
+            e2 <= e1
+        with self.assertRaises(TypeError):
+            e2 <  e1
+        with self.assertRaises(TypeError):
+            e2 >= e1
+        with self.assertRaises(TypeError):
+            e2 >  e1
 
 # vim: set et sw=4 ts=4:

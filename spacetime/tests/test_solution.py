@@ -123,24 +123,24 @@ class SolutionTC(unittest.TestCase):
 
         sol = self.sol10
 
+        self.assertEqual(list(sol.celms()), list(sol.celms(odd_plane=False)))
+
         gold = [sol.celm(it, odd_plane=False) for it in range(sol.grid.ncelm)]
-        gold = [str(it) for it in gold]
-        self.assertEqual(gold, [str(it) for it in sol.celms(odd_plane=False)])
+        self.assertEqual(gold, list(sol.celms(odd_plane=False)))
 
         gold = [sol.celm(it, odd_plane=True) for it in range(sol.grid.ncelm-1)]
-        gold = [str(it) for it in gold]
-        self.assertEqual(gold, [str(it) for it in sol.celms(odd_plane=True)])
+        self.assertEqual(gold, list(sol.celms(odd_plane=True)))
 
     def test_selms(self):
 
         sol = self.sol10
 
+        self.assertEqual(list(sol.selms()), list(sol.selms(odd_plane=False)))
+
         gold = [sol.selm(it, odd_plane=False) for it in range(sol.grid.nselm)]
-        gold = [str(it) for it in gold]
-        self.assertEqual(gold, [str(it) for it in sol.selms(odd_plane=False)])
+        self.assertEqual(gold, list(sol.selms(odd_plane=False)))
 
         gold = [sol.selm(it, odd_plane=True) for it in range(sol.grid.nselm-1)]
-        gold = [str(it) for it in gold]
-        self.assertEqual(gold, [str(it) for it in sol.selms(odd_plane=True)])
+        self.assertEqual(gold, list(sol.selms(odd_plane=True)))
 
 # vim: set et sw=4 ts=4:
