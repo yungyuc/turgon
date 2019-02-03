@@ -22,7 +22,7 @@ def draw():
 
     # CE grids.
     linewidth = '0.5pt'
-    for se in libst.selm_in(sol):
+    for se in sol.selms(odd_plane=False):
         c.line((se.x, 0), (se.x, dt), linewidth=linewidth)
     c.line((sol.selm(0).x, 0), (sol.selm(grid.ncelm).x, 0),
            linewidth=linewidth)
@@ -37,10 +37,10 @@ def draw():
            linewidth=linewidth)
     c.uput(sep, 'l', (grid.xmin-sep,-hdt*1.2), r'$j$')
     c.uput(sep, 'r', (grid.xmax+sep,-hdt*1.2), r'$x$')
-    for se in libst.selm_in(sol):
+    for se in sol.selms(odd_plane=False):
         c.line((se.x, -hdt*1.2-sep), (se.x, -hdt*1.2+sep))
         c.uput(sep, 'd', (se.x,-hdt*1.2-sep), r'$%d$'%se.index)
-    for se in libst.selm_in(sol, odd_plane=True):
+    for se in sol.selms(odd_plane=True):
         c.line((se.x, -hdt*1.2-sep/2), (se.x, -hdt*1.2+sep/2))
         c.uput(sep, 'd', (se.x,-hdt*1.2-sep), r'$\frac{%d}{2}$'%(se.index*2+1))
 
@@ -60,10 +60,10 @@ def draw():
     sep = 0.05
     sepx = dx*0.1
     sept = dt*0.1
-    for se in libst.selm_in(sol):
+    for se in sol.selms(odd_plane=False):
         c.selm(se, 0,
                sep=sep, linestyle='dotted', dotsep='1pt', linecolor='red')
-    for se in libst.selm_in(sol, odd_plane=True):
+    for se in sol.selms(odd_plane=True):
         c.selm(se, hdt,
                sep=sep, linestyle='dotted', dotsep='1pt', linecolor='blue')
 
