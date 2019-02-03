@@ -10,7 +10,7 @@ def draw():
 
     xloc = np.array([-1, 0, 2, 3.5])
     grid = libst.Grid(xloc=xloc)
-    sol = libst.Solution(grid=grid, nvar=1, time_increment=6/4)
+    sol = libst.Solver(grid=grid, nvar=1, time_increment=6/4)
 
     dx = (grid.xmax-grid.xmin)/grid.ncelm
     dt = dx
