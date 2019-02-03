@@ -81,6 +81,62 @@ protected:
 
 }; /* end class WrapElementBase */
 
+template< typename ST >
+class SolutionElmIterator
+{
+
+public:
+
+    using solution_type = ST;
+
+    SolutionElmIterator() = delete;
+    SolutionElmIterator(std::shared_ptr<ST> const & sol, bool odd_plane, size_t starting, bool selm)
+      : m_solution(sol), m_odd_plane(odd_plane), m_current(starting), m_selm(selm)
+    {}
+
+    typename ST::celm_type next_celm()
+    {
+        size_t ncelm = m_solution->grid().ncelm();
+        if (m_odd_plane) { --ncelm; }
+        if (m_current < ncelm)
+        {
+            typename ST::celm_type ret = m_solution->celm(m_current, m_odd_plane);
+            ++m_current;
+            return ret;
+        }
+        else
+        {
+            throw pybind11::stop_iteration();
+        }
+    }
+
+    typename ST::selm_type next_selm()
+    {
+        size_t nselm = m_solution->grid().nselm();
+        if (m_odd_plane) { --nselm; }
+        if (m_current < nselm)
+        {
+            typename ST::selm_type ret = m_solution->selm(m_current, m_odd_plane);
+            ++m_current;
+            return ret;
+        }
+        else
+        {
+            throw pybind11::stop_iteration();
+        }
+    }
+
+    bool is_selm() const { return m_selm; }
+
+private:
+
+    std::shared_ptr<solution_type> m_solution;
+    bool m_odd_plane;
+    size_t m_current = 0;
+    bool m_selm = false;
+
+}; /* end class SolutionBaseCelmIterator */
+
 template<class WT, class ST>
 class
 WrapSolutionBase
@@ -101,6 +157,23 @@ protected:
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
+
+        using elm_iter_type = SolutionElmIterator<wrapped_type>;
+        std::string elm_pyname = std::string(pyname) + "ElementIterator";
+        pybind11::class_< elm_iter_type >(mod, elm_pyname.c_str())
+            .def("__iter__", [](elm_iter_type & self){ return self; })
+            .def(
+                "__next__"
+              , [](elm_iter_type & self)
+                {
+                    py::object ret;
+                    if (self.is_selm()) { ret = py::cast(self.next_selm()); }
+                    else                { ret = py::cast(self.next_celm()); }
+                    return ret;
+                }
+            )
+        ;
+
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
@@ -122,6 +195,20 @@ protected:
                 "selm"
               , static_cast<typename wrapped_type::selm_type (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at)
               , py::arg("ielm"), py::arg("odd_plane")=false
+            )
+            .def
+            (
+                "celms"
+              , [](wrapped_type & self, bool odd_plane)
+                { return elm_iter_type(self.shared_from_this(), odd_plane, 0, false); }
+              , py::arg("odd_plane")=false
+            )
+            .def
+            (
+                "selms"
+              , [](wrapped_type & self, bool odd_plane)
+                { return elm_iter_type(self.shared_from_this(), odd_plane, 0, true); }
+              , py::arg("odd_plane")=false
             )
             .def_property_readonly(
                 "so0"

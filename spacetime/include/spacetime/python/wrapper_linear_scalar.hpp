@@ -5,6 +5,8 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include <string>
+
 #include "spacetime/python/common.hpp"
 
 namespace spacetime
@@ -33,9 +35,11 @@ WrapLinearScalarSolution
         (*this)
             .def
             (
-                py::init([](std::shared_ptr<Grid> const & grid, typename wrapped_type::value_type time_increment) {
-                    return wrapped_type::construct(grid, time_increment);
-                })
+                py::init
+                (
+                    [](std::shared_ptr<Grid> const & grid, typename wrapped_type::value_type time_increment)
+                    { return wrapped_type::construct(grid, time_increment); }
+                )
               , py::arg("grid"), py::arg("time_increment")
             )
         ;
@@ -68,7 +72,8 @@ WrapLinearScalarSelm
             .def
             (
                 "set_so0"
-              , [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
+              , [](wrapped_type & self, size_t it, wrapped_type::value_type val)
+                {
                     self.so0(it) = val;
                 }
             )
@@ -80,7 +85,8 @@ WrapLinearScalarSelm
             .def
             (
                 "set_so1"
-              , [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
+              , [](wrapped_type & self, size_t it, wrapped_type::value_type val)
+                {
                     self.so1(it) = val;
                 }
             )

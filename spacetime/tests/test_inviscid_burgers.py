@@ -19,7 +19,7 @@ class InviscidBurgersSolutionTC(unittest.TestCase):
 
         self.sol10.so0.fill(1)
         self.sol10.so1.fill(1)
-        for elm in libst.selm_in(self.sol10, odd_plane=False):
+        for elm in self.sol10.selms(odd_plane=False):
             r = elm.grid.xmin + elm.xctr / (elm.grid.xmax-elm.grid.xmin)
             v = np.sin(r * np.pi * 2)
             dv = np.cos(r * np.pi * 2) * 2 * np.pi
@@ -33,14 +33,14 @@ class InviscidBurgersSolutionTC(unittest.TestCase):
     def test_march_half_so0(self):
 
         self.sol10.march_half_so0(odd_plane=False)
-        res = [s.so0(0) for s in libst.selm_in(self.sol10, odd_plane=True)]
+        res = [s.so0(0) for s in self.sol10.selms(odd_plane=True)]
         self.assertEqual(10, len(res))
         self.assertEqual([3]*10, res)
 
     def test_march_half_so1(self):
 
         self.sol10.march_half_so1(odd_plane=False)
-        res = [s.so1(0) for s in libst.selm_in(self.sol10, odd_plane=True)]
+        res = [s.so1(0) for s in self.sol10.selms(odd_plane=True)]
         self.assertEqual(10, len(res))
         self.assertEqual([0]*10, res)
 

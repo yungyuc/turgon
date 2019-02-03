@@ -38,12 +38,14 @@ PyObject * initialize_linear_scalar(pybind11::module & mod)
 
     xt::import_numpy(); // or numpy c api segfault.
 
-    WrapLinearScalarSolution::commit(
+    WrapLinearScalarSolution::commit
+    (
         mod
       , "LinearScalarSolution"
       , "Solution for a linear scalar equation"
     );
-    WrapLinearScalarSelm::commit(
+    WrapLinearScalarSelm::commit
+    (
         mod
       , "LinearScalarSelm"
       , "Solution element of a linear scalar equation"
@@ -58,12 +60,14 @@ PyObject * initialize_inviscid_burgers(pybind11::module & mod)
 
     xt::import_numpy(); // or numpy c api segfault.
 
-    WrapInviscidBurgersSolution::commit(
+    WrapInviscidBurgersSolution::commit
+    (
         mod
       , "InviscidBurgersSolution"
       , "Solution for the inviscid Burgers equation"
     );
-    WrapInviscidBurgersSelm::commit(
+    WrapInviscidBurgersSelm::commit
+    (
         mod
       , "InviscidBurgersFelm"
       , "Flux calculator for the solution element of the inviscid Burgers equation"
