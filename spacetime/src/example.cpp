@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
     namespace st = spacetime;
 
     std::shared_ptr<st::Grid> grid=st::Grid::construct(0, 100, 100);
-    std::shared_ptr<st::Solution> sol=st::Solution::construct(grid, 1, 1);
+    std::shared_ptr<st::Solver> sol=st::Solver::construct(grid, 1, 1);
     std::cout << *grid << std::endl;
     std::cout << *sol << std::endl;
 

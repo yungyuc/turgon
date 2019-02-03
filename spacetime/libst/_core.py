@@ -11,11 +11,9 @@ from ._libst import (
     Grid,
     Celm,
     Selm,
-    Solution,
-    InviscidBurgersSolution,
-    InviscidBurgersFelm,
-    LinearScalarSolution,
-    LinearScalarSelm,
+    Solver,
+    InviscidBurgersSolver,
+    LinearScalarSolver,
 )
 
 
@@ -24,10 +22,8 @@ __all__ = [
     'Celm',
     'Selm',
     'Solution',
-    'InviscidBurgersSolution',
-    'InviscidBurgersFelm',
-    'LinearScalarSolution',
-    'LinearScalarSelm',
+    'InviscidBurgersSolver',
+    'LinearScalarSolver',
 ]
 
 # vim: set et sw=4 ts=4:

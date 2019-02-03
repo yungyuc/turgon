@@ -8,13 +8,13 @@ import numpy as np
 import libst
 
 
-class LinearScalarTC(unittest.TestCase):
+class LinearScalarSolverTC(unittest.TestCase):
 
     def setUp(self):
 
         self.dt = 0.1
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.LinearScalarSolution(
+        self.sol10 = libst.LinearScalarSolver(
             grid=self.grid10,
             time_increment=self.dt,
         )

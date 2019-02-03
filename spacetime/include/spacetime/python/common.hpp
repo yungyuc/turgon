@@ -92,15 +92,15 @@ protected:
 }; /* end class WrapElementBase */
 
 template< typename ST >
-class SolutionElmIterator
+class SolverElementIterator
 {
 
 public:
 
     using solution_type = ST;
 
-    SolutionElmIterator() = delete;
-    SolutionElmIterator(std::shared_ptr<ST> const & sol, bool odd_plane, size_t starting, bool selm)
+    SolverElementIterator() = delete;
+    SolverElementIterator(std::shared_ptr<ST> const & sol, bool odd_plane, size_t starting, bool selm)
       : m_solution(sol), m_odd_plane(odd_plane), m_current(starting), m_selm(selm)
     {}
 
@@ -145,11 +145,11 @@ private:
     size_t m_current = 0;
     bool m_selm = false;
 
-}; /* end class SolutionBaseCelmIterator */
+}; /* end class SolverElementIterator */
 
 template<class WT, class ST>
 class
-WrapSolutionBase
+WrapSolverBase
   : public WrapBase< WT, ST, std::shared_ptr<ST> >
 {
 
@@ -163,12 +163,12 @@ public:
 
 protected:
 
-    WrapSolutionBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSolverBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
 
-        using elm_iter_type = SolutionElmIterator<wrapped_type>;
+        using elm_iter_type = SolverElementIterator<wrapped_type>;
         std::string elm_pyname = std::string(pyname) + "ElementIterator";
         pybind11::class_< elm_iter_type >(mod, elm_pyname.c_str())
             .def("__iter__", [](elm_iter_type & self){ return self; })
@@ -233,7 +233,7 @@ protected:
         ;
     }
 
-}; /* end class WrapSolutionBase */
+}; /* end class WrapSolverBase */
 
 class ModuleInitializer {
 

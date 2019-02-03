@@ -14,7 +14,7 @@
 #include "spacetime/ElementBase_decl.hpp"
 #include "spacetime/Grid_decl.hpp"
 #include "spacetime/Field_decl.hpp"
-#include "spacetime/SolutionBase_decl.hpp"
+#include "spacetime/SolverBase_decl.hpp"
 
 namespace spacetime
 {
@@ -81,21 +81,21 @@ LinearScalarSelm::value_type LinearScalarSelm::so0p(size_t iv) const
 
 using LinearScalarCelm = CelmBase<LinearScalarSelm>;
 
-class LinearScalarSolution
-  : public SolutionBase<LinearScalarSolution, LinearScalarCelm, LinearScalarSelm>
+class LinearScalarSolver
+  : public SolverBase<LinearScalarSolver, LinearScalarCelm, LinearScalarSelm>
 {
 
 public:
 
-    using base_type = SolutionBase<LinearScalarSolution, LinearScalarCelm, LinearScalarSelm>;
+    using base_type = SolverBase<LinearScalarSolver, LinearScalarCelm, LinearScalarSelm>;
     using base_type::base_type;
 
-    static std::shared_ptr<LinearScalarSolution> construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
+    static std::shared_ptr<LinearScalarSolver> construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
     {
         return construct_impl(grid, 1, time_increment);
     }
 
-}; /* end class LinearScalarSolution */
+}; /* end class LinearScalarSolver */
 
 } /* end namespace spacetime */
 

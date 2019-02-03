@@ -8,19 +8,19 @@ import numpy as np
 import libst
 
 
-class SolutionTC(unittest.TestCase):
+class SolverTC(unittest.TestCase):
 
     def setUp(self):
 
         self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.Solution(grid=self.grid10, nvar=1,
-                                    time_increment=0.2)
+        self.sol10 = libst.Solver(grid=self.grid10, nvar=1,
+                                  time_increment=0.2)
         self.sol10.so0.fill(-1)
         self.sol10.so1.fill(-2)
 
     def test_str(self):
 
-        self.assertEqual("Solution(grid=Grid(xmin=0, xmax=10, ncelm=10))",
+        self.assertEqual("Solver(grid=Grid(xmin=0, xmax=10, ncelm=10))",
                          str(self.sol10))
 
     def test_grid(self):

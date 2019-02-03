@@ -28,7 +28,7 @@ class Selm;
  * CE and SE.
  */
 template< typename ST, typename CE, typename SE >
-class SolutionBase
+class SolverBase
   : public std::enable_shared_from_this<ST>
 {
 
@@ -50,14 +50,14 @@ protected:
 
 public:
 
-    SolutionBase(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
+    SolverBase(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
       : m_field(grid, nvar, time_increment) {}
 
-    SolutionBase() = delete;
-    SolutionBase(SolutionBase const & ) = delete;
-    SolutionBase(SolutionBase       &&) = delete;
-    SolutionBase & operator=(SolutionBase const & ) = delete;
-    SolutionBase & operator=(SolutionBase       &&) = delete;
+    SolverBase() = delete;
+    SolverBase(SolverBase const & ) = delete;
+    SolverBase(SolverBase       &&) = delete;
+    SolverBase & operator=(SolverBase const & ) = delete;
+    SolverBase & operator=(SolverBase       &&) = delete;
 
     Grid const & grid() const { return m_field.grid(); }
     Grid       & grid()       { return m_field.grid(); }
@@ -89,7 +89,7 @@ private:
 
     Field m_field;
 
-}; /* end class SolutionBase */
+}; /* end class SolverBase */
 
 } /* end namespace spacetime */
 

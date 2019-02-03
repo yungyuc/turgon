@@ -5,27 +5,27 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "spacetime/SolutionBase_decl.hpp"
+#include "spacetime/SolverBase_decl.hpp"
 #include "spacetime/Field.hpp"
 
 namespace spacetime
 {
 
-class Solution
-  : public SolutionBase<Solution, Celm, Selm>
+class Solver
+  : public SolverBase<Solver, Celm, Selm>
 {
 
 public:
 
-    using base_type = SolutionBase<Solution, Celm, Selm>;
+    using base_type = SolverBase<Solver, Celm, Selm>;
     using base_type::base_type;
 
-    static std::shared_ptr<Solution> construct(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment)
+    static std::shared_ptr<Solver> construct(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment)
     {
         return construct_impl(grid, nvar, time_increment);
     }
 
-}; /* end class Solution */
+}; /* end class Solver */
 
 } /* end namespace spacetime */
 

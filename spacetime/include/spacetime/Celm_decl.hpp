@@ -9,7 +9,7 @@
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase_decl.hpp"
 #include "spacetime/Grid_decl.hpp"
-#include "spacetime/SolutionBase_decl.hpp"
+#include "spacetime/SolverBase_decl.hpp"
 #include "spacetime/Selm_decl.hpp"
 
 namespace spacetime

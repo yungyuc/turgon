@@ -15,18 +15,18 @@ namespace python
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapInviscidBurgersSolution
-  : public WrapSolutionBase< WrapInviscidBurgersSolution, InviscidBurgersSolution >
+WrapInviscidBurgersSolver
+  : public WrapSolverBase< WrapInviscidBurgersSolver, InviscidBurgersSolver >
 {
 
-    using base_type = WrapSolutionBase< WrapInviscidBurgersSolution, InviscidBurgersSolution >;
+    using base_type = WrapSolverBase< WrapInviscidBurgersSolver, InviscidBurgersSolver >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
     friend base_type;
     friend base_type::base_type;
 
-    WrapInviscidBurgersSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapInviscidBurgersSolver(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -40,7 +40,7 @@ WrapInviscidBurgersSolution
         ;
     }
 
-}; /* end class WrapInviscidBurgersSolution */
+}; /* end class WrapInviscidBurgersSolver */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY

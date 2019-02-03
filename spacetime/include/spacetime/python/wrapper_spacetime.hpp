@@ -93,18 +93,18 @@ WrapField
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapSolution
-  : public WrapSolutionBase< WrapSolution, Solution >
+WrapSolver
+  : public WrapSolverBase< WrapSolver, Solver >
 {
 
-    using base_type = WrapSolutionBase< WrapSolution, Solution >;
+    using base_type = WrapSolverBase< WrapSolver, Solver >;
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
     friend base_type;
     friend base_type::base_type;
 
-    WrapSolution(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSolver(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -118,7 +118,7 @@ WrapSolution
         ;
     }
 
-}; /* end class WrapSolution */
+}; /* end class WrapSolver */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
