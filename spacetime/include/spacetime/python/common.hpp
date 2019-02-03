@@ -97,20 +97,20 @@ class SolverElementIterator
 
 public:
 
-    using solution_type = ST;
+    using solver_type = ST;
 
     SolverElementIterator() = delete;
     SolverElementIterator(std::shared_ptr<ST> const & sol, bool odd_plane, size_t starting, bool selm)
-      : m_solution(sol), m_odd_plane(odd_plane), m_current(starting), m_selm(selm)
+      : m_solver(sol), m_odd_plane(odd_plane), m_current(starting), m_selm(selm)
     {}
 
     typename ST::celm_type next_celm()
     {
-        size_t ncelm = m_solution->grid().ncelm();
+        size_t ncelm = m_solver->grid().ncelm();
         if (m_odd_plane) { --ncelm; }
         if (m_current < ncelm)
         {
-            typename ST::celm_type ret = m_solution->celm(m_current, m_odd_plane);
+            typename ST::celm_type ret = m_solver->celm(m_current, m_odd_plane);
             ++m_current;
             return ret;
         }
@@ -122,11 +122,11 @@ public:
 
     typename ST::selm_type next_selm()
     {
-        size_t nselm = m_solution->grid().nselm();
+        size_t nselm = m_solver->grid().nselm();
         if (m_odd_plane) { --nselm; }
         if (m_current < nselm)
         {
-            typename ST::selm_type ret = m_solution->selm(m_current, m_odd_plane);
+            typename ST::selm_type ret = m_solver->selm(m_current, m_odd_plane);
             ++m_current;
             return ret;
         }
@@ -137,15 +137,35 @@ public:
     }
 
     bool is_selm() const { return m_selm; }
+    bool is_odd_plane() const { return m_odd_plane; }
+    size_t current() const { return m_current; }
+    size_t nelem() const
+    {
+        size_t ret = is_selm() ? m_solver->grid().nselm() : m_solver->grid().ncelm();
+        if (m_odd_plane) { --ret; }
+        return ret;
+    }
 
 private:
 
-    std::shared_ptr<solution_type> m_solution;
+    std::shared_ptr<solver_type> m_solver;
     bool m_odd_plane;
     size_t m_current = 0;
     bool m_selm = false;
 
 }; /* end class SolverElementIterator */
+
+template< typename ST >
+std::ostream& operator<<(std::ostream& os, const SolverElementIterator<ST> & seiter)
+{
+    os
+        << "SolverElementIterator("
+        << (seiter.is_selm() ? "selm" : "celm")
+        << ", " << (seiter.is_odd_plane() ? "odd_plane" : "even_plane")
+        << ", current=" << seiter.current() << ", nelem=" << seiter.nelem() << ")"
+    ;
+    return os;
+}
 
 template<class WT, class ST>
 class
@@ -171,6 +191,7 @@ protected:
         using elm_iter_type = SolverElementIterator<wrapped_type>;
         std::string elm_pyname = std::string(pyname) + "ElementIterator";
         pybind11::class_< elm_iter_type >(mod, elm_pyname.c_str())
+            .def("__str__", &detail::to_str<elm_iter_type>)
             .def("__iter__", [](elm_iter_type & self){ return self; })
             .def(
                 "__next__"
