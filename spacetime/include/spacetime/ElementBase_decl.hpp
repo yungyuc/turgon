@@ -61,6 +61,13 @@ public:
     ET & move_neg_at() { return move_at(-1); }
     ET & move_pos_at() { return move_at(1); }
 
+    bool operator==(ET const & b) const { return (m_field == b.m_field) && (m_xptr == b.m_xptr); }
+    bool operator!=(ET const & b) const { return (m_field != b.m_field) || (m_xptr != b.m_xptr); }
+    bool operator< (ET const & b) const { return (m_field == b.m_field) && (m_xptr <  b.m_xptr); }
+    bool operator<=(ET const & b) const { return (m_field == b.m_field) && (m_xptr <= b.m_xptr); }
+    bool operator> (ET const & b) const { return (m_field == b.m_field) && (m_xptr >  b.m_xptr); }
+    bool operator>=(ET const & b) const { return (m_field == b.m_field) && (m_xptr >= b.m_xptr); }
+
 protected:
 
     size_t xindex() const;
