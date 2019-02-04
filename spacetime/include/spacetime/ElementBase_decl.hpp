@@ -48,18 +48,18 @@ public:
     value_type xpos() const { return *(m_xptr+1); }
     value_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
-    ET & move(ssize_t offset);
-    ET & move_at(ssize_t offset) { return static_cast<ET *>(this)->move_at(offset); }
+    void move(ssize_t offset);
+    void move_at(ssize_t offset) { static_cast<ET *>(this)->move_at(offset); }
 
-    ET & move_left() { return move(-2); }
-    ET & move_right() { return move(2); }
-    ET & move_neg() { return move(-1); }
-    ET & move_pos() { return move(1); }
+    void move_left() { move(-2); }
+    void move_right() { move(2); }
+    void move_neg() { move(-1); }
+    void move_pos() { move(1); }
 
-    ET & move_left_at() { return move_at(-2); }
-    ET & move_right_at() { return move_at(2); }
-    ET & move_neg_at() { return move_at(-1); }
-    ET & move_pos_at() { return move_at(1); }
+    void move_left_at() { move_at(-2); }
+    void move_right_at() { move_at(2); }
+    void move_neg_at() { move_at(-1); }
+    void move_pos_at() { move_at(1); }
 
     bool operator==(ET const & b) const { return (m_field == b.m_field) && (m_xptr == b.m_xptr); }
     bool operator!=(ET const & b) const { return (m_field != b.m_field) || (m_xptr != b.m_xptr); }

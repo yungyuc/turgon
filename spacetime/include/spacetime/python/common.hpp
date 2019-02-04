@@ -81,11 +81,11 @@ protected:
             .def_property_readonly("dt", &wrapped_type::dt)
             .def_property_readonly("hdt", &wrapped_type::hdt)
             .def_property_readonly("qdt", &wrapped_type::qdt)
-            .def("move", &wrapped_type::move_at)
-            .def("move_left", &wrapped_type::move_left_at)
-            .def("move_right", &wrapped_type::move_right_at)
-            .def("move_neg", &wrapped_type::move_neg_at)
-            .def("move_pos", &wrapped_type::move_pos_at)
+            .def("move" , [](wrapped_type & s, size_t v) { s.move_at(v); return s; } )
+            .def("move_left" , [](wrapped_type & s) { s.move_left_at(); return s; } )
+            .def("move_right" , [](wrapped_type & s) { s.move_right_at(); return s; } )
+            .def("move_neg" , [](wrapped_type & s) { s.move_neg_at(); return s; } )
+            .def("move_pos" , [](wrapped_type & s) { s.move_pos_at(); return s; } )
         ;
     }
 
@@ -137,7 +137,7 @@ public:
     }
 
     bool is_selm() const { return m_selm; }
-    bool is_odd_plane() const { return m_odd_plane; }
+    bool on_odd_plane() const { return m_odd_plane; }
     size_t current() const { return m_current; }
     size_t nelem() const
     {
@@ -161,7 +161,7 @@ std::ostream& operator<<(std::ostream& os, const SolverElementIterator<ST> & sei
     os
         << "SolverElementIterator("
         << (seiter.is_selm() ? "selm" : "celm")
-        << ", " << (seiter.is_odd_plane() ? "odd_plane" : "even_plane")
+        << ", " << (seiter.on_odd_plane() ? "on_odd_plane" : "on_even_plane")
         << ", current=" << seiter.current() << ", nelem=" << seiter.nelem() << ")"
     ;
     return os;
