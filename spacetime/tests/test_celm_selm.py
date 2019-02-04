@@ -55,27 +55,17 @@ class CelmTC(unittest.TestCase):
     def test_index(self):
 
         self.assertEqual(0, self.ce0.index)
-
         # Moving a half grid makes it on odd plane.
-        ce = self.ce0.dup
-        ce.move_pos()
-        self.assertEqual(0, ce.index)
-
+        self.assertEqual(0, self.ce0.dup.move_pos().index)
         # Moving a full grid makes it back on even plane.
-        ce = self.ce0.dup
-        ce.move_right()
-        self.assertEqual(1, ce.index)
+        self.assertEqual(1, self.ce0.dup.move_right().index)
 
     def test_on_even_plane(self):
 
         self.assertTrue(self.ce0.on_even_plane)
         self.assertFalse(self.ce0.on_odd_plane)
-        ce = self.ce0.dup
-        ce.move_pos()
-        self.assertFalse(ce.on_even_plane)
-        ce = self.ce0.dup
-        ce.move_right()
-        self.assertTrue(ce.on_even_plane)
+        self.assertFalse(self.ce0.dup.move_pos().on_even_plane)
+        self.assertTrue(self.ce0.dup.move_right().on_even_plane)
 
     def test_coordinates(self):
 
@@ -96,18 +86,12 @@ class CelmTC(unittest.TestCase):
     def test_move_all(self):
 
         # Move right/left for a full CE (compound CE).
-        ce = self.ce0.dup
-        ce.move_right()
-        self.assertEqual(1.5, ce.x)
-        ce.move_left()
-        self.assertEqual(0.5, ce.x)
+        self.assertEqual(1.5, self.ce0.dup.move_right().x)
+        self.assertEqual(0.5, self.ce0.dup.move_right().move_left().x)
 
         # Move pos(itive)/neg(itive) for a half CE (basic CE).
-        ce = self.ce0.dup
-        ce.move_pos()
-        self.assertEqual(1, ce.x)
-        ce.move_neg()
-        self.assertEqual(0.5, ce.x)
+        self.assertEqual(1, self.ce0.dup.move_pos().x)
+        self.assertEqual(0.5, self.ce0.dup.move_pos().move_neg().x)
 
         # Out of bound.
         ce0d = self.ce0.dup
@@ -198,24 +182,16 @@ class SelmTC(unittest.TestCase):
 
         self.assertEqual(0, self.se0.index)
         # Moving a half grid makes it on odd plane.
-        ce = self.se0.dup
-        ce.move_pos()
-        self.assertEqual(0, ce.index)
+        self.assertEqual(0, self.se0.dup.move_pos().index)
         # Moving a full grid makes it back on even plane.
-        ce = self.se0.dup
-        ce.move_right()
-        self.assertEqual(1, ce.index)
+        self.assertEqual(1, self.se0.dup.move_right().index)
 
     def test_on_even_plane(self):
 
         self.assertTrue(self.se0.on_even_plane)
         self.assertFalse(self.se0.on_odd_plane)
-        se = self.se0.dup
-        se.move_pos()
-        self.assertFalse(se.on_even_plane)
-        se = self.se0.dup
-        se.move_right()
-        self.assertTrue(se.on_even_plane)
+        self.assertFalse(self.se0.dup.move_pos().on_even_plane)
+        self.assertTrue(self.se0.dup.move_right().on_even_plane)
 
         self.assertFalse(self.sol10.selm(5, odd_plane=True).on_even_plane)
         self.assertTrue(self.sol10.selm(5, odd_plane=False).on_even_plane)
@@ -242,18 +218,12 @@ class SelmTC(unittest.TestCase):
     def test_move_all(self):
 
         # Move right/left for a full CE (compound CE).
-        se = self.se0.dup
-        se.move_right()
-        self.assertEqual(1, se.x)
-        se.move_left()
-        self.assertEqual(0, se.x)
+        self.assertEqual(1, self.se0.dup.move_right().x)
+        self.assertEqual(0, self.se0.dup.move_right().move_left().x)
 
         # Move pos(itive)/neg(itive) for a half CE (basic CE).
-        se = self.se0.dup
-        se.move_pos()
-        self.assertEqual(0.5, se.x)
-        se.move_neg()
-        self.assertEqual(0, se.x)
+        self.assertEqual(0.5, self.se0.dup.move_pos().x)
+        self.assertEqual(0, self.se0.dup.move_pos().move_neg().x)
 
         # Out of bound.
         se0d = self.se0.dup
