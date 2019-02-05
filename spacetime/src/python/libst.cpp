@@ -3,7 +3,7 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "spacetime/python.hpp"
+#include "spacetime/python.hpp" // must be first
 
 #include <utility>
 #include <memory>

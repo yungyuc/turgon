@@ -29,7 +29,7 @@ void Field::set_time_increment(value_type time_increment)
 
 template< typename CE >
 inline
-CE Field::celm_at(size_t ielm, bool odd_plane)
+CE Field::celm_at(sindex_type ielm, bool odd_plane)
 {
     const CE elm = celm<CE>(ielm, odd_plane);
     if (elm.xindex() < 2 || elm.xindex() >= grid().xsize()-2) {
@@ -44,7 +44,7 @@ CE Field::celm_at(size_t ielm, bool odd_plane)
 
 template< typename SE >
 inline
-SE Field::selm_at(size_t ielm, bool odd_plane)
+SE Field::selm_at(sindex_type ielm, bool odd_plane)
 {
     const SE elm = selm<SE>(ielm, odd_plane);
     if (elm.xindex() < 1 || elm.xindex() >= grid().xsize()-1) {

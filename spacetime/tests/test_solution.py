@@ -59,22 +59,33 @@ class SolverTC(unittest.TestCase):
 
     def test_so0_so1(self):
 
+        nx = (self.sol10.grid.ncelm + self.sol10.grid.BOUND_COUNT)*2 + 1
+
         # shape
-        self.assertEqual((23,1), self.sol10.so0.shape)
-        self.assertEqual((23,1), self.sol10.so1.shape)
+        self.assertEqual((nx,1), self.sol10.so0.shape)
+        self.assertEqual((nx,1), self.sol10.so1.shape)
         # type
         self.assertEqual(np.float64, self.sol10.so0.dtype)
         self.assertEqual(np.float64, self.sol10.so1.dtype)
         # content
         self.sol10.so0.fill(0)
-        self.assertEqual([0.0]*23, self.sol10.so0.flatten().tolist())
+        self.assertEqual([0.0]*nx, self.sol10.so0.flatten().tolist())
         self.sol10.so1.fill(1)
-        self.assertEqual([1.0]*23, self.sol10.so1.flatten().tolist())
+        self.assertEqual([1.0]*nx, self.sol10.so1.flatten().tolist())
 
     def test_celm(self):
 
-        with self.assertRaises(TypeError):
-            self.sol10.celm(-1)
+        with self.assertRaisesRegex(
+            IndexError,
+            "Field::celm_at\(ielm=-1, odd_plane=0\): xindex = 1 "
+            "outside the interval \[2, 23\)",
+        ):
+            self.sol10.celm(-1, odd_plane=False)
+
+        self.assertEqual(
+            "Celm(odd, index=-1, x=0, xneg=-0.5, xpos=0.5)",
+            str(self.sol10.celm(-1, odd_plane=True)),
+        )
 
         self.assertEqual(
             "Celm(even, index=0, x=0.5, xneg=0, xpos=1)",
@@ -91,28 +102,35 @@ class SolverTC(unittest.TestCase):
             str(self.sol10.celm(9, odd_plane=False)),
         )
 
-        with self.assertRaisesRegex(
-            IndexError,
-            "Field::celm_at\(ielm=9, odd_plane=1\): xindex = 21 "
-            "outside the interval \[2, 21\)",
-        ):
-            self.sol10.celm(9, odd_plane=True)
+        self.assertEqual(
+            "Celm(odd, index=9, x=10, xneg=9.5, xpos=10.5)",
+            str(self.sol10.celm(9, odd_plane=True)),
+        )
 
         with self.assertRaisesRegex(
             IndexError,
-            "Field::celm_at\(ielm=10, odd_plane=0\): xindex = 22 "
-            "outside the interval \[2, 21\)",
+            "Field::celm_at\(ielm=10, odd_plane=0\): xindex = 23 "
+            "outside the interval \[2, 23\)",
         ):
             self.sol10.celm(10)
 
     def test_selm(self):
 
-        with self.assertRaises(TypeError):
-            self.sol10.selm(-1)
+        with self.assertRaisesRegex(
+            IndexError,
+            "Field::selm_at\(ielm=-1, odd_plane=0\): xindex = 0 "
+            "outside the interval \[1, 24\)",
+        ):
+            self.sol10.selm(-1, odd_plane=False)
+
+        self.assertEqual(
+            "Selm(odd, index=-1, x=-0.5, xneg=-1, xpos=0)",
+            str(self.sol10.selm(-1, odd_plane=True)),
+        )
 
         self.assertEqual(
             "Selm(even, index=0, x=0, xneg=-0.5, xpos=0.5)",
-            str(self.sol10.selm(0)),
+            str(self.sol10.selm(0, odd_plane=False)),
         )
 
         self.assertEqual(
@@ -125,17 +143,15 @@ class SolverTC(unittest.TestCase):
             str(self.sol10.selm(10, odd_plane=False)),
         )
 
-        with self.assertRaisesRegex(
-            IndexError,
-            "Field::selm_at\(ielm=10, odd_plane=1\): xindex = 22 "
-            "outside the interval \[1, 22\)",
-        ):
-            self.sol10.selm(10, odd_plane=True)
+        self.assertEqual(
+            "Selm(odd, index=10, x=10.5, xneg=10, xpos=11)",
+            str(self.sol10.selm(10, odd_plane=True)),
+        )
 
         with self.assertRaisesRegex(
             IndexError,
-            "Field::selm_at\(ielm=11, odd_plane=0\): xindex = 23 "
-            "outside the interval \[1, 22\)",
+            "Field::selm_at\(ielm=11, odd_plane=0\): xindex = 24 "
+            "outside the interval \[1, 24\)",
         ):
             self.sol10.selm(11)
 
