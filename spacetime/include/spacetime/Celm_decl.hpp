@@ -68,8 +68,8 @@ public:
 
     SE selm_xn() { return SE(field(), index(), on_odd_plane()); }
     SE selm_xp() { return SE(field(), index()+1, on_odd_plane()); }
-    SE selm_tn() { return SE(field(), index(), !on_odd_plane()); }
-    SE selm_tp() { return SE(field(), index(), !on_odd_plane()); }
+    SE selm_tn() { return SE(field(), index()+on_odd_plane(), !on_odd_plane()); }
+    SE selm_tp() { return SE(field(), index()+on_odd_plane(), !on_odd_plane()); }
 
     value_type calc_so0(size_t iv);
     value_type calc_so1(size_t iv);

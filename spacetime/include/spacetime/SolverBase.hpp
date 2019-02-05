@@ -13,9 +13,9 @@ namespace spacetime
 template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_half_so0(bool odd_plane)
 {
-    size_t ncelm = grid().ncelm();
-    if (odd_plane) { ncelm -= 1;}
-    for (size_t ic=0; ic<ncelm; ++ic)
+    const sindex_type start = odd_plane ? -1 : 0;
+    const sindex_type stop = grid().ncelm();
+    for (sindex_type ic=start; ic<stop; ++ic)
     {
         auto ce = celm(ic, odd_plane);
         ce.selm_tp().so0(0) = ce.calc_so0(0);
@@ -25,9 +25,9 @@ void SolverBase<ST,CE,SE>::march_half_so0(bool odd_plane)
 template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_half_so1(bool odd_plane)
 {
-    size_t ncelm = grid().ncelm();
-    if (odd_plane) { ncelm -= 1;}
-    for (size_t ic=0; ic<ncelm; ++ic)
+    const sindex_type start = odd_plane ? -1 : 0;
+    const sindex_type stop = grid().ncelm();
+    for (sindex_type ic=start; ic<stop; ++ic)
     {
         auto ce = celm(ic, odd_plane);
         ce.selm_tp().so1(0) = ce.calc_so1(0);
