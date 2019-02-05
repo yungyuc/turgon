@@ -85,6 +85,11 @@ public:
     void march_half_so0(bool odd_plane);
     void march_half_so1(bool odd_plane);
 
+    void treat_boundary_so0();
+    void treat_boundary_so1();
+
+    void march_full();
+
 private:
 
     Field m_field;

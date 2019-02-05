@@ -91,32 +91,7 @@ public:
         return construct_impl(grid, 1, time_increment);
     }
 
-    void treat_so0();
-    void treat_so1();
-
 }; /* end class LinearScalarSolver */
-
-void LinearScalarSolver::treat_so0()
-{
-    selm_type const selm_left_in = selm(0, true);
-    selm_type       selm_left_out = selm(-1, true);
-    selm_type const selm_right_in = selm(grid().ncelm()-1, true);
-    selm_type       selm_right_out = selm(grid().ncelm(), true);
-
-    selm_left_out.so0(0) = selm_right_in.so0(0);
-    selm_right_out.so0(0) = selm_left_in.so0(0);
-}
-
-void LinearScalarSolver::treat_so1()
-{
-    selm_type const selm_left_in = selm(0, true);
-    selm_type       selm_left_out = selm(-1, true);
-    selm_type const selm_right_in = selm(grid().ncelm()-1, true);
-    selm_type       selm_right_out = selm(grid().ncelm(), true);
-
-    selm_left_out.so1(0) = selm_right_in.so1(0);
-    selm_right_out.so1(0) = selm_left_in.so1(0);
-}
 
 } /* end namespace spacetime */
 

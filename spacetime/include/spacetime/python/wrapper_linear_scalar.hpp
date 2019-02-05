@@ -42,8 +42,6 @@ WrapLinearScalarSolver
                 )
               , py::arg("grid"), py::arg("time_increment")
             )
-            .def("treat_so0", &wrapped_type::treat_so0)
-            .def("treat_so1", &wrapped_type::treat_so1)
         ;
     }
 
