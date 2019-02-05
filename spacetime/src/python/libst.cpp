@@ -3,7 +3,7 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "spacetime/python.hpp"
+#include "spacetime/python.hpp" // must be first
 
 #include <utility>
 #include <memory>
@@ -44,6 +44,12 @@ PyObject * initialize_linear_scalar(pybind11::module & mod)
       , "LinearScalarSolver"
       , "Solving algorithm for a linear scalar equation"
     );
+    WrapLinearScalarCelm::commit
+    (
+        mod
+      , "LinearScalarCelm"
+      , "Conservation element of a linear scalar equation"
+    );
     WrapLinearScalarSelm::commit
     (
         mod
@@ -66,11 +72,17 @@ PyObject * initialize_inviscid_burgers(pybind11::module & mod)
       , "InviscidBurgersSolver"
       , "Solving algorithm of the inviscid Burgers equation"
     );
+    WrapInviscidBurgersCelm::commit
+    (
+        mod
+      , "InviscidBurgersCelm"
+      , "Conservation element of the inviscid Burgers equation"
+    );
     WrapInviscidBurgersSelm::commit
     (
         mod
-      , "InviscidBurgersFelm"
-      , "Flux calculator for the solution element of the inviscid Burgers equation"
+      , "InviscidBurgersSelm"
+      , "Solution element of the inviscid Burgers equation"
     );
 
     return mod.ptr();

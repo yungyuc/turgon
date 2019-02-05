@@ -28,20 +28,17 @@ public:
       : base_type(&field, field.grid().xptr_celm(index, odd_plane, Grid::CelmPK()))
     {}
 
-    /**
-     * Celm index.
-     */
-    index_type index() const { return (xindex() - 2) >> 1; }
+    sindex_type index() const;
 
     /**
      * Return true for even plane, false for odd plane (temporal).
      */
     bool on_even_plane() const { return !on_odd_plane(); }
-    bool on_odd_plane() const { return bool((xindex() - 2) & 1); }
+    bool on_odd_plane() const { return bool((xindex() - (1+Grid::BOUND_COUNT)) & 1); }
 
     value_type xctr() const { return x(); }
 
-    void move_at(ssize_t offset);
+    void move_at(sindex_type offset);
 
     value_type time_increment() const { return field().time_increment(); }
     value_type dt() const { return field().dt(); }
@@ -71,13 +68,22 @@ public:
 
     SE selm_xn() { return SE(field(), index(), on_odd_plane()); }
     SE selm_xp() { return SE(field(), index()+1, on_odd_plane()); }
-    SE selm_tn() { return SE(field(), index(), !on_odd_plane()); }
-    SE selm_tp() { return SE(field(), index(), !on_odd_plane()); }
+    SE selm_tn() { return SE(field(), index()+on_odd_plane(), !on_odd_plane()); }
+    SE selm_tp() { return SE(field(), index()+on_odd_plane(), !on_odd_plane()); }
 
     value_type calc_so0(size_t iv);
     value_type calc_so1(size_t iv);
 
 }; /* end class CelmBase */
+
+/**
+ * Celm index.
+ */
+sindex_type Celm::index() const
+{
+    static_assert(0 == (Grid::BOUND_COUNT % 2), "only work with even BOUND_COUNT");
+    return (static_cast<sindex_type>(xindex() - 1) >> 1) - 1;
+}
 
 } /* end namespace spacetime */
 

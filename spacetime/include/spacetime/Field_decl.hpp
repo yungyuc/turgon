@@ -65,11 +65,11 @@ public:
     real_type hdt() const { return m_half_time_increment; }
     real_type qdt() const { return m_quarter_time_increment; }
 
-    template< typename CE > CE celm(size_t ielm, bool odd_plane) { return CE(*this, ielm, odd_plane); }
-    template< typename CE > CE celm_at(size_t ielm, bool odd_plane);
+    template< typename CE > CE celm(sindex_type ielm, bool odd_plane) { return CE(*this, ielm, odd_plane); }
+    template< typename CE > CE celm_at(sindex_type ielm, bool odd_plane);
 
-    template< typename SE > SE selm(size_t ielm, bool odd_plane) { return SE(*this, ielm, odd_plane); }
-    template< typename SE > SE selm_at(size_t ielm, bool odd_plane);
+    template< typename SE > SE selm(sindex_type ielm, bool odd_plane) { return SE(*this, ielm, odd_plane); }
+    template< typename SE > SE selm_at(sindex_type ielm, bool odd_plane);
 
 private:
 

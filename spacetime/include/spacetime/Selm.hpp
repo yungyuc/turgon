@@ -10,9 +10,9 @@
 namespace spacetime
 {
 
-void Selm::move_at(ssize_t offset)
+void Selm::move_at(sindex_type offset)
 {
-    const ssize_t xindex = this->xindex() + offset;
+    const size_t xindex = this->xindex() + offset;
     if (xindex < 1 || xindex >= grid().xsize()-1) {
         throw std::out_of_range(Formatter()
             << "Selm(xindex=" << this->xindex() << ")::move_at(offset=" << offset

@@ -48,7 +48,7 @@ public:
     value_type xpos() const { return *(m_xptr+1); }
     value_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
-    void move(ssize_t offset);
+    void move(ssize_t offset) { m_xptr += offset; }
     void move_at(ssize_t offset) { static_cast<ET *>(this)->move_at(offset); }
 
     void move_left() { move(-2); }

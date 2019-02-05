@@ -31,8 +31,6 @@ public:
     using base_type = Selm;
     using base_type::base_type;
 
-    InviscidBurgersSelm(Selm && selm) : Selm(selm.field(), selm.index(), selm.on_odd_plane()) {}
-
     value_type xn(size_t iv) const;
     value_type xp(size_t iv) const;
     value_type tn(size_t iv) const;

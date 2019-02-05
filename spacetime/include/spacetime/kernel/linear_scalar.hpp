@@ -28,8 +28,6 @@ public:
     using base_type = Selm;
     using base_type::base_type;
 
-    LinearScalarSelm(Selm && selm) : Selm(selm.field(), selm.index(), selm.on_odd_plane()) {}
-
     value_type xn(size_t iv) const;
     value_type xp(size_t iv) const;
     value_type tn(size_t iv) const;
@@ -41,16 +39,14 @@ public:
 
 LinearScalarSelm::value_type LinearScalarSelm::xn(size_t iv) const
 {
-    const value_type area = x() - xneg();
     const value_type displacement = 0.5 * (x() + xneg()) - xctr();
-    return area * (so0(iv) + displacement * so1(iv));
+    return dxneg() * (so0(iv) + displacement * so1(iv));
 }
 
 LinearScalarSelm::value_type LinearScalarSelm::xp(size_t iv) const
 {
-    const value_type area = xpos() - x();
     const value_type displacement = 0.5 * (x() + xpos()) - xctr();
-    return area * (so0(iv) + displacement * so1(iv));
+    return dxpos() * (so0(iv) + displacement * so1(iv));
 }
 
 LinearScalarSelm::value_type LinearScalarSelm::tn(size_t iv) const

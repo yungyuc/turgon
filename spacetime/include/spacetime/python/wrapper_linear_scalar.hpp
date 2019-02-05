@@ -99,6 +99,32 @@ WrapLinearScalarSelm
 
 }; /* end class WrapLinearScalarSelm */
 
+class
+SPACETIME_PYTHON_WRAPPER_VISIBILITY
+WrapLinearScalarCelm
+  : public WrapElementBase< WrapLinearScalarCelm, LinearScalarCelm >
+{
+
+    using base_type = WrapElementBase< WrapLinearScalarCelm, LinearScalarCelm >;
+    using wrapper_type = typename base_type::wrapper_type;
+    using wrapped_type = typename base_type::wrapped_type;
+
+    friend base_type;
+    friend base_type::base_type;
+
+    WrapLinearScalarCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {
+        (*this)
+            .def_property_readonly("selm_xn", &wrapped_type::selm_xn)
+            .def_property_readonly("selm_xp", &wrapped_type::selm_xp)
+            .def_property_readonly("selm_tn", &wrapped_type::selm_tp)
+            .def_property_readonly("selm_tp", &wrapped_type::selm_tp)
+        ;
+    }
+
+}; /* end class WrapLinearScalarCelm */
+
 } /* end namespace python */
 
 } /* end namespace spacetime */

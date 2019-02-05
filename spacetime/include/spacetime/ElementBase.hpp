@@ -6,22 +6,19 @@
  */
 
 #include "spacetime/ElementBase_decl.hpp"
-#include "spacetime/Grid.hpp"
+#include "spacetime/Field_decl.hpp"
+#include "spacetime/Grid_decl.hpp"
 
 namespace spacetime
 {
 
 template< class ET >
+inline
 Grid const & ElementBase<ET>::grid() const { return m_field->grid(); }
 
 template< class ET >
+inline
 size_t ElementBase<ET>::xindex() const { return m_xptr - grid().xptr(); }
-
-template< class ET >
-void ElementBase<ET>::move(ssize_t offset)
-{
-    m_xptr += offset;
-}
 
 } /* end namespace spacetime */
 

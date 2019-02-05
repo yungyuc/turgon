@@ -76,14 +76,19 @@ public:
     real_type hdt() const { return m_field.hdt(); }
     real_type qdt() const { return m_field.qdt(); }
 
-    CE celm(size_t ielm, bool odd_plane) { return m_field.celm<CE>(ielm, odd_plane); }
-    CE celm_at(size_t ielm, bool odd_plane) { return m_field.celm_at<CE>(ielm, odd_plane); }
+    CE celm(sindex_type ielm, bool odd_plane) { return m_field.celm<CE>(ielm, odd_plane); }
+    CE celm_at(sindex_type ielm, bool odd_plane) { return m_field.celm_at<CE>(ielm, odd_plane); }
 
-    SE selm(size_t ielm, bool odd_plane) { return m_field.selm<SE>(ielm, odd_plane); }
-    SE selm_at(size_t ielm, bool odd_plane) { return m_field.selm_at<SE>(ielm, odd_plane); }
+    SE selm(sindex_type ielm, bool odd_plane) { return m_field.selm<SE>(ielm, odd_plane); }
+    SE selm_at(sindex_type ielm, bool odd_plane) { return m_field.selm_at<SE>(ielm, odd_plane); }
 
     void march_half_so0(bool odd_plane);
     void march_half_so1(bool odd_plane);
+
+    void treat_boundary_so0();
+    void treat_boundary_so1();
+
+    void march_full();
 
 private:
 

@@ -9,7 +9,8 @@ namespace spacetime
 {
 
 using real_type = double;
-using index_type = int32_t;
+using index_type = uint32_t;
+using sindex_type = int32_t;
 
 } /* end namespace spacetime */
 

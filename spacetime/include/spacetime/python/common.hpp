@@ -5,14 +5,13 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include <list>
-#include <functional>
-
-#include "pybind11/pybind11.h"
+#include "pybind11/pybind11.h" // must be first
 #include "pybind11/operators.h"
 #include "pybind11/stl.h"
 #include "xtensor-python/pyarray.hpp"
 
+#include <list>
+#include <functional>
 #include <sstream>
 
 #include "spacetime.hpp"
@@ -219,12 +218,12 @@ protected:
             .def_property_readonly("qdt", &wrapped_type::qdt)
             .def(
                 "celm"
-              , static_cast<typename wrapped_type::celm_type (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at)
+              , static_cast<typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::celm_at)
               , py::arg("ielm"), py::arg("odd_plane")=false
             )
             .def(
                 "selm"
-              , static_cast<typename wrapped_type::selm_type (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at)
+              , static_cast<typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::selm_at)
               , py::arg("ielm"), py::arg("odd_plane")=false
             )
             .def
@@ -251,6 +250,9 @@ protected:
             )
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
             .def("march_half_so1", &wrapped_type::march_half_so1, py::arg("odd_plane"))
+            .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)
+            .def("treat_boundary_so1", &wrapped_type::treat_boundary_so1)
+            .def("march_full", &wrapped_type::march_full)
         ;
     }
 

@@ -47,6 +47,7 @@ WrapGrid
                 "xcoord",
                 static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::xcoord)
             )
+            .def_property_readonly_static("BOUND_COUNT", [](py::object){ return Grid::BOUND_COUNT; })
         ;
     }
 
@@ -78,12 +79,14 @@ WrapField
             .def_property_readonly("qdt", &wrapped_type::qdt)
             .def(
                 "celm",
-                static_cast<Celm (wrapped_type::*)(size_t, bool)>(&wrapped_type::celm_at),
+                //static_cast<Celm (wrapped_type::*)(ssize_t, bool)>(&wrapped_type::celm_at),
+                &wrapped_type::celm_at<Celm>,
                 py::arg("ielm"), py::arg("odd_plane")=false
             )
             .def(
                 "selm",
-                static_cast<Selm (wrapped_type::*)(size_t, bool)>(&wrapped_type::selm_at),
+                //static_cast<Selm (wrapped_type::*)(ssize_t, bool)>(&wrapped_type::selm_at),
+                &wrapped_type::selm_at<Selm>,
                 py::arg("ielm"), py::arg("odd_plane")=false
             )
         ;

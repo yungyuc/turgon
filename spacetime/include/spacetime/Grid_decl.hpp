@@ -32,6 +32,8 @@ public:
     // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
     using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
+    constexpr static size_t BOUND_COUNT = 2;
+    static_assert(BOUND_COUNT >= 2, "BOUND_COUNT must be greater or equal to 2");
 
 private:
 
@@ -72,8 +74,8 @@ public:
     /**
      * Get pointer to an coordinate value using conservation-element index.
      */
-    real_type       * xptr_celm(size_t ielm, bool odd_plane, CelmPK const &)       { return xptr(xindex_celm(ielm, odd_plane)); }
-    real_type const * xptr_celm(size_t ielm, bool odd_plane, CelmPK const &) const { return xptr(xindex_celm(ielm, odd_plane)); }
+    real_type       * xptr_celm(sindex_type ielm, bool odd_plane, CelmPK const &)       { return xptr(xindex_celm(ielm, odd_plane)); }
+    real_type const * xptr_celm(sindex_type ielm, bool odd_plane, CelmPK const &) const { return xptr(xindex_celm(ielm, odd_plane)); }
 
 public:
 
@@ -82,32 +84,22 @@ public:
     /**
      * Get pointer to an coordinate value using conservation-element index.
      */
-    real_type       * xptr_selm(size_t ielm, bool odd_plane, SelmPK const &)       { return xptr(xindex_selm(ielm, odd_plane)); }
-    real_type const * xptr_selm(size_t ielm, bool odd_plane, SelmPK const &) const { return xptr(xindex_selm(ielm, odd_plane)); }
+    real_type       * xptr_selm(sindex_type ielm, bool odd_plane, SelmPK const &)       { return xptr(xindex_selm(ielm, odd_plane)); }
+    real_type const * xptr_selm(sindex_type ielm, bool odd_plane, SelmPK const &) const { return xptr(xindex_selm(ielm, odd_plane)); }
 
 private:
 
     /**
      * Convert celm index to coordinate index.
      */
-    size_t xindex_celm(size_t ielm) const { return 2 + (ielm << 1); }
-    size_t xindex_celm(size_t ielm, bool odd_plane) const
-    {
-        size_t xindex = xindex_celm(ielm);
-        if (odd_plane) { ++xindex; }
-        return xindex;
-    }
+    size_t xindex_celm(sindex_type ielm) const { return 1 + BOUND_COUNT + (ielm << 1); }
+    size_t xindex_celm(sindex_type ielm, bool odd_plane) const { return xindex_celm(ielm) + odd_plane; }
 
     /**
      * Convert selm index to coordinate index.
      */
-    size_t xindex_selm(size_t ielm) const { return 1 + (ielm << 1); }
-    size_t xindex_selm(size_t ielm, bool odd_plane) const
-    {
-        size_t xindex = xindex_selm(ielm);
-        if (odd_plane) { ++xindex; }
-        return xindex;
-    }
+    size_t xindex_selm(sindex_type ielm) const { return BOUND_COUNT + (ielm << 1); }
+    size_t xindex_selm(sindex_type ielm, bool odd_plane) const { return xindex_selm(ielm) + odd_plane; }
 
     /**
      * Get pointer to an coordinate value using coordinate index.
