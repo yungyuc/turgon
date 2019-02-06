@@ -90,6 +90,72 @@ protected:
 
 }; /* end class WrapElementBase */
 
+template< class Wrapper, class ET >
+class
+WrapCelmBase
+  : public WrapElementBase< Wrapper, ET >
+{
+
+protected:
+
+    using base_type = WrapElementBase< Wrapper, ET >;
+    using wrapper_type = typename base_type::wrapper_type;
+    using wrapped_type = typename base_type::wrapped_type;
+
+    WrapCelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {
+        (*this)
+            .def_property_readonly("selm_xn", &wrapped_type::selm_xn)
+            .def_property_readonly("selm_xp", &wrapped_type::selm_xp)
+            .def_property_readonly("selm_tn", &wrapped_type::selm_tp)
+            .def_property_readonly("selm_tp", &wrapped_type::selm_tp)
+        ;
+    }
+
+}; /* end class WrapCelmBase */
+
+template< class Wrapper, class ET >
+class
+WrapSelmBase
+  : public WrapElementBase< Wrapper, ET >
+{
+
+protected:
+
+    using base_type = WrapElementBase< Wrapper, ET >;
+    using wrapper_type = typename base_type::wrapper_type;
+    using wrapped_type = typename base_type::wrapped_type;
+
+    WrapSelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {
+        using value_type = typename wrapped_type::value_type;
+        using getter_type = value_type const & (wrapped_type::*)(size_t) const;
+        (*this)
+            .def_property_readonly("dxneg", &wrapped_type::dxneg)
+            .def_property_readonly("dxpos", &wrapped_type::dxpos)
+            .def("so0", static_cast<getter_type>(&wrapped_type::so0))
+            .def("so1" , static_cast<getter_type>(&wrapped_type::so1))
+            .def
+            (
+                "set_so0"
+              , [](wrapped_type & self, size_t it, value_type val) { self.so0(it) = val; }
+            )
+            .def
+            (
+                "set_so1"
+              , [](wrapped_type & self, size_t it, value_type val) { self.so1(it) = val; }
+            )
+            .def("xn", &wrapped_type::xn)
+            .def("xp", &wrapped_type::xp)
+            .def("tn", &wrapped_type::tn)
+            .def("tp", &wrapped_type::tp)
+        ;
+    }
+
+}; /* end class WrapSelmBase */
+
 template< typename ST >
 class SolverElementIterator
 {
@@ -287,6 +353,33 @@ public:
     ModuleInitializer & add(init_type init)
     {
         m_initializers.push_back(init);
+        return *this;
+    }
+
+    template< typename WST, typename WCET, typename WSET >
+    ModuleInitializer & add_solver(pybind11::module & mod, const std::string & name, const std::string & desc)
+    {
+        using namespace spacetime::python;
+
+        WST::commit
+        (
+            mod
+          , (name + "Solver").c_str()
+          , ("Solving algorithm of " + desc).c_str()
+        );
+        WCET::commit
+        (
+            mod
+          , (name + "Celm").c_str()
+          , ("Conservation element of " + desc).c_str()
+        );
+        WSET::commit
+        (
+            mod
+          , (name + "Selm").c_str()
+          , ("Solution element of " + desc).c_str()
+        );
+
         return *this;
     }
 

@@ -44,75 +44,33 @@ WrapInviscidBurgersSolver
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapInviscidBurgersSelm
-  : public WrapElementBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >
-{
-
-    using base_type = WrapElementBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >;
-    using wrapper_type = typename base_type::wrapper_type;
-    using wrapped_type = typename base_type::wrapped_type;
-
-    friend base_type;
-    friend base_type::base_type;
-
-    WrapInviscidBurgersSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
-      : base_type(mod, pyname, clsdoc)
-    {
-        (*this)
-            .def(
-                "so0",
-                static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)
-            )
-            .def(
-                "set_so0",
-                [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
-                    self.so0(it) = val;
-                }
-            )
-            .def(
-                "so1",
-                static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so1)
-            )
-            .def(
-                "set_so1",
-                [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
-                    self.so1(it) = val;
-                }
-            )
-            .def("xn", &wrapped_type::xn)
-            .def("xp", &wrapped_type::xp)
-            .def("tn", &wrapped_type::tn)
-            .def("tp", &wrapped_type::tp)
-        ;
-    }
-
-}; /* end class WrapInviscidBurgersSelm */
-
-class
-SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapInviscidBurgersCelm
-  : public WrapElementBase< WrapInviscidBurgersCelm, InviscidBurgersCelm >
+  : public WrapCelmBase< WrapInviscidBurgersCelm, InviscidBurgersCelm >
 {
 
-    using base_type = WrapElementBase< WrapInviscidBurgersCelm, InviscidBurgersCelm >;
-    using wrapper_type = typename base_type::wrapper_type;
-    using wrapped_type = typename base_type::wrapped_type;
-
-    friend base_type;
-    friend base_type::base_type;
+    using base_type = WrapCelmBase< WrapInviscidBurgersCelm, InviscidBurgersCelm >;
+    friend base_type::base_type::base_type;
 
     WrapInviscidBurgersCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
-    {
-        (*this)
-            .def_property_readonly("selm_xn", &wrapped_type::selm_xn)
-            .def_property_readonly("selm_xp", &wrapped_type::selm_xp)
-            .def_property_readonly("selm_tn", &wrapped_type::selm_tp)
-            .def_property_readonly("selm_tp", &wrapped_type::selm_tp)
-        ;
-    }
+    {}
 
 }; /* end class WrapInviscidBurgersCelm */
+
+class
+SPACETIME_PYTHON_WRAPPER_VISIBILITY
+WrapInviscidBurgersSelm
+  : public WrapSelmBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >
+{
+
+    using base_type = WrapSelmBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >;
+    friend base_type::base_type::base_type;
+
+    WrapInviscidBurgersSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {}
+
+}; /* end class WrapInviscidBurgersSelm */
 
 } /* end namespace python */
 

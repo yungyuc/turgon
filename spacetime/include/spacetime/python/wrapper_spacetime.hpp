@@ -112,11 +112,14 @@ WrapSolver
     {
         namespace py = pybind11;
         (*this)
-            .def(
-                py::init([](std::shared_ptr<Grid> const & grid, size_t nvar, typename wrapped_type::value_type time_increment) {
-                    return wrapped_type::construct(grid, nvar, time_increment);
-                }),
-                py::arg("grid"), py::arg("nvar"), py::arg("time_increment")
+            .def
+            (
+                py::init
+                (
+                    [](std::shared_ptr<Grid> const & grid, size_t nvar, typename wrapped_type::value_type time_increment)
+                    { return wrapped_type::construct(grid, nvar, time_increment); }
+                )
+              , py::arg("grid"), py::arg("nvar"), py::arg("time_increment")
             )
         ;
     }
@@ -126,70 +129,30 @@ WrapSolver
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapCelm
-  : public WrapElementBase< WrapCelm, Celm >
+  : public WrapCelmBase< WrapCelm, Celm >
 {
 
-    using base_type = WrapElementBase< WrapCelm, Celm >;
-    using wrapper_type = typename base_type::wrapper_type;
-    using wrapped_type = typename base_type::wrapped_type;
-
-    friend base_type;
-    friend base_type::base_type;
+    using base_type = WrapCelmBase< WrapCelm, Celm >;
+    friend base_type::base_type::base_type;
 
     WrapCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
-    {
-        (*this)
-            .def_property_readonly("selm_xn", &wrapped_type::selm_xn)
-            .def_property_readonly("selm_xp", &wrapped_type::selm_xp)
-            .def_property_readonly("selm_tn", &wrapped_type::selm_tp)
-            .def_property_readonly("selm_tp", &wrapped_type::selm_tp)
-        ;
-    }
+    {}
 
 }; /* end class WrapCelm */
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapSelm
-  : public WrapElementBase< WrapSelm, Selm >
+  : public WrapSelmBase< WrapSelm, Selm >
 {
 
-    using base_type = WrapElementBase< WrapSelm, Selm >;
-    using wrapper_type = typename base_type::wrapper_type;
-    using wrapped_type = typename base_type::wrapped_type;
-
-    friend base_type;
-    friend base_type::base_type;
+    using base_type = WrapSelmBase< WrapSelm, Selm >;
+    friend base_type::base_type::base_type;
 
     WrapSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
-    {
-        (*this)
-            .def_property_readonly("dxneg", &wrapped_type::dxneg)
-            .def_property_readonly("dxpos", &wrapped_type::dxpos)
-            .def(
-                "so0",
-                static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so0)
-            )
-            .def(
-                "set_so0",
-                [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
-                    self.so0(it) = val;
-                }
-            )
-            .def(
-                "so1",
-                static_cast<wrapped_type::value_type const & (wrapped_type::*)(size_t) const>(&wrapped_type::so1)
-            )
-            .def(
-                "set_so1",
-                [](wrapped_type & self, size_t it, wrapped_type::value_type val) {
-                    self.so1(it) = val;
-                }
-            )
-        ;
-    }
+    {}
 
 }; /* end class WrapSelm */
 
