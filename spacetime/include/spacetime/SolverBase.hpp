@@ -12,6 +12,16 @@ namespace spacetime
 
 template< typename ST, typename CE, typename SE > inline
 typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::xctr(bool odd_plane)
+{
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).xctr(); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
 SolverBase<ST,CE,SE>::get_so0(size_t iv, bool odd_plane)
 {
     if (iv >= m_field.nvar()) { throw std::out_of_range("get_so0(): out of nvar range"); }

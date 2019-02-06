@@ -62,6 +62,8 @@ public:
     Grid const & grid() const { return m_field.grid(); }
     Grid       & grid()       { return m_field.grid(); }
 
+    array_type xctr(bool odd_plane);
+
     array_type const & so0() const { return m_field.so0(); }
     array_type       & so0()       { return m_field.so0(); }
     array_type const & so1() const { return m_field.so1(); }

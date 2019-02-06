@@ -277,6 +277,7 @@ protected:
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+            .def("xctr", &wrapped_type::xctr, py::arg("odd_plane")=false)
             .def_property_readonly("nvar", &wrapped_type::nvar)
             .def_property(
                 "time_increment"

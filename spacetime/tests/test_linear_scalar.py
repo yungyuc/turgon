@@ -43,6 +43,20 @@ class LinearScalarSolverTC(unittest.TestCase):
         self.nstep, self.xcrd, self.svr = self._build_solver(self.resolution)
         self.cycle = 10
 
+    def test_xctr(self):
+
+        # On even plane.
+        self.assertEqual(len(self.svr.xctr()), self.svr.grid.ncelm+1)
+        self.assertEqual(self.svr.xctr().tolist(), self.xcrd.tolist())
+        self.assertEqual(self.svr.xctr().tolist(),
+                         [e.xctr for e in self.svr.selms(odd_plane=False)])
+
+        # On odd plane.
+        self.assertEqual(len(self.svr.xctr(odd_plane=True)), self.svr.grid.ncelm)
+        self.assertEqual(self.svr.xctr().tolist(), self.xcrd.tolist())
+        self.assertEqual(self.svr.xctr(odd_plane=True).tolist(),
+                         [e.xctr for e in self.svr.selms(odd_plane=True)])
+
     def test_nvar(self):
 
         self.assertEqual(1, self.svr.nvar)
