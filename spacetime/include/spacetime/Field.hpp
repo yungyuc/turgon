@@ -16,6 +16,7 @@ Field::Field(std::shared_ptr<Grid> const & grid, size_t nvar, Field::value_type 
   : m_grid(grid)
   , m_so0(array_type(std::vector<size_t>{grid->xsize(), nvar}))
   , m_so1(array_type(std::vector<size_t>{grid->xsize(), nvar}))
+  , m_cfl(array_type(std::vector<size_t>{grid->xsize()}))
 {
     set_time_increment(time_increment);
 }

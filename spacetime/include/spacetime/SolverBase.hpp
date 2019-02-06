@@ -65,6 +65,26 @@ SolverBase<ST,CE,SE>::set_so1(size_t iv, typename SolverBase<ST,CE,SE>::array_ty
 }
 
 template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::get_cfl(bool odd_plane) const
+{
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).cfl(); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+void
+SolverBase<ST,CE,SE>::set_cfl(typename SolverBase<ST,CE,SE>::array_type const & arr, bool odd_plane)
+{
+    if (1 != arr.shape().size()) { throw std::out_of_range("set_so1(): input not 1D"); }
+    const index_type nselm = grid().nselm() - odd_plane;
+    if (nselm != arr.size()) { throw std::out_of_range("set_so1(): input wrong size"); }
+    for (index_type it=0; it<nselm; ++it) { selm(it, odd_plane).cfl() = arr[it]; }
+}
+
+template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_half_so0(bool odd_plane)
 {
     const sindex_type start = odd_plane ? -1 : 0;
@@ -76,6 +96,16 @@ void SolverBase<ST,CE,SE>::march_half_so0(bool odd_plane)
     }
 }
 
+template< typename ST, typename CE, typename SE > inline
+void SolverBase<ST,CE,SE>::update_cfl(bool odd_plane)
+{
+    const sindex_type start = odd_plane ? -1 : 0;
+    const sindex_type stop = grid().nselm();
+    for (sindex_type ic=start; ic<stop; ++ic)
+    {
+        selm(ic, odd_plane).update_cfl();
+    }
+}
 template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_half_so1(bool odd_plane)
 {
@@ -116,10 +146,12 @@ template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_full()
 {
     march_half_so0(false);
-    march_half_so1(false);
     treat_boundary_so0();
+    update_cfl(true);
+    march_half_so1(false);
     treat_boundary_so1();
     march_half_so0(true);
+    update_cfl(false);
     march_half_so1(true);
 }
 

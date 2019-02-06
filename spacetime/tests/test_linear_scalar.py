@@ -34,6 +34,7 @@ class LinearScalarSolverTC(unittest.TestCase):
         # Initialize.
         svr.set_so0(0, np.sin(xcrd))
         svr.set_so1(0, np.cos(xcrd))
+        svr.setup_march()
 
         return nstep, xcrd, svr
 
@@ -110,6 +111,9 @@ class LinearScalarSolverTC(unittest.TestCase):
 
         np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
                                    rtol=1.e-14, atol=1.e-15)
+        ones = np.ones(self.svr.grid.nselm, dtype='float64')
+        np.testing.assert_allclose(self.svr.get_cfl(), ones,
+                                   rtol=1.e-15, atol=1.e-15)
 
     def test_march_fine_interface(self):
 
