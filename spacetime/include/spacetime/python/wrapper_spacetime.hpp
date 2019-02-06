@@ -79,14 +79,12 @@ WrapField
             .def_property_readonly("qdt", &wrapped_type::qdt)
             .def(
                 "celm",
-                //static_cast<Celm (wrapped_type::*)(ssize_t, bool)>(&wrapped_type::celm_at),
-                &wrapped_type::celm_at<Celm>,
+                static_cast<Celm (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::celm_at<Celm>),
                 py::arg("ielm"), py::arg("odd_plane")=false
             )
             .def(
                 "selm",
-                //static_cast<Selm (wrapped_type::*)(ssize_t, bool)>(&wrapped_type::selm_at),
-                &wrapped_type::selm_at<Selm>,
+                static_cast<Selm (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::selm_at<Selm>),
                 py::arg("ielm"), py::arg("odd_plane")=false
             )
         ;

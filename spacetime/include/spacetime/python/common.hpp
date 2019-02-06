@@ -105,11 +105,12 @@ protected:
     WrapCelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
+        using se_getter_type = typename wrapped_type::selm_type (wrapped_type::*)();
         (*this)
-            .def_property_readonly("selm_xn", &wrapped_type::selm_xn)
-            .def_property_readonly("selm_xp", &wrapped_type::selm_xp)
-            .def_property_readonly("selm_tn", &wrapped_type::selm_tp)
-            .def_property_readonly("selm_tp", &wrapped_type::selm_tp)
+            .def_property_readonly("selm_xn", static_cast<se_getter_type>(&wrapped_type::selm_xn))
+            .def_property_readonly("selm_xp", static_cast<se_getter_type>(&wrapped_type::selm_xp))
+            .def_property_readonly("selm_tn", static_cast<se_getter_type>(&wrapped_type::selm_tn))
+            .def_property_readonly("selm_tp", static_cast<se_getter_type>(&wrapped_type::selm_tp))
         ;
     }
 

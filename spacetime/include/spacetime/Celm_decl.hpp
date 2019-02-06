@@ -24,8 +24,17 @@ class Celm
 
 public:
 
+    using selm_type = Selm;
+
     Celm(Field & field, size_t index, bool odd_plane)
       : base_type(&field, field.grid().xptr_celm(index, odd_plane, Grid::CelmPK()))
+    {}
+
+    class const_ctor_passkey { const_ctor_passkey(){} friend Field; };
+
+    Celm(Field & field, size_t index, bool odd_plane, const_ctor_passkey)
+      : Celm(*const_cast<Field*>(&field), index, odd_plane)
+        // TODO: fix the workaround for field constness.
     {}
 
     sindex_type index() const;
@@ -45,13 +54,17 @@ public:
     value_type hdt() const { return field().hdt(); }
     value_type qdt() const { return field().qdt(); }
 
-    Selm selm_xn() { return Selm(field(), index(), on_odd_plane()); }
-    Selm selm_xp() { return Selm(field(), index()+1, on_odd_plane()); }
-    Selm selm_tn() { return Selm(field(), index(), !on_odd_plane()); }
-    Selm selm_tp() { return Selm(field(), index(), !on_odd_plane()); }
+    Selm const selm_xn() const { return field().selm<Selm>(index(), on_odd_plane()); }
+    Selm       selm_xn()       { return field().selm<Selm>(index(), on_odd_plane()); }
+    Selm const selm_xp() const { return field().selm<Selm>(index()+1, on_odd_plane()); }
+    Selm       selm_xp()       { return field().selm<Selm>(index()+1, on_odd_plane()); }
+    Selm const selm_tn() const { return field().selm<Selm>(index()+on_odd_plane(), !on_odd_plane()); }
+    Selm       selm_tn()       { return field().selm<Selm>(index()+on_odd_plane(), !on_odd_plane()); }
+    Selm const selm_tp() const { return field().selm<Selm>(index()+on_odd_plane(), !on_odd_plane()); }
+    Selm       selm_tp()       { return field().selm<Selm>(index()+on_odd_plane(), !on_odd_plane()); }
 
-    value_type calc_so0(size_t iv) { return 0.0; }
-    value_type calc_so1(size_t iv) { return 0.0; }
+    value_type calc_so0(size_t iv) const { return 0.0; }
+    value_type calc_so1(size_t iv) const { return 0.0; }
 
 }; /* end class Celm */
 
@@ -66,13 +79,17 @@ public:
     using base_type::base_type;
     using selm_type = SE;
 
-    SE selm_xn() { return SE(field(), index(), on_odd_plane()); }
-    SE selm_xp() { return SE(field(), index()+1, on_odd_plane()); }
-    SE selm_tn() { return SE(field(), index()+on_odd_plane(), !on_odd_plane()); }
-    SE selm_tp() { return SE(field(), index()+on_odd_plane(), !on_odd_plane()); }
+    SE const selm_xn() const { return field().template selm<SE>(index(), on_odd_plane()); }
+    SE       selm_xn()       { return field().template selm<SE>(index(), on_odd_plane()); }
+    SE const selm_xp() const { return field().template selm<SE>(index()+1, on_odd_plane()); }
+    SE       selm_xp()       { return field().template selm<SE>(index()+1, on_odd_plane()); }
+    SE const selm_tn() const { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    SE       selm_tn()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    SE const selm_tp() const { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    SE       selm_tp()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
 
-    value_type calc_so0(size_t iv);
-    value_type calc_so1(size_t iv);
+    value_type calc_so0(size_t iv) const;
+    value_type calc_so1(size_t iv) const;
 
 }; /* end class CelmBase */
 

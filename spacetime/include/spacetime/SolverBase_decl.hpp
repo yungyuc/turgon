@@ -62,15 +62,15 @@ public:
     Grid const & grid() const { return m_field.grid(); }
     Grid       & grid()       { return m_field.grid(); }
 
-    array_type xctr(bool odd_plane);
+    array_type xctr(bool odd_plane) const;
 
     array_type const & so0() const { return m_field.so0(); }
     array_type       & so0()       { return m_field.so0(); }
     array_type const & so1() const { return m_field.so1(); }
     array_type       & so1()       { return m_field.so1(); }
 
-    array_type get_so0(size_t iv, bool odd_plane);
-    array_type get_so1(size_t iv, bool odd_plane);
+    array_type get_so0(size_t iv, bool odd_plane) const;
+    array_type get_so1(size_t iv, bool odd_plane) const;
     void set_so0(size_t iv, array_type const & arr, bool odd_plane);
     void set_so1(size_t iv, array_type const & arr, bool odd_plane);
 
@@ -83,11 +83,15 @@ public:
     real_type hdt() const { return m_field.hdt(); }
     real_type qdt() const { return m_field.qdt(); }
 
-    CE celm(sindex_type ielm, bool odd_plane) { return m_field.celm<CE>(ielm, odd_plane); }
-    CE celm_at(sindex_type ielm, bool odd_plane) { return m_field.celm_at<CE>(ielm, odd_plane); }
+    CE const celm(sindex_type ielm, bool odd_plane) const { return m_field.celm<CE>(ielm, odd_plane); }
+    CE       celm(sindex_type ielm, bool odd_plane)       { return m_field.celm<CE>(ielm, odd_plane); }
+    CE const celm_at(sindex_type ielm, bool odd_plane) const { return m_field.celm_at<CE>(ielm, odd_plane); }
+    CE       celm_at(sindex_type ielm, bool odd_plane)       { return m_field.celm_at<CE>(ielm, odd_plane); }
 
-    SE selm(sindex_type ielm, bool odd_plane) { return m_field.selm<SE>(ielm, odd_plane); }
-    SE selm_at(sindex_type ielm, bool odd_plane) { return m_field.selm_at<SE>(ielm, odd_plane); }
+    SE const selm(sindex_type ielm, bool odd_plane) const { return m_field.selm<SE>(ielm, odd_plane); }
+    SE       selm(sindex_type ielm, bool odd_plane)       { return m_field.selm<SE>(ielm, odd_plane); }
+    SE const selm_at(sindex_type ielm, bool odd_plane) const { return m_field.selm_at<SE>(ielm, odd_plane); }
+    SE       selm_at(sindex_type ielm, bool odd_plane)       { return m_field.selm_at<SE>(ielm, odd_plane); }
 
     void march_half_so0(bool odd_plane);
     void march_half_so1(bool odd_plane);
