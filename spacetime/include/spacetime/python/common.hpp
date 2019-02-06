@@ -306,6 +306,20 @@ protected:
             )
             .def("get_so0", &wrapped_type::get_so0, py::arg("iv"), py::arg("odd_plane")=false)
             .def("get_so1", &wrapped_type::get_so1, py::arg("iv"), py::arg("odd_plane")=false)
+            .def
+            (
+                "set_so0"
+              , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane)
+                { self.set_so0(iv, arr, odd_plane); }
+              , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false
+            )
+            .def
+            (
+                "set_so1"
+              , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane)
+                { self.set_so1(iv, arr, odd_plane); }
+              , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false
+            )
             .def_property_readonly("so0", static_cast<raw_array_getter>(&wrapped_type::so0))
             .def_property_readonly("so1", static_cast<raw_array_getter>(&wrapped_type::so1))
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))

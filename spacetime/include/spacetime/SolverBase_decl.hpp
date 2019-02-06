@@ -69,6 +69,8 @@ public:
 
     array_type get_so0(size_t iv, bool odd_plane);
     array_type get_so1(size_t iv, bool odd_plane);
+    void set_so0(size_t iv, array_type const & arr, bool odd_plane);
+    void set_so1(size_t iv, array_type const & arr, bool odd_plane);
 
     size_t nvar() const { return m_field.nvar(); }
 
