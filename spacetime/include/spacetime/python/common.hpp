@@ -90,6 +90,73 @@ protected:
 
 }; /* end class WrapElementBase */
 
+template< class Wrapper, class ET >
+class
+WrapCelmBase
+  : public WrapElementBase< Wrapper, ET >
+{
+
+protected:
+
+    using base_type = WrapElementBase< Wrapper, ET >;
+    using wrapper_type = typename base_type::wrapper_type;
+    using wrapped_type = typename base_type::wrapped_type;
+
+    WrapCelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {
+        using se_getter_type = typename wrapped_type::selm_type (wrapped_type::*)();
+        (*this)
+            .def_property_readonly("selm_xn", static_cast<se_getter_type>(&wrapped_type::selm_xn))
+            .def_property_readonly("selm_xp", static_cast<se_getter_type>(&wrapped_type::selm_xp))
+            .def_property_readonly("selm_tn", static_cast<se_getter_type>(&wrapped_type::selm_tn))
+            .def_property_readonly("selm_tp", static_cast<se_getter_type>(&wrapped_type::selm_tp))
+        ;
+    }
+
+}; /* end class WrapCelmBase */
+
+template< class Wrapper, class ET >
+class
+WrapSelmBase
+  : public WrapElementBase< Wrapper, ET >
+{
+
+protected:
+
+    using base_type = WrapElementBase< Wrapper, ET >;
+    using wrapper_type = typename base_type::wrapper_type;
+    using wrapped_type = typename base_type::wrapped_type;
+
+    WrapSelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : base_type(mod, pyname, clsdoc)
+    {
+        using value_type = typename wrapped_type::value_type;
+        using getter_type = value_type const & (wrapped_type::*)(size_t) const;
+        (*this)
+            .def_property_readonly("dxneg", &wrapped_type::dxneg)
+            .def_property_readonly("dxpos", &wrapped_type::dxpos)
+            .def("get_so0", static_cast<getter_type>(&wrapped_type::so0))
+            .def("get_so1" , static_cast<getter_type>(&wrapped_type::so1))
+            .def
+            (
+                "set_so0"
+              , [](wrapped_type & self, size_t it, value_type val) { self.so0(it) = val; }
+            )
+            .def
+            (
+                "set_so1"
+              , [](wrapped_type & self, size_t it, value_type val) { self.so1(it) = val; }
+            )
+            .def("xn", &wrapped_type::xn)
+            .def("xp", &wrapped_type::xp)
+            .def("tn", &wrapped_type::tn)
+            .def("tp", &wrapped_type::tp)
+        ;
+    }
+
+}; /* end class WrapSelmBase */
+
 template< typename ST >
 class SolverElementIterator
 {
@@ -204,9 +271,14 @@ protected:
             )
         ;
 
+        using celm_getter = typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool);
+        using selm_getter = typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool);
+        using raw_array_getter = typename wrapped_type::array_type & (wrapped_type::*)();
+
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+            .def("xctr", &wrapped_type::xctr, py::arg("odd_plane")=false)
             .def_property_readonly("nvar", &wrapped_type::nvar)
             .def_property(
                 "time_increment"
@@ -216,16 +288,10 @@ protected:
             .def_property_readonly("dt", &wrapped_type::dt)
             .def_property_readonly("hdt", &wrapped_type::hdt)
             .def_property_readonly("qdt", &wrapped_type::qdt)
-            .def(
-                "celm"
-              , static_cast<typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::celm_at)
-              , py::arg("ielm"), py::arg("odd_plane")=false
-            )
-            .def(
-                "selm"
-              , static_cast<typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::selm_at)
-              , py::arg("ielm"), py::arg("odd_plane")=false
-            )
+            .def("celm" , static_cast<celm_getter>(&wrapped_type::celm_at)
+               , py::arg("ielm"), py::arg("odd_plane")=false)
+            .def("selm" , static_cast<selm_getter>(&wrapped_type::selm_at)
+               , py::arg("ielm"), py::arg("odd_plane")=false)
             .def
             (
                 "celms"
@@ -240,14 +306,24 @@ protected:
                 { return elm_iter_type(self.shared_from_this(), odd_plane, 0, true); }
               , py::arg("odd_plane")=false
             )
-            .def_property_readonly(
-                "so0"
-              , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so0)
+            .def("get_so0", &wrapped_type::get_so0, py::arg("iv"), py::arg("odd_plane")=false)
+            .def("get_so1", &wrapped_type::get_so1, py::arg("iv"), py::arg("odd_plane")=false)
+            .def
+            (
+                "set_so0"
+              , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane)
+                { self.set_so0(iv, arr, odd_plane); }
+              , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false
             )
-            .def_property_readonly(
-                "so1"
-              , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so1)
+            .def
+            (
+                "set_so1"
+              , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane)
+                { self.set_so1(iv, arr, odd_plane); }
+              , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false
             )
+            .def_property_readonly("so0", static_cast<raw_array_getter>(&wrapped_type::so0))
+            .def_property_readonly("so1", static_cast<raw_array_getter>(&wrapped_type::so1))
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
             .def("march_half_so1", &wrapped_type::march_half_so1, py::arg("odd_plane"))
             .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)
@@ -287,6 +363,33 @@ public:
     ModuleInitializer & add(init_type init)
     {
         m_initializers.push_back(init);
+        return *this;
+    }
+
+    template< typename WST, typename WCET, typename WSET >
+    ModuleInitializer & add_solver(pybind11::module & mod, const std::string & name, const std::string & desc)
+    {
+        using namespace spacetime::python;
+
+        WST::commit
+        (
+            mod
+          , (name + "Solver").c_str()
+          , ("Solving algorithm of " + desc).c_str()
+        );
+        WCET::commit
+        (
+            mod
+          , (name + "Celm").c_str()
+          , ("Conservation element of " + desc).c_str()
+        );
+        WSET::commit
+        (
+            mod
+          , (name + "Selm").c_str()
+          , ("Solution element of " + desc).c_str()
+        );
+
         return *this;
     }
 

@@ -19,82 +19,24 @@ namespace
 PyObject * initialize_spacetime(pybind11::module & mod)
 {
     using namespace spacetime::python;
-
     xt::import_numpy(); // or numpy c api segfault.
-
     mod.doc() = "_libst: One-dimensional space-time CESE method code";
-
     WrapGrid::commit(mod, "Grid", "Spatial grid");
-    WrapSolver::commit(mod, "Solver", "Solving algorithm operating on the field");
-    WrapCelm::commit(mod, "Celm", "Conservation element");
-    WrapSelm::commit(mod, "Selm", "Solution element");
-
-    return mod.ptr();
-}
-
-PyObject * initialize_linear_scalar(pybind11::module & mod)
-{
-    using namespace spacetime::python;
-
-    xt::import_numpy(); // or numpy c api segfault.
-
-    WrapLinearScalarSolver::commit
-    (
-        mod
-      , "LinearScalarSolver"
-      , "Solving algorithm for a linear scalar equation"
-    );
-    WrapLinearScalarCelm::commit
-    (
-        mod
-      , "LinearScalarCelm"
-      , "Conservation element of a linear scalar equation"
-    );
-    WrapLinearScalarSelm::commit
-    (
-        mod
-      , "LinearScalarSelm"
-      , "Solution element of a linear scalar equation"
-    );
-
-    return mod.ptr();
-}
-
-PyObject * initialize_inviscid_burgers(pybind11::module & mod)
-{
-    using namespace spacetime::python;
-
-    xt::import_numpy(); // or numpy c api segfault.
-
-    WrapInviscidBurgersSolver::commit
-    (
-        mod
-      , "InviscidBurgersSolver"
-      , "Solving algorithm of the inviscid Burgers equation"
-    );
-    WrapInviscidBurgersCelm::commit
-    (
-        mod
-      , "InviscidBurgersCelm"
-      , "Conservation element of the inviscid Burgers equation"
-    );
-    WrapInviscidBurgersSelm::commit
-    (
-        mod
-      , "InviscidBurgersSelm"
-      , "Solution element of the inviscid Burgers equation"
-    );
-
     return mod.ptr();
 }
 
 } /* end namespace */
 
 PYBIND11_MODULE(_libst, mod) {
-    ::spacetime::python::ModuleInitializer::get_instance()
+    using namespace spacetime::python;
+    ModuleInitializer::get_instance()
         .add(initialize_spacetime)
-        .add(initialize_linear_scalar)
-        .add(initialize_inviscid_burgers)
+        .add_solver<WrapSolver, WrapCelm, WrapSelm>
+        (mod, "", "no equation")
+        .add_solver<WrapLinearScalarSolver, WrapLinearScalarCelm, WrapLinearScalarSelm>
+        (mod, "LinearScalar", "a linear scalar equation")
+        .add_solver<WrapInviscidBurgersSolver, WrapInviscidBurgersCelm, WrapInviscidBurgersSelm>
+        (mod, "InviscidBurgers", "the inviscid Burgers equation")
         .initialize(mod)
     ;
 }

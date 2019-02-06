@@ -27,6 +27,13 @@ public:
       : base_type(&field, field.grid().xptr_selm(index, odd_plane, Grid::SelmPK()))
     {}
 
+    class const_ctor_passkey { const_ctor_passkey(){} friend Field; };
+
+    Selm(Field const & field, size_t index, bool odd_plane, const_ctor_passkey)
+      : Selm(*const_cast<Field*>(&field), index, odd_plane)
+        // TODO: fix the workaround for field constness.
+    {}
+
     sindex_type index() const;
 
     /**

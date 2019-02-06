@@ -32,9 +32,8 @@ class LinearScalarSolverTC(unittest.TestCase):
         )
 
         # Initialize.
-        for e in svr.selms(odd_plane=False):
-            e.set_so0(0, np.sin(e.xctr))
-            e.set_so1(0, np.cos(e.xctr))
+        svr.set_so0(0, np.sin(xcrd))
+        svr.set_so1(0, np.cos(xcrd))
 
         return nstep, xcrd, svr
 
@@ -44,22 +43,72 @@ class LinearScalarSolverTC(unittest.TestCase):
         self.nstep, self.xcrd, self.svr = self._build_solver(self.resolution)
         self.cycle = 10
 
+    def test_xctr(self):
+
+        # On even plane.
+        self.assertEqual(len(self.svr.xctr()), self.svr.grid.ncelm+1)
+        self.assertEqual(self.svr.xctr().tolist(), self.xcrd.tolist())
+        self.assertEqual(self.svr.xctr().tolist(),
+                         [e.xctr for e in self.svr.selms(odd_plane=False)])
+
+        # On odd plane.
+        self.assertEqual(len(self.svr.xctr(odd_plane=True)), self.svr.grid.ncelm)
+        self.assertEqual(self.svr.xctr().tolist(), self.xcrd.tolist())
+        self.assertEqual(self.svr.xctr(odd_plane=True).tolist(),
+                         [e.xctr for e in self.svr.selms(odd_plane=True)])
+
     def test_nvar(self):
 
         self.assertEqual(1, self.svr.nvar)
 
+    def test_array_getter(self):
+
+        v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=False)]
+        v2 = self.svr.get_so0(0).tolist()
+        self.assertEqual(self.svr.grid.ncelm+1, len(v2))
+        self.assertEqual(v1, v2)
+
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so0(1)
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so0(1, odd_plane=True)
+
+        v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=False)]
+        v2 = self.svr.get_so1(0).tolist()
+        self.assertEqual(self.svr.grid.ncelm+1, len(v2))
+        self.assertEqual(v1, v2)
+
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so1(1)
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so1(1, odd_plane=True)
+
+        # The odd-plane value is uninitialized before marching.
+        self.svr.march_full()
+
+        v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=True)]
+        v2 = self.svr.get_so0(0, odd_plane=True).tolist()
+        self.assertEqual(self.svr.grid.ncelm, len(v2))
+        self.assertEqual(v1, v2)
+
+        v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=True)]
+        v2 = self.svr.get_so1(0, odd_plane=True).tolist()
+        self.assertEqual(self.svr.grid.ncelm, len(v2))
+        self.assertEqual(v1, v2)
+
     def test_initialized(self):
 
-        v = [e.so0(0) for e in self.svr.selms(odd_plane=False)]
-        self.assertEqual(v, np.sin(self.xcrd).tolist())
+        self.assertEqual(self.svr.get_so0(0).tolist(),
+                         np.sin(self.xcrd).tolist())
+        self.assertEqual(self.svr.get_so1(0).tolist(),
+                         np.cos(self.xcrd).tolist())
 
     def test_march(self):
 
         for it in range(self.nstep*self.cycle):
             self.svr.march_full()
 
-        v = np.array([e.so0(0) for e in self.svr.selms(odd_plane=False)])
-        np.testing.assert_allclose(v, np.sin(self.xcrd),
+        np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
                                    rtol=1.e-14, atol=1.e-15)
 
     def test_march_fine_interface(self):
@@ -78,9 +127,7 @@ class LinearScalarSolverTC(unittest.TestCase):
         for it in range(self.nstep*self.cycle):
             _march()
             svr2.march_full()
-
-        v1 = np.array([e.so0(0) for e in self.svr.selms(odd_plane=False)])
-        v2 = np.array([e.so0(0) for e in svr2.selms(odd_plane=False)])
-        self.assertEqual(v1.tolist(), v2.tolist())
+            self.assertEqual(self.svr.get_so0(0).tolist(),
+                            svr2.get_so0(0).tolist())
 
 # vim: set et sw=4 ts=4:

@@ -33,14 +33,14 @@ class InviscidBurgersSolverTC(unittest.TestCase):
     def test_march_half_so0(self):
 
         self.sol10.march_half_so0(odd_plane=False)
-        res = [s.so0(0) for s in self.sol10.selms(odd_plane=True)]
+        res = [s.get_so0(0) for s in self.sol10.selms(odd_plane=True)]
         self.assertEqual(10, len(res))
         self.assertEqual([3]*10, res)
 
     def test_march_half_so1(self):
 
         self.sol10.march_half_so1(odd_plane=False)
-        res = [s.so1(0) for s in self.sol10.selms(odd_plane=True)]
+        res = [s.get_so1(0) for s in self.sol10.selms(odd_plane=True)]
         self.assertEqual(10, len(res))
         self.assertEqual([0]*10, res)
 

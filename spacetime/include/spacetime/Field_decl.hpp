@@ -25,7 +25,7 @@ class Selm;
 
 /**
  * Data class for solution.  It doesn't contain type information for the CE and
- * SE.
+ * SE.  A Field declared as const is useless.
  */
 class Field
 {
@@ -65,11 +65,15 @@ public:
     real_type hdt() const { return m_half_time_increment; }
     real_type qdt() const { return m_quarter_time_increment; }
 
-    template< typename CE > CE celm(sindex_type ielm, bool odd_plane) { return CE(*this, ielm, odd_plane); }
-    template< typename CE > CE celm_at(sindex_type ielm, bool odd_plane);
+    template< typename CE > CE const celm(sindex_type ielm, bool odd_plane) const { return CE(*this, ielm, odd_plane, typename CE::const_ctor_passkey()); }
+    template< typename CE > CE       celm(sindex_type ielm, bool odd_plane)       { return CE(*this, ielm, odd_plane); }
+    template< typename CE > CE const celm_at(sindex_type ielm, bool odd_plane) const;
+    template< typename CE > CE       celm_at(sindex_type ielm, bool odd_plane);
 
-    template< typename SE > SE selm(sindex_type ielm, bool odd_plane) { return SE(*this, ielm, odd_plane); }
-    template< typename SE > SE selm_at(sindex_type ielm, bool odd_plane);
+    template< typename SE > SE const selm(sindex_type ielm, bool odd_plane) const { return SE(*this, ielm, odd_plane, typename SE::const_ctor_passkey()); }
+    template< typename SE > SE       selm(sindex_type ielm, bool odd_plane)       { return SE(*this, ielm, odd_plane); }
+    template< typename SE > SE const selm_at(sindex_type ielm, bool odd_plane) const;
+    template< typename SE > SE       selm_at(sindex_type ielm, bool odd_plane);
 
 private:
 

@@ -11,6 +11,60 @@ namespace spacetime
 {
 
 template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::xctr(bool odd_plane) const
+{
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).xctr(); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::get_so0(size_t iv, bool odd_plane) const
+{
+    if (iv >= m_field.nvar()) { throw std::out_of_range("get_so0(): out of nvar range"); }
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).so0(iv); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::get_so1(size_t iv, bool odd_plane) const
+{
+    if (iv >= m_field.nvar()) { throw std::out_of_range("get_so1(): out of nvar range"); }
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).so1(iv); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+void
+SolverBase<ST,CE,SE>::set_so0(size_t iv, typename SolverBase<ST,CE,SE>::array_type const & arr, bool odd_plane)
+{
+    if (iv >= m_field.nvar()) { throw std::out_of_range("set_so0(): out of nvar range"); }
+    if (1 != arr.shape().size()) { throw std::out_of_range("set_so0(): input not 1D"); }
+    const index_type nselm = grid().nselm() - odd_plane;
+    if (nselm != arr.size()) { throw std::out_of_range("set_so0(): input wrong size"); }
+    for (index_type it=0; it<nselm; ++it) { selm(it, odd_plane).so0(iv) = arr[it]; }
+}
+
+template< typename ST, typename CE, typename SE > inline
+void
+SolverBase<ST,CE,SE>::set_so1(size_t iv, typename SolverBase<ST,CE,SE>::array_type const & arr, bool odd_plane)
+{
+    if (iv >= m_field.nvar()) { throw std::out_of_range("set_so1(): out of nvar range"); }
+    if (1 != arr.shape().size()) { throw std::out_of_range("set_so1(): input not 1D"); }
+    const index_type nselm = grid().nselm() - odd_plane;
+    if (nselm != arr.size()) { throw std::out_of_range("set_so1(): input wrong size"); }
+    for (index_type it=0; it<nselm; ++it) { selm(it, odd_plane).so1(iv) = arr[it]; }
+}
+
+template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_half_so0(bool odd_plane)
 {
     const sindex_type start = odd_plane ? -1 : 0;

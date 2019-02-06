@@ -29,6 +29,21 @@ void Field::set_time_increment(value_type time_increment)
 
 template< typename CE >
 inline
+CE const Field::celm_at(sindex_type ielm, bool odd_plane) const
+{
+    const CE elm = celm<CE>(ielm, odd_plane);
+    if (elm.xindex() < 2 || elm.xindex() >= grid().xsize()-2) {
+        throw std::out_of_range(Formatter()
+            << "Field::celm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
+            << "): xindex = " << elm.xindex()
+            << " outside the interval [2, " << grid().xsize()-2 << ")"
+        );
+    }
+    return elm;
+}
+
+template< typename CE >
+inline
 CE Field::celm_at(sindex_type ielm, bool odd_plane)
 {
     const CE elm = celm<CE>(ielm, odd_plane);
@@ -37,6 +52,21 @@ CE Field::celm_at(sindex_type ielm, bool odd_plane)
             << "Field::celm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
             << "): xindex = " << elm.xindex()
             << " outside the interval [2, " << grid().xsize()-2 << ")"
+        );
+    }
+    return elm;
+}
+
+template< typename SE >
+inline
+SE const Field::selm_at(sindex_type ielm, bool odd_plane) const
+{
+    const SE elm = selm<SE>(ielm, odd_plane);
+    if (elm.xindex() < 1 || elm.xindex() >= grid().xsize()-1) {
+        throw std::out_of_range(Formatter()
+            << "Field::selm_at(ielm=" << ielm << ", odd_plane=" << odd_plane
+            << "): xindex = " << elm.xindex()
+            << " outside the interval [1, " << grid().xsize()-1 << ")"
         );
     }
     return elm;
