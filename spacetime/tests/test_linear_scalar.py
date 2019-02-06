@@ -50,7 +50,7 @@ class LinearScalarSolverTC(unittest.TestCase):
 
     def test_initialized(self):
 
-        v = [e.so0(0) for e in self.svr.selms(odd_plane=False)]
+        v = [e.get_so0(0) for e in self.svr.selms(odd_plane=False)]
         self.assertEqual(v, np.sin(self.xcrd).tolist())
 
     def test_march(self):
@@ -58,7 +58,7 @@ class LinearScalarSolverTC(unittest.TestCase):
         for it in range(self.nstep*self.cycle):
             self.svr.march_full()
 
-        v = np.array([e.so0(0) for e in self.svr.selms(odd_plane=False)])
+        v = np.array([e.get_so0(0) for e in self.svr.selms(odd_plane=False)])
         np.testing.assert_allclose(v, np.sin(self.xcrd),
                                    rtol=1.e-14, atol=1.e-15)
 
@@ -79,8 +79,8 @@ class LinearScalarSolverTC(unittest.TestCase):
             _march()
             svr2.march_full()
 
-        v1 = np.array([e.so0(0) for e in self.svr.selms(odd_plane=False)])
-        v2 = np.array([e.so0(0) for e in svr2.selms(odd_plane=False)])
+        v1 = np.array([e.get_so0(0) for e in self.svr.selms(odd_plane=False)])
+        v2 = np.array([e.get_so0(0) for e in svr2.selms(odd_plane=False)])
         self.assertEqual(v1.tolist(), v2.tolist())
 
 # vim: set et sw=4 ts=4:

@@ -135,8 +135,8 @@ protected:
         (*this)
             .def_property_readonly("dxneg", &wrapped_type::dxneg)
             .def_property_readonly("dxpos", &wrapped_type::dxpos)
-            .def("so0", static_cast<getter_type>(&wrapped_type::so0))
-            .def("so1" , static_cast<getter_type>(&wrapped_type::so1))
+            .def("get_so0", static_cast<getter_type>(&wrapped_type::so0))
+            .def("get_so1" , static_cast<getter_type>(&wrapped_type::so1))
             .def
             (
                 "set_so0"
