@@ -48,18 +48,52 @@ class LinearScalarSolverTC(unittest.TestCase):
 
         self.assertEqual(1, self.svr.nvar)
 
+    def test_array_getter(self):
+
+        v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=False)]
+        v2 = self.svr.get_so0(0).tolist()
+        self.assertEqual(self.svr.grid.ncelm+1, len(v2))
+        self.assertEqual(v1, v2)
+
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so0(1)
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so0(1, odd_plane=True)
+
+        v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=False)]
+        v2 = self.svr.get_so1(0).tolist()
+        self.assertEqual(self.svr.grid.ncelm+1, len(v2))
+        self.assertEqual(v1, v2)
+
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so1(1)
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so1(1, odd_plane=True)
+
+        # The odd-plane value is uninitialized before marching.
+        self.svr.march_full()
+
+        v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=True)]
+        v2 = self.svr.get_so0(0, odd_plane=True).tolist()
+        self.assertEqual(self.svr.grid.ncelm, len(v2))
+        self.assertEqual(v1, v2)
+
+        v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=True)]
+        v2 = self.svr.get_so1(0, odd_plane=True).tolist()
+        self.assertEqual(self.svr.grid.ncelm, len(v2))
+        self.assertEqual(v1, v2)
+
     def test_initialized(self):
 
-        v = [e.get_so0(0) for e in self.svr.selms(odd_plane=False)]
-        self.assertEqual(v, np.sin(self.xcrd).tolist())
+        self.assertEqual(self.svr.get_so0(0).tolist(),
+                         np.sin(self.xcrd).tolist())
 
     def test_march(self):
 
         for it in range(self.nstep*self.cycle):
             self.svr.march_full()
 
-        v = np.array([e.get_so0(0) for e in self.svr.selms(odd_plane=False)])
-        np.testing.assert_allclose(v, np.sin(self.xcrd),
+        np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
                                    rtol=1.e-14, atol=1.e-15)
 
     def test_march_fine_interface(self):

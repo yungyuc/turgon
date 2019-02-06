@@ -270,6 +270,10 @@ protected:
             )
         ;
 
+        using celm_getter = typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool);
+        using selm_getter = typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool);
+        using raw_array_getter = typename wrapped_type::array_type & (wrapped_type::*)();
+
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
@@ -282,16 +286,10 @@ protected:
             .def_property_readonly("dt", &wrapped_type::dt)
             .def_property_readonly("hdt", &wrapped_type::hdt)
             .def_property_readonly("qdt", &wrapped_type::qdt)
-            .def(
-                "celm"
-              , static_cast<typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::celm_at)
-              , py::arg("ielm"), py::arg("odd_plane")=false
-            )
-            .def(
-                "selm"
-              , static_cast<typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::selm_at)
-              , py::arg("ielm"), py::arg("odd_plane")=false
-            )
+            .def("celm" , static_cast<celm_getter>(&wrapped_type::celm_at)
+               , py::arg("ielm"), py::arg("odd_plane")=false)
+            .def("selm" , static_cast<selm_getter>(&wrapped_type::selm_at)
+               , py::arg("ielm"), py::arg("odd_plane")=false)
             .def
             (
                 "celms"
@@ -306,14 +304,10 @@ protected:
                 { return elm_iter_type(self.shared_from_this(), odd_plane, 0, true); }
               , py::arg("odd_plane")=false
             )
-            .def_property_readonly(
-                "so0"
-              , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so0)
-            )
-            .def_property_readonly(
-                "so1"
-              , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::so1)
-            )
+            .def("get_so0", &wrapped_type::get_so0, py::arg("iv"), py::arg("odd_plane")=false)
+            .def("get_so1", &wrapped_type::get_so1, py::arg("iv"), py::arg("odd_plane")=false)
+            .def_property_readonly("so0", static_cast<raw_array_getter>(&wrapped_type::so0))
+            .def_property_readonly("so1", static_cast<raw_array_getter>(&wrapped_type::so1))
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
             .def("march_half_so1", &wrapped_type::march_half_so1, py::arg("odd_plane"))
             .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)

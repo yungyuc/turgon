@@ -67,6 +67,9 @@ public:
     array_type const & so1() const { return m_field.so1(); }
     array_type       & so1()       { return m_field.so1(); }
 
+    array_type get_so0(size_t iv, bool odd_plane);
+    array_type get_so1(size_t iv, bool odd_plane);
+
     size_t nvar() const { return m_field.nvar(); }
 
     void set_time_increment(value_type time_increment) { m_field.set_time_increment(time_increment); }
@@ -90,7 +93,7 @@ public:
 
     void march_full();
 
-private:
+protected:
 
     Field m_field;
 
