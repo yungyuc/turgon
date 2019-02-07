@@ -145,11 +145,13 @@ void SolverBase<ST,CE,SE>::treat_boundary_so1()
 template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_full()
 {
+    // first half step.
     march_half_so0(false);
     treat_boundary_so0();
     update_cfl(true);
     march_half_so1(false);
     treat_boundary_so1();
+    // second half step.
     march_half_so0(true);
     update_cfl(false);
     march_half_so1(true);

@@ -345,6 +345,7 @@ protected:
             .def("treat_boundary_so1", &wrapped_type::treat_boundary_so1)
             .def("setup_march", &wrapped_type::setup_march)
             .def("march_full", &wrapped_type::march_full)
+            .def("march", &wrapped_type::march, py::arg("steps"))
         ;
 
 #undef DECL_ST_WRAP_ARRAY_ACCESS_1D

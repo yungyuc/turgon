@@ -109,6 +109,7 @@ public:
 
     void setup_march() { update_cfl(false); }
     void march_full();
+    void march(size_t steps) { for (size_t it=0; it<steps; ++it) { march_full(); } }
 
 protected:
 
