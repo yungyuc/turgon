@@ -132,12 +132,14 @@ protected:
       : base_type(mod, pyname, clsdoc)
     {
         using value_type = typename wrapped_type::value_type;
-        using getter_type = value_type const & (wrapped_type::*)(size_t) const;
+        using so_getter_type = value_type const & (wrapped_type::*)(size_t) const;
+        using cfl_getter_type = value_type const & (wrapped_type::*)() const;
         (*this)
             .def_property_readonly("dxneg", &wrapped_type::dxneg)
             .def_property_readonly("dxpos", &wrapped_type::dxpos)
-            .def("get_so0", static_cast<getter_type>(&wrapped_type::so0))
-            .def("get_so1" , static_cast<getter_type>(&wrapped_type::so1))
+            .def("get_so0", static_cast<so_getter_type>(&wrapped_type::so0))
+            .def("get_so1" , static_cast<so_getter_type>(&wrapped_type::so1))
+            .def("get_cfl" , static_cast<cfl_getter_type>(&wrapped_type::cfl))
             .def
             (
                 "set_so0"
@@ -148,10 +150,16 @@ protected:
                 "set_so1"
               , [](wrapped_type & self, size_t it, value_type val) { self.so1(it) = val; }
             )
+            .def
+            (
+                "set_cfl"
+              , [](wrapped_type & self, value_type val) { self.cfl() = val; }
+            )
             .def("xn", &wrapped_type::xn)
             .def("xp", &wrapped_type::xp)
             .def("tn", &wrapped_type::tn)
             .def("tp", &wrapped_type::tp)
+            .def("update_cfl", &wrapped_type::update_cfl)
         ;
     }
 
@@ -252,6 +260,7 @@ protected:
     WrapSolverBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
+
         namespace py = pybind11;
 
         using elm_iter_type = SolverElementIterator<wrapped_type>;
@@ -273,7 +282,27 @@ protected:
 
         using celm_getter = typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool);
         using selm_getter = typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool);
-        using raw_array_getter = typename wrapped_type::array_type & (wrapped_type::*)();
+
+#define DECL_ST_WRAP_ARRAY_ACCESS_0D(NAME) \
+    .def_property_readonly(#NAME, static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME)) \
+    .def("get_" #NAME, &wrapped_type::get_ ## NAME, py::arg("odd_plane")=false) \
+    .def \
+    ( \
+        "set_" #NAME \
+      , [](wrapped_type & self, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane) \
+        { self.set_ ## NAME(arr, odd_plane); } \
+      , py::arg("arr"), py::arg("odd_plane")=false \
+    )
+#define DECL_ST_WRAP_ARRAY_ACCESS_1D(NAME) \
+    .def_property_readonly(#NAME, static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME)) \
+    .def("get_" #NAME, &wrapped_type::get_ ## NAME, py::arg("iv"), py::arg("odd_plane")=false) \
+    .def \
+    ( \
+        "set_" #NAME \
+      , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane) \
+        { self.set_ ## NAME(iv, arr, odd_plane); } \
+      , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
+    )
 
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
@@ -306,30 +335,22 @@ protected:
                 { return elm_iter_type(self.shared_from_this(), odd_plane, 0, true); }
               , py::arg("odd_plane")=false
             )
-            .def("get_so0", &wrapped_type::get_so0, py::arg("iv"), py::arg("odd_plane")=false)
-            .def("get_so1", &wrapped_type::get_so1, py::arg("iv"), py::arg("odd_plane")=false)
-            .def
-            (
-                "set_so0"
-              , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane)
-                { self.set_so0(iv, arr, odd_plane); }
-              , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false
-            )
-            .def
-            (
-                "set_so1"
-              , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane)
-                { self.set_so1(iv, arr, odd_plane); }
-              , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false
-            )
-            .def_property_readonly("so0", static_cast<raw_array_getter>(&wrapped_type::so0))
-            .def_property_readonly("so1", static_cast<raw_array_getter>(&wrapped_type::so1))
+            DECL_ST_WRAP_ARRAY_ACCESS_0D(cfl)
+            DECL_ST_WRAP_ARRAY_ACCESS_1D(so0)
+            DECL_ST_WRAP_ARRAY_ACCESS_1D(so1)
+            .def("update_cfl", &wrapped_type::update_cfl, py::arg("odd_plane"))
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
             .def("march_half_so1", &wrapped_type::march_half_so1, py::arg("odd_plane"))
             .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)
             .def("treat_boundary_so1", &wrapped_type::treat_boundary_so1)
+            .def("setup_march", &wrapped_type::setup_march)
             .def("march_full", &wrapped_type::march_full)
+            .def("march", &wrapped_type::march, py::arg("steps"))
         ;
+
+#undef DECL_ST_WRAP_ARRAY_ACCESS_1D
+#undef DECL_ST_WRAP_ARRAY_ACCESS_0D
+
     }
 
 }; /* end class WrapSolverBase */

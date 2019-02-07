@@ -54,12 +54,17 @@ public:
     value_type const & so1(size_t iv) const { return field().so1(xindex(), iv); }
     value_type       & so1(size_t iv)       { return field().so1(xindex(), iv); }
 
+    value_type const & cfl() const { return field().cfl(xindex()); }
+    value_type       & cfl()       { return field().cfl(xindex()); }
+
     value_type xn(size_t iv) const { return 0.0; }
     value_type xp(size_t iv) const { return 0.0; }
     value_type tn(size_t iv) const { return 0.0; }
     value_type tp(size_t iv) const { return 0.0; }
 
     value_type so0p(size_t iv) const { return so0(iv); }
+
+    value_type & update_cfl() { cfl() = 0.0; return cfl(); }
 
 }; /* end class Selm */
 

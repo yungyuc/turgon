@@ -35,6 +35,8 @@ public:
 
     value_type so0p(size_t iv) const;
 
+    value_type & update_cfl();
+
 }; /* end class LinearScalarSelm */
 
 LinearScalarSelm::value_type LinearScalarSelm::xn(size_t iv) const
@@ -73,6 +75,13 @@ LinearScalarSelm::value_type LinearScalarSelm::so0p(size_t iv) const
     ret += (x()-xctr()) * so1(iv); /* displacement in x */
     ret -= hdt() * so1(iv); /* displacement in t */
     return ret;
+}
+
+LinearScalarSelm::value_type & LinearScalarSelm::update_cfl()
+{
+    const value_type hdx = std::min(dxneg(), dxpos());
+    this->cfl() = field().hdt() / hdx;
+    return this->cfl();
 }
 
 using LinearScalarCelm = CelmBase<LinearScalarSelm>;

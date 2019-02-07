@@ -50,11 +50,15 @@ public:
     array_type       & so0()       { return m_so0; }
     array_type const & so1() const { return m_so1; }
     array_type       & so1()       { return m_so1; }
+    array_type const & cfl() const { return m_cfl; }
+    array_type       & cfl()       { return m_cfl; }
 
     value_type const & so0(size_t it, size_t iv) const { return m_so0(it, iv); }
     value_type       & so0(size_t it, size_t iv)       { return m_so0(it, iv); }
     value_type const & so1(size_t it, size_t iv) const { return m_so1(it, iv); }
     value_type       & so1(size_t it, size_t iv)       { return m_so1(it, iv); }
+    value_type const & cfl(size_t it) const { return m_cfl(it); }
+    value_type       & cfl(size_t it)       { return m_cfl(it); }
 
     size_t nvar() const { return m_so0.shape()[1]; }
 
@@ -81,6 +85,7 @@ private:
 
     array_type m_so0;
     array_type m_so1;
+    array_type m_cfl;
 
     real_type m_time_increment;
     // Cached value;

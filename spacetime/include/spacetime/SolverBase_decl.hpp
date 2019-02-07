@@ -64,15 +64,23 @@ public:
 
     array_type xctr(bool odd_plane) const;
 
-    array_type const & so0() const { return m_field.so0(); }
-    array_type       & so0()       { return m_field.so0(); }
-    array_type const & so1() const { return m_field.so1(); }
-    array_type       & so1()       { return m_field.so1(); }
+#define DECL_ST_ARRAY_ACCESS_0D(NAME) \
+    array_type const & NAME() const { return m_field.NAME(); } \
+    array_type       & NAME()       { return m_field.NAME(); } \
+    array_type get_ ## NAME(bool odd_plane) const; \
+    void set_ ## NAME(array_type const & arr, bool odd_plane);
+#define DECL_ST_ARRAY_ACCESS_1D(NAME) \
+    array_type const & NAME() const { return m_field.NAME(); } \
+    array_type       & NAME()       { return m_field.NAME(); } \
+    array_type get_ ## NAME(size_t iv, bool odd_plane) const; \
+    void set_ ## NAME(size_t iv, array_type const & arr, bool odd_plane);
 
-    array_type get_so0(size_t iv, bool odd_plane) const;
-    array_type get_so1(size_t iv, bool odd_plane) const;
-    void set_so0(size_t iv, array_type const & arr, bool odd_plane);
-    void set_so1(size_t iv, array_type const & arr, bool odd_plane);
+    DECL_ST_ARRAY_ACCESS_0D(cfl)
+    DECL_ST_ARRAY_ACCESS_1D(so0)
+    DECL_ST_ARRAY_ACCESS_1D(so1)
+
+#undef DECL_ST_ARRAY_ACCESS_1D
+#undef DECL_ST_ARRAY_ACCESS_0D
 
     size_t nvar() const { return m_field.nvar(); }
 
@@ -93,13 +101,15 @@ public:
     SE const selm_at(sindex_type ielm, bool odd_plane) const { return m_field.selm_at<SE>(ielm, odd_plane); }
     SE       selm_at(sindex_type ielm, bool odd_plane)       { return m_field.selm_at<SE>(ielm, odd_plane); }
 
+    void update_cfl(bool odd_plane);
     void march_half_so0(bool odd_plane);
     void march_half_so1(bool odd_plane);
-
     void treat_boundary_so0();
     void treat_boundary_so1();
 
+    void setup_march() { update_cfl(false); }
     void march_full();
+    void march(size_t steps) { for (size_t it=0; it<steps; ++it) { march_full(); } }
 
 protected:
 

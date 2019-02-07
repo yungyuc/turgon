@@ -34,6 +34,7 @@ class LinearScalarSolverTC(unittest.TestCase):
         # Initialize.
         svr.set_so0(0, np.sin(xcrd))
         svr.set_so1(0, np.cos(xcrd))
+        svr.setup_march()
 
         return nstep, xcrd, svr
 
@@ -105,21 +106,26 @@ class LinearScalarSolverTC(unittest.TestCase):
 
     def test_march(self):
 
-        for it in range(self.nstep*self.cycle):
-            self.svr.march_full()
-
+        self.svr.march(self.nstep*self.cycle)
         np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
                                    rtol=1.e-14, atol=1.e-15)
+        ones = np.ones(self.svr.grid.nselm, dtype='float64')
+        np.testing.assert_allclose(self.svr.get_cfl(), ones,
+                                   rtol=1.e-15, atol=1.e-15)
 
     def test_march_fine_interface(self):
 
         def _march():
 
+            # first half step.
             self.svr.march_half_so0(odd_plane=False)
-            self.svr.march_half_so1(odd_plane=False)
             self.svr.treat_boundary_so0()
+            self.svr.update_cfl(odd_plane=True)
+            self.svr.march_half_so1(odd_plane=False)
             self.svr.treat_boundary_so1()
+            # second half step.
             self.svr.march_half_so0(odd_plane=True)
+            self.svr.update_cfl(odd_plane=False)
             self.svr.march_half_so1(odd_plane=True)
 
         svr2 = self._build_solver(self.resolution)[-1]
