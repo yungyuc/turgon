@@ -62,6 +62,7 @@ public:
     Grid const & grid() const { return m_field.grid(); }
     Grid       & grid()       { return m_field.grid(); }
 
+    array_type x(bool odd_plane) const;
     array_type xctr(bool odd_plane) const;
 
 #define DECL_ST_ARRAY_ACCESS_0D(NAME) \
@@ -81,6 +82,8 @@ public:
 
 #undef DECL_ST_ARRAY_ACCESS_1D
 #undef DECL_ST_ARRAY_ACCESS_0D
+
+    array_type get_so0p(size_t iv, bool odd_plane) const;
 
     size_t nvar() const { return m_field.nvar(); }
 
@@ -108,7 +111,9 @@ public:
     void treat_boundary_so1();
 
     void setup_march() { update_cfl(false); }
-    void march_full();
+    void march_half_first();
+    void march_half_second();
+    void march_full() { march_half_first(); march_half_second(); }
     void march(size_t steps) { for (size_t it=0; it<steps; ++it) { march_full(); } }
 
 protected:

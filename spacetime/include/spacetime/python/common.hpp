@@ -307,6 +307,7 @@ protected:
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+            .def("x", &wrapped_type::x, py::arg("odd_plane")=false)
             .def("xctr", &wrapped_type::xctr, py::arg("odd_plane")=false)
             .def_property_readonly("nvar", &wrapped_type::nvar)
             .def_property(
@@ -335,6 +336,7 @@ protected:
                 { return elm_iter_type(self.shared_from_this(), odd_plane, 0, true); }
               , py::arg("odd_plane")=false
             )
+            .def("get_so0p", &wrapped_type::get_so0p, py::arg("iv"), py::arg("odd_plane")=false)
             DECL_ST_WRAP_ARRAY_ACCESS_0D(cfl)
             DECL_ST_WRAP_ARRAY_ACCESS_1D(so0)
             DECL_ST_WRAP_ARRAY_ACCESS_1D(so1)
@@ -344,6 +346,8 @@ protected:
             .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)
             .def("treat_boundary_so1", &wrapped_type::treat_boundary_so1)
             .def("setup_march", &wrapped_type::setup_march)
+            .def("march_half_first", &wrapped_type::march_half_first)
+            .def("march_half_second", &wrapped_type::march_half_second)
             .def("march_full", &wrapped_type::march_full)
             .def("march", &wrapped_type::march, py::arg("steps"))
         ;

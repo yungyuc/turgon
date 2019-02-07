@@ -43,13 +43,12 @@ typename CelmBase<SE>::value_type CelmBase<SE>::calc_so1(size_t iv) const
     // Fetch value.
     const SE se_xn = selm_xn();
     const SE se_xp = selm_xp();
-    const value_type upp = se_xn.so0p(iv);
-    const value_type upn = se_xp.so0p(iv);
-    const SE se_tp = selm_tp();
-    const value_type up = se_tp.so0(iv);
+    const value_type upn = se_xn.so0p(iv); // u' at left SE
+    const value_type upp = se_xp.so0p(iv); // u' at right SE
+    const value_type utp = selm_tp().so0(iv); // u at top SE
     // alpha-scheme. (alpha = 2)
-    const value_type duxn = (up - upn) / se_xn.dxpos();
-    const value_type duxp = (upp - up) / se_xp.dxneg();
+    const value_type duxn = (utp - upn) / se_xn.dxpos();
+    const value_type duxp = (upp - utp) / se_xp.dxneg();
     const value_type fan = duxn*duxn;
     const value_type fap = duxp*duxp;
     constexpr value_type tiny = std::numeric_limits<value_type>::min();

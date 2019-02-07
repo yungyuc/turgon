@@ -10,60 +10,46 @@ import libst
 
 class InviscidBurgersSolverTC(unittest.TestCase):
 
+    @staticmethod
+    def _build_solver(resolution):
+
+        # Build grid.
+        xcrd = np.arange(resolution+1) / resolution
+        xcrd *= 2 * np.pi
+        grid = libst.Grid(xcrd)
+        dx = (grid.xmax - grid.xmin) / grid.ncelm
+
+        # Build solver.
+        time_stop = 2*np.pi
+        cfl_max = 1.0
+        dt_max = dx * cfl_max
+        nstep = int(np.ceil(time_stop / dt_max))
+        dt = time_stop / nstep
+        cfl = dt / dx
+        svr = libst.InviscidBurgersSolver(grid=grid, time_increment=dt)
+
+        # Initialize.
+        svr.set_so0(0, np.sin(xcrd))
+        svr.set_so1(0, np.cos(xcrd))
+        svr.setup_march()
+
+        return nstep, xcrd, svr
+
     def setUp(self):
 
-        self.dt = 0.1
-        self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.InviscidBurgersSolver(
-            grid=self.grid10, time_increment=self.dt)
-
-        self.sol10.so0.fill(1)
-        self.sol10.so1.fill(1)
-        for elm in self.sol10.selms(odd_plane=False):
-            r = elm.grid.xmin + elm.xctr / (elm.grid.xmax-elm.grid.xmin)
-            v = np.sin(r * np.pi * 2)
-            dv = np.cos(r * np.pi * 2) * 2 * np.pi
-            elm.set_so0(0, 3) # FIXME: find a generic way to initialize.
-            elm.set_so1(0, 0)
+        self.resolution = 8
+        self.nstep, self.xcrd, self.svr = self._build_solver(self.resolution)
+        self.cycle = 2
 
     def test_nvar(self):
 
-        self.assertEqual(1, self.sol10.nvar)
+        self.assertEqual(1, self.svr.nvar)
 
-    def test_march_half_so0(self):
+    def test_result_bound(self):
 
-        self.sol10.march_half_so0(odd_plane=False)
-        res = [s.get_so0(0) for s in self.sol10.selms(odd_plane=True)]
-        self.assertEqual(10, len(res))
-        self.assertEqual([3]*10, res)
-
-    def test_march_half_so1(self):
-
-        self.sol10.march_half_so1(odd_plane=False)
-        res = [s.get_so1(0) for s in self.sol10.selms(odd_plane=True)]
-        self.assertEqual(10, len(res))
-        self.assertEqual([0]*10, res)
-
-
-class InviscidBurgersSelm(unittest.TestCase):
-
-    def setUp(self):
-        self.dt = 0.2
-        self.grid10 = libst.Grid(0, 10, 10)
-        self.sol10 = libst.InviscidBurgersSolver(
-            grid=self.grid10, time_increment=self.dt)
-        self.se0 = self.sol10.selm(0)
-        self.se9 = self.sol10.selm(9)
-        self.se10 = self.sol10.selm(10)
-        # Set trivial solution.
-        self.sol10.so0.fill(1)
-        self.sol10.so1.fill(0)
-
-    def test_flux(self):
-
-        self.assertEqual(0.5, self.se0.xn(0))
-        self.assertEqual(0.5, self.se0.xp(0))
-        self.assertEqual(0.05, self.se0.tn(0))
-        self.assertEqual(0.05, self.se0.tp(0))
+        for it in range(self.nstep*self.cycle):
+            res = self.svr.get_so0(0)
+            self.assertLessEqual(res.max(), 1)
+            self.assertGreaterEqual(res.min(), -1)
 
 # vim: set et sw=4 ts=4:
