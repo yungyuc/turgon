@@ -40,12 +40,20 @@ template< typename SE >
 inline
 typename CelmBase<SE>::value_type CelmBase<SE>::calc_so1(size_t iv) const
 {
+    // Fetch value.
     const SE se_xn = selm_xn();
     const SE se_xp = selm_xp();
     const value_type upp = se_xn.so0p(iv);
     const value_type upn = se_xp.so0p(iv);
     const SE se_tp = selm_tp();
-    return (upn - upp) / se_tp.dx();
+    const value_type up = se_tp.so0(iv);
+    // alpha-scheme. (alpha = 2)
+    const value_type duxn = (up - upn) / se_xn.dxpos();
+    const value_type duxp = (upp - up) / se_xp.dxneg();
+    const value_type fan = duxn*duxn;
+    const value_type fap = duxp*duxp;
+    constexpr value_type tiny = std::numeric_limits<value_type>::min();
+    return (fap*duxn + fan*duxp) / (fap + fan + tiny);
 }
 
 } /* end namespace spacetime */
