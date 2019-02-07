@@ -1,0 +1,101 @@
+language: cpp
+dist: xenial
+
+cache:
+  directory:
+  - $HOME/miniconda
+
+env:
+  global:
+    # Disable GCE boto plugin which is incompatible to Python 3, see
+    # https://github.com/travis-ci/travis-ci/issues/5246
+    - BOTO_CONFIG=/tmp/nowhere
+
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      services: docker
+      env: RUNMODE=docker
+    - os: linux
+      sudo: required
+      compiler: gcc
+      env: RUNMODE=travis
+      addons:
+        # If using C++11/14 see http://genbattle.bitbucket.org/blog/2016/01/17/c++-travis-ci/
+        apt:
+          packages: [ openssh-client, openssh-server, liblapack-pic, liblapack-dev ]
+#    - os: osx
+#      #osx_image: xcode7.3
+#      compiler: clang
+#      env: RUNMODE=travis
+
+before_install:
+  - |
+    if [[ "$RUNMODE" == "docker" ]] ; then
+      # Configure docker
+      DOCKER=yungyuc/turgon
+      docker pull $DOCKER
+
+      containerid=$(docker run --detach --tty \
+        --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR} \
+        --workdir=${TRAVIS_BUILD_DIR} \
+        $DOCKER)
+
+      SCRIPT_RUN_PREFIX="docker exec --tty $containerid"
+    else
+      # Configure ssh
+      ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+      chmod 700 ~/.ssh/
+      cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+      chmod 600 ~/.ssh/authorized_keys
+      ssh-keyscan -t rsa localhost >> ~/.ssh/known_hosts
+      ssh-keyscan -t rsa 127.0.0.1 >> ~/.ssh/known_hosts
+      chmod 600 ~/.ssh/known_hosts
+      ls -al ~/.ssh/
+      ssh localhost ls
+      ssh 127.0.0.1 ls
+
+      SCRIPT_RUN_PREFIX=
+    fi
+
+install:
+  - |
+    # APT
+    if [[ "$RUNMODE" != "docker" ]] ; then
+      $SCRIPT_RUN_PREFIX sudo bash ${TRAVIS_BUILD_DIR}/contrib/depend/apt.xenial.sh
+    fi
+  - $SCRIPT_RUN_PREFIX sudo bash ${TRAVIS_BUILD_DIR}/contrib/depend/install.sh everything
+  - |
+    # Debugging information
+    if [ -n "$DEBUG" ] ; then
+      $SCRIPT_RUN_PREFIX which python3
+      $SCRIPT_RUN_PREFIX python3 --version
+      $SCRIPT_RUN_PREFIX which $CXX
+      $SCRIPT_RUN_PREFIX $CXX --version
+      $SCRIPT_RUN_PREFIX which $CC
+      $SCRIPT_RUN_PREFIX $CC --version
+      $SCRIPT_RUN_PREFIX id
+    fi
+
+script:
+  - |
+    # Build code
+    chmod -R 777 ${TRAVIS_BUILD_DIR}
+    $SCRIPT_RUN_PREFIX rm -rf ${TRAVIS_BUILD_DIR}/spacetime/build
+    $SCRIPT_RUN_PREFIX mkdir -p ${TRAVIS_BUILD_DIR}/spacetime/build
+    $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime/build ; cmake \
+      -DPYTHON_EXECUTABLE:FILEPATH=`$SCRIPT_RUN_PREFIX which python3` \
+      -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/spacetime \
+      -DCMAKE_BUILD_TYPE=Release \
+      .."
+    $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build install VERBOSE=${VERBOSITY:-0}
+  - $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime ; env PYTHONPATH=. py.test-3 -v"
+  - $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/writing ; make VERBOSE=${VERBOSITY:-0}"
+
+after_script:
+  - |
+    if [[ "$RUNMODE" == "docker" ]] ; then
+      docker stop "$containerid"
+      docker rm "$containerid"
+    fi
