@@ -38,6 +38,8 @@ public:
 
     value_type so0p(size_t iv) const;
 
+    value_type & update_cfl();
+
 }; /* end class FelmBase */
 
 /**
@@ -45,9 +47,8 @@ public:
  */
 InviscidBurgersSelm::value_type InviscidBurgersSelm::xn(size_t iv) const
 {
-    const value_type area = x() - xneg();
     const value_type displacement = 0.5 * (x() + xneg()) - xctr();
-    return area * (so0(iv) + displacement * so1(iv));
+    return dxneg() * (so0(iv) + displacement * so1(iv));
 }
 
 /**
@@ -55,9 +56,8 @@ InviscidBurgersSelm::value_type InviscidBurgersSelm::xn(size_t iv) const
  */
 InviscidBurgersSelm::value_type InviscidBurgersSelm::xp(size_t iv) const
 {
-    const value_type area = xpos() - x();
     const value_type displacement = 0.5 * (x() + xpos()) - xctr();
-    return area * (so0(iv) + displacement * so1(iv));
+    return dxpos() * (so0(iv) + displacement * so1(iv));
 }
 
 /**
@@ -96,7 +96,14 @@ InviscidBurgersSelm::value_type InviscidBurgersSelm::so0p(size_t iv) const
     value_type ret = so0(iv);
     ret += (x()-xctr()) * so1(iv); /* displacement in x */
     ret -= hdt() * so1(iv); /* displacement in t */
-    return ret * so0(iv);
+    return ret;
+}
+
+InviscidBurgersSelm::value_type & InviscidBurgersSelm::update_cfl()
+{
+    const value_type hdx = std::min(dxneg(), dxpos());
+    this->cfl() = std::fabs(so0(0)) * field().hdt() / hdx;
+    return this->cfl();
 }
 
 using InviscidBurgersCelm = CelmBase<InviscidBurgersSelm>;

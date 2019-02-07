@@ -26,10 +26,7 @@ class LinearScalarSolverTC(unittest.TestCase):
         nstep = int(np.ceil(time_stop / dt_max))
         dt = time_stop / nstep
         cfl = dt / dx
-        svr = libst.LinearScalarSolver(
-            grid=grid,
-            time_increment=dt,
-        )
+        svr = libst.LinearScalarSolver(grid=grid, time_increment=dt)
 
         # Initialize.
         svr.set_so0(0, np.sin(xcrd))

@@ -12,11 +12,32 @@ namespace spacetime
 
 template< typename ST, typename CE, typename SE > inline
 typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::x(bool odd_plane) const
+{
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).x(); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
 SolverBase<ST,CE,SE>::xctr(bool odd_plane) const
 {
     const index_type nselm = grid().nselm() - odd_plane;
     array_type ret(std::vector<size_t>{nselm});
     for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).xctr(); }
+    return ret;
+}
+
+template< typename ST, typename CE, typename SE > inline
+typename SolverBase<ST,CE,SE>::array_type
+SolverBase<ST,CE,SE>::get_so0p(size_t iv, bool odd_plane) const
+{
+    if (iv >= m_field.nvar()) { throw std::out_of_range("get_so0p(): out of nvar range"); }
+    const index_type nselm = grid().nselm() - odd_plane;
+    array_type ret(std::vector<size_t>{nselm});
+    for (index_type it=0; it<nselm; ++it) { ret[it] = selm(it, odd_plane).so0p(iv); }
     return ret;
 }
 
@@ -106,6 +127,7 @@ void SolverBase<ST,CE,SE>::update_cfl(bool odd_plane)
         selm(ic, odd_plane).update_cfl();
     }
 }
+
 template< typename ST, typename CE, typename SE > inline
 void SolverBase<ST,CE,SE>::march_half_so1(bool odd_plane)
 {
@@ -143,15 +165,18 @@ void SolverBase<ST,CE,SE>::treat_boundary_so1()
 }
 
 template< typename ST, typename CE, typename SE > inline
-void SolverBase<ST,CE,SE>::march_full()
+void SolverBase<ST,CE,SE>::march_half_first()
 {
-    // first half step.
     march_half_so0(false);
     treat_boundary_so0();
     update_cfl(true);
     march_half_so1(false);
     treat_boundary_so1();
-    // second half step.
+}
+
+template< typename ST, typename CE, typename SE > inline
+void SolverBase<ST,CE,SE>::march_half_second()
+{
     march_half_so0(true);
     update_cfl(false);
     march_half_so1(true);
