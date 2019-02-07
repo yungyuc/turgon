@@ -108,10 +108,10 @@ class LinearScalarSolverTC(unittest.TestCase):
 
         self.svr.march(self.nstep*self.cycle)
         np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
-                                   rtol=1.e-14, atol=1.e-15)
+                                   rtol=0, atol=1.e-14)
         ones = np.ones(self.svr.grid.nselm, dtype='float64')
         np.testing.assert_allclose(self.svr.get_cfl(), ones,
-                                   rtol=1.e-15, atol=1.e-15)
+                                   rtol=0, atol=1.e-14)
 
     def test_march_fine_interface(self):
 
