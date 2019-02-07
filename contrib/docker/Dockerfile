@@ -19,7 +19,7 @@
 FROM ubuntu:18.04
 MAINTAINER Yung-Yu Chen <yyc@solvcon.net>
 
-ARG turgon_repo=https://gitlab.com/solvcon/turgon
+ARG turgon_repo=https://github.com/yungyuc/turgon
 ARG turgon_branch=master
 
 # Install compiler and tools.
