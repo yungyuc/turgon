@@ -12,6 +12,9 @@ int main(int argc, char ** argv)
     std::cout << *grid << std::endl;
     std::cout << *sol << std::endl;
 
+    std::shared_ptr<st::Solver> csol=sol->clone();
+    std::cout << *csol << std::endl;
+
     st::Celm ce0 = sol->celm(0, false);
     st::Celm ce99 = sol->celm(99, false);
     std::cout << (ce0 == ce99) << std::endl;

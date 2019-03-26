@@ -38,9 +38,9 @@ public:
     Field(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment);
 
     Field() = delete;
-    Field(Field const & ) = delete;
+    Field(Field const & ) = default;
     Field(Field       &&) = delete;
-    Field & operator=(Field const & ) = delete;
+    Field & operator=(Field const & ) = default;
     Field & operator=(Field       &&) = delete;
 
     Grid const & grid() const { return *m_grid; }

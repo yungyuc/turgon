@@ -48,15 +48,22 @@ protected:
         return std::make_shared<ST>(std::forward<Args>(args) ..., ctor_passkey());
     }
 
+    std::shared_ptr<ST> clone_impl(bool grid)
+    {
+        auto ret = std::make_shared<ST>(*reinterpret_cast<ST*>(this));
+        // FIXME: treat grid.
+        return ret;
+    }
+
 public:
 
     SolverBase(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
       : m_field(grid, nvar, time_increment) {}
 
     SolverBase() = delete;
-    SolverBase(SolverBase const & ) = delete;
+    SolverBase(SolverBase const & ) = default;
     SolverBase(SolverBase       &&) = delete;
-    SolverBase & operator=(SolverBase const & ) = delete;
+    SolverBase & operator=(SolverBase const & ) = default;
     SolverBase & operator=(SolverBase       &&) = delete;
 
     Grid const & grid() const { return m_field.grid(); }
