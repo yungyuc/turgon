@@ -13,7 +13,10 @@ int main(int argc, char ** argv)
     std::cout << *sol << std::endl;
 
     std::shared_ptr<st::Solver> csol=sol->clone();
-    std::cout << *csol << std::endl;
+    std::cout << "copied: " << *csol << std::endl;
+
+    std::shared_ptr<st::Solver> csol2=sol->clone(true);
+    std::cout << "copied with grid: " << *csol2 << std::endl;
 
     st::Celm ce0 = sol->celm(0, false);
     st::Celm ce99 = sol->celm(99, false);

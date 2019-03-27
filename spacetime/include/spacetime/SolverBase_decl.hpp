@@ -51,7 +51,11 @@ protected:
     std::shared_ptr<ST> clone_impl(bool grid)
     {
         auto ret = std::make_shared<ST>(*reinterpret_cast<ST*>(this));
-        // FIXME: treat grid.
+        if (grid)
+        {
+            std::shared_ptr<Grid> new_grid = m_field.clone_grid();
+            ret->m_field.set_grid(new_grid);
+        }
         return ret;
     }
 

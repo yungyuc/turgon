@@ -306,6 +306,7 @@ protected:
 
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
+            .def("clone", &wrapped_type::clone, py::arg("grid")=false)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
             .def("x", &wrapped_type::x, py::arg("odd_plane")=false)
             .def("xctr", &wrapped_type::xctr, py::arg("odd_plane")=false)

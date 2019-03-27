@@ -43,6 +43,11 @@ class SolverTC(unittest.TestCase):
             str(self.sol10.selms(odd_plane=True))
         )
 
+    def test_clone(self):
+
+        self.assertEqual(self.grid10, self.sol10.clone().grid)
+        self.assertNotEqual(self.grid10, self.sol10.clone(grid=True).grid)
+
     def test_grid(self):
 
         self.assertEqual(self.grid10, self.sol10.grid)

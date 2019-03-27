@@ -43,6 +43,20 @@ public:
     Field & operator=(Field const & ) = default;
     Field & operator=(Field       &&) = delete;
 
+    Field clone(bool grid=false) const
+    {
+        Field ret(*this);
+        ret.m_grid = clone_grid();
+        return ret;
+    }
+
+    std::shared_ptr<Grid> clone_grid() const
+    {
+        return m_grid->clone();
+    }
+
+    void set_grid(std::shared_ptr<Grid> const & grid) { m_grid = grid; }
+
     Grid const & grid() const { return *m_grid; }
     Grid       & grid()       { return *m_grid; }
 

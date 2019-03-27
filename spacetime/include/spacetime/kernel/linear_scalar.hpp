@@ -100,6 +100,11 @@ public:
         return construct_impl(grid, 1, time_increment);
     }
 
+    std::shared_ptr<LinearScalarSolver> clone(bool grid=false)
+    {
+        return clone_impl(grid);
+    }
+
 }; /* end class LinearScalarSolver */
 
 } /* end namespace spacetime */

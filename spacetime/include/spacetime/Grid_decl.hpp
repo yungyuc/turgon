@@ -47,14 +47,19 @@ public:
         return std::make_shared<Grid>(std::forward<Args>(args) ..., ctor_passkey());
     }
 
+    std::shared_ptr<Grid> clone() const
+    {
+        return std::make_shared<Grid>(*this);
+    }
+
     Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &);
 
     Grid(array_type const & xloc, ctor_passkey const &) { init_from_array(xloc); }
 
     Grid() = delete;
-    Grid(Grid const & ) = delete;
+    Grid(Grid const & ) = default;
     Grid(Grid       &&) = delete;
-    Grid & operator=(Grid const & ) = delete;
+    Grid & operator=(Grid const & ) = default;
     Grid & operator=(Grid       &&) = delete;
 
     real_type xmin() const { return m_xmin; }
