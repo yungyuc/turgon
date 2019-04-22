@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(BUILD_GTESTS "build libst google-test suite" ON)
+
 find_package(pybind11 REQUIRED)
 find_package(NumPy REQUIRED)
 find_package(xtl REQUIRED)
@@ -47,11 +49,6 @@ set(SPACETIME_HEADERS
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
        SPACETIME_HEADERS "${SPACETIME_HEADERS}")
 
-set(EXAMPLE_SOURCES
-    src/example.cpp
-)
-add_executable(example ${EXAMPLE_SOURCES} ${SPACETIME_HEADERS})
-
 set(SPACETIME_PY_HEADERS
     include/spacetime/python.hpp
     include/spacetime/python/common.hpp
@@ -73,5 +70,9 @@ pybind11_add_module(
     ${SPACETIME_PY_HEADERS}
 )
 install(TARGETS _libst DESTINATION libst)
+
+if(BUILD_GTESTS)
+    add_subdirectory(gtests)
+endif()
 
 # vim: set ff=unix fenc=utf8 nobomb et sw=4 ts=4:

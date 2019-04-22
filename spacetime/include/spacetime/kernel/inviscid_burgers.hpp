@@ -122,6 +122,11 @@ public:
         return construct_impl(grid, 1, time_increment);
     }
 
+    std::shared_ptr<InviscidBurgersSolver> clone(bool grid=false)
+    {
+        return clone_impl(grid);
+    }
+
 }; /* end class InviscidBurgersSolver */
 
 } /* end namespace spacetime */

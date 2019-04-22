@@ -20,9 +20,17 @@ public:
     using base_type = SolverBase<Solver, Celm, Selm>;
     using base_type::base_type;
 
+    Solver(Solver const &) = default;
+    Solver & operator=(Solver const &) = default;
+
     static std::shared_ptr<Solver> construct(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment)
     {
         return construct_impl(grid, nvar, time_increment);
+    }
+
+    std::shared_ptr<Solver> clone(bool grid=false)
+    {
+        return clone_impl(grid);
     }
 
 }; /* end class Solver */

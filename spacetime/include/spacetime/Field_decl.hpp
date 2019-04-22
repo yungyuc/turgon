@@ -38,10 +38,24 @@ public:
     Field(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment);
 
     Field() = delete;
-    Field(Field const & ) = delete;
-    Field(Field       &&) = delete;
-    Field & operator=(Field const & ) = delete;
-    Field & operator=(Field       &&) = delete;
+    Field(Field const & ) = default;
+    Field(Field       &&) = default;
+    Field & operator=(Field const & ) = default;
+    Field & operator=(Field       &&) = default;
+
+    Field clone(bool grid=false) const
+    {
+        Field ret(*this);
+        ret.m_grid = clone_grid();
+        return ret;
+    }
+
+    std::shared_ptr<Grid> clone_grid() const
+    {
+        return m_grid->clone();
+    }
+
+    void set_grid(std::shared_ptr<Grid> const & grid) { m_grid = grid; }
 
     Grid const & grid() const { return *m_grid; }
     Grid       & grid()       { return *m_grid; }
