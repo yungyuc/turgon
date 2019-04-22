@@ -58,9 +58,9 @@ public:
 
     Grid() = delete;
     Grid(Grid const & ) = default;
-    Grid(Grid       &&) = delete;
+    Grid(Grid       &&) = default;
     Grid & operator=(Grid const & ) = default;
-    Grid & operator=(Grid       &&) = delete;
+    Grid & operator=(Grid       &&) = default;
 
     real_type xmin() const { return m_xmin; }
     real_type xmax() const { return m_xmax; }

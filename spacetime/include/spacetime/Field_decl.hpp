@@ -39,9 +39,9 @@ public:
 
     Field() = delete;
     Field(Field const & ) = default;
-    Field(Field       &&) = delete;
+    Field(Field       &&) = default;
     Field & operator=(Field const & ) = default;
-    Field & operator=(Field       &&) = delete;
+    Field & operator=(Field       &&) = default;
 
     Field clone(bool grid=false) const
     {

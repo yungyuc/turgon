@@ -66,9 +66,9 @@ public:
 
     SolverBase() = delete;
     SolverBase(SolverBase const & ) = default;
-    SolverBase(SolverBase       &&) = delete;
+    SolverBase(SolverBase       &&) = default;
     SolverBase & operator=(SolverBase const & ) = default;
-    SolverBase & operator=(SolverBase       &&) = delete;
+    SolverBase & operator=(SolverBase       &&) = default;
 
     Grid const & grid() const { return m_field.grid(); }
     Grid       & grid()       { return m_field.grid(); }
