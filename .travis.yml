@@ -90,7 +90,9 @@ script:
       -DCMAKE_BUILD_TYPE=Release \
       .."
     $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build install VERBOSE=${VERBOSITY:-0}
-  - $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime ; env PYTHONPATH=. py.test-3 -v"
+    $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build libst_gtests VERBOSE=${VERBOSITY:-0}
+  - $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime ; build/gtests/libst_gtests"
+  - $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime ; env PYTHONPATH=. py.test-3 -v tests"
   - $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/writing ; make VERBOSE=${VERBOSITY:-0}"
 
 after_script:
