@@ -16,7 +16,7 @@ matrix:
     - os: linux
       sudo: required
       services: docker
-      env: RUNMODE=docker USE_CLANG_TIDY=OFF
+      env: RUNMODE=docker USE_CLANG_TIDY=ON
     - os: linux
       sudo: required
       compiler: gcc
@@ -75,6 +75,8 @@ install:
       $SCRIPT_RUN_PREFIX $CXX --version
       $SCRIPT_RUN_PREFIX which $CC
       $SCRIPT_RUN_PREFIX $CC --version
+      $SCRIPT_RUN_PREFIX which clang-tidy
+      $SCRIPT_RUN_PREFIX clang-tidy -version
       $SCRIPT_RUN_PREFIX id
     fi
 
@@ -90,6 +92,7 @@ script:
       -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/spacetime \
       -DCMAKE_BUILD_TYPE=Release \
       -DUSE_CLANG_TIDY=${USE_CLANG_TIDY} \
+      -DLINT_AS_ERRORS=ON \
       .."
     $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build install VERBOSE=${VERBOSITY:-0}
     $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build libst_gtests VERBOSE=${VERBOSITY:-0}
