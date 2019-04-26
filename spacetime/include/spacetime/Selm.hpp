@@ -10,6 +10,7 @@
 namespace spacetime
 {
 
+inline
 void Selm::move_at(sindex_type offset)
 {
     const size_t xindex = this->xindex() + offset;

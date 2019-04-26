@@ -17,24 +17,28 @@
 namespace spacetime
 {
 
+inline
 std::ostream& operator<<(std::ostream& os, const Grid & grid)
 {
     os << "Grid(xmin=" << grid.xmin() << ", xmax=" << grid.xmax() << ", ncelm=" << grid.ncelm() << ")";
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const Field & sol)
 {
     os << "Field(grid=" << sol.grid() << ")";
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const Solver & sol)
 {
     os << "Solver(grid=" << sol.grid() << ")";
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const Celm & elm)
 {
     os << "Celm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
@@ -42,6 +46,7 @@ std::ostream& operator<<(std::ostream& os, const Celm & elm)
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const Selm & elm)
 {
     os << "Selm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
@@ -49,12 +54,14 @@ std::ostream& operator<<(std::ostream& os, const Selm & elm)
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const InviscidBurgersSolver & sol)
 {
     os << "InviscidBurgersSolver(grid=" << sol.grid() << ")";
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const InviscidBurgersCelm & elm)
 {
     os << "InviscidBurgersCelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
@@ -62,6 +69,7 @@ std::ostream& operator<<(std::ostream& os, const InviscidBurgersCelm & elm)
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const InviscidBurgersSelm & elm)
 {
     os << "InviscidBurgersSelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
@@ -69,12 +77,14 @@ std::ostream& operator<<(std::ostream& os, const InviscidBurgersSelm & elm)
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const LinearScalarSolver & sol)
 {
     os << "LinearScalarSolver(grid=" << sol.grid() << ")";
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const LinearScalarCelm & elm)
 {
     os << "LinearScalarCelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";
@@ -82,6 +92,7 @@ std::ostream& operator<<(std::ostream& os, const LinearScalarCelm & elm)
     return os;
 }
 
+inline
 std::ostream& operator<<(std::ostream& os, const LinearScalarSelm & elm)
 {
     os << "LinearScalarSelm(" << (elm.on_even_plane() ? "even" : "odd") << ", ";

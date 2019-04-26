@@ -8,8 +8,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile commands")
 
 option(BUILD_GTESTS "build libst google-test suite" ON)
+option(USE_CLANG_TIDY "use clang-tidy" ON)
+option(LINT_AS_ERRORS "clang-tidy warnings as errors" OFF)
+option(FORCE_LINT "force linters" OFF)
 
 find_package(pybind11 REQUIRED)
 find_package(NumPy REQUIRED)
@@ -60,6 +64,29 @@ set(SPACETIME_PY_HEADERS
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
        SPACETIME_PY_HEADERS "${SPACETIME_PY_HEADERS}")
 
+find_program(
+    CLANG_TIDY_EXE
+    NAMES "clang-tidy"
+    DOC "Path to clang-tidy executable"
+)
+if(NOT CLANG_TIDY_EXE)
+    message(STATUS "clang-tidy not found")
+    if(FORCE_LINT)
+        message(FATAL_ERROR "FORCE_LINT is on but clang-tidy is not found")
+    endif()
+else()
+    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+    if(USE_CLANG_TIDY)
+        set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}")
+        if(LINT_AS_ERRORS)
+            set(DO_CLANG_TIDY "${DO_CLANG_TIDY}" "-warnings-as-errors=*")
+        endif()
+        message(STATUS "use clang-tidy with DO_CLANG_TIDY: ${DO_CLANG_TIDY}")
+    else()
+        message(STATUS "not use clang-tidy")
+    endif()
+endif()
+
 set(LIBST_SOURCES
     src/python/libst.cpp
 )
@@ -70,6 +97,13 @@ pybind11_add_module(
     ${SPACETIME_PY_HEADERS}
 )
 install(TARGETS _libst DESTINATION libst)
+
+if(CLANG_TIDY_EXE AND USE_CLANG_TIDY)
+    set_target_properties(
+        _libst PROPERTIES
+        CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
+    )
+endif()
 
 if(BUILD_GTESTS)
     add_subdirectory(gtests)

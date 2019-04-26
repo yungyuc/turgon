@@ -47,7 +47,7 @@ WrapGrid
                 "xcoord",
                 static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::xcoord)
             )
-            .def_property_readonly_static("BOUND_COUNT", [](py::object){ return Grid::BOUND_COUNT; })
+            .def_property_readonly_static("BOUND_COUNT", [](py::object const &){ return Grid::BOUND_COUNT; })
         ;
     }
 

@@ -27,7 +27,7 @@ public:
       : base_type(&field, field.grid().xptr_selm(index, odd_plane, Grid::SelmPK()))
     {}
 
-    class const_ctor_passkey { const_ctor_passkey(){} friend Field; };
+    class const_ctor_passkey { const_ctor_passkey() = default; friend Field; };
 
     Selm(Field const & field, size_t index, bool odd_plane, const_ctor_passkey)
       : Selm(*const_cast<Field*>(&field), index, odd_plane)
@@ -40,7 +40,7 @@ public:
      * Return true for even plane, false for odd plane (temporal).
      */
     bool on_even_plane() const { return !on_odd_plane(); }
-    bool on_odd_plane() const { return bool((xindex() - Grid::BOUND_COUNT) & 1); }
+    bool on_odd_plane() const { return static_cast<bool>((xindex() - Grid::BOUND_COUNT) & 1); }
 
     value_type dxneg() const { return x()-xneg(); }
     value_type dxpos() const { return xpos()-x(); }
@@ -57,10 +57,10 @@ public:
     value_type const & cfl() const { return field().cfl(xindex()); }
     value_type       & cfl()       { return field().cfl(xindex()); }
 
-    value_type xn(size_t iv) const { return 0.0; }
-    value_type xp(size_t iv) const { return 0.0; }
-    value_type tn(size_t iv) const { return 0.0; }
-    value_type tp(size_t iv) const { return 0.0; }
+    value_type xn(size_t /*iv*/) const { return 0.0; }
+    value_type xp(size_t /*iv*/) const { return 0.0; }
+    value_type tn(size_t /*iv*/) const { return 0.0; }
+    value_type tp(size_t /*iv*/) const { return 0.0; }
 
     value_type so0p(size_t iv) const { return so0(iv); }
 
@@ -71,8 +71,10 @@ public:
 /**
  * Selm index.
  */
+inline
 sindex_type Selm::index() const
 {
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
     static_assert(0 == (Grid::BOUND_COUNT % 2), "only work with even BOUND_COUNT");
     return (static_cast<sindex_type>(xindex()) >> 1) - 1;
 }
