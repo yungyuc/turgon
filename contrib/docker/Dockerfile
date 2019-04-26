@@ -27,7 +27,18 @@ RUN \
   apt-get -qy install tzdata && \
   ln -fs /usr/share/zoneinfo/Asia/Taipei /etc/localtime && \
   dpkg-reconfigure --frontend noninteractive tzdata && \
-  apt-get -qy install sudo build-essential make cmake libc6-dev gcc-7 g++-7 curl git clang-tidy && \
+  apt-get -qy install sudo build-essential make cmake libc6-dev gcc-7 g++-7 curl git && \
+  rm -rf /var/lib/apt/lists/*
+
+# Install clang.
+RUN \
+  export DEBIAN_FRONTEND=noninteractive && \
+  curl https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+  apt-get -qq update && \
+  apt-get -qy install software-properties-common && \
+  apt-add-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main' && \
+  apt-get -qy install clang-tidy-9 && \
+  cd /usr/bin && ln -s clang-tidy-9 clang-tidy && \
   rm -rf /var/lib/apt/lists/*
 
 # Install Python.
