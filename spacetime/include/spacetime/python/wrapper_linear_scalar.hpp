@@ -28,7 +28,7 @@ WrapLinearScalarSolver
     friend base_type;
     friend base_type::base_type;
 
-    WrapLinearScalarSolver(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapLinearScalarSolver(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -56,7 +56,7 @@ WrapLinearScalarCelm
     using base_type = WrapCelmBase< WrapLinearScalarCelm, LinearScalarCelm >;
     friend base_type::base_type::base_type;
 
-    WrapLinearScalarCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapLinearScalarCelm(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {}
 
@@ -71,7 +71,7 @@ WrapLinearScalarSelm
     using base_type = WrapSelmBase< WrapLinearScalarSelm, LinearScalarSelm >;
     friend base_type::base_type::base_type;
 
-    WrapLinearScalarSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapLinearScalarSelm(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {}
 

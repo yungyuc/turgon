@@ -5,17 +5,17 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "pybind11/pybind11.h" // must be first
+#include "pybind11/pybind11.h" // NOLINT(llvm-include-order) must be first
 #include "pybind11/operators.h"
 #include "pybind11/stl.h"
 #include "xtensor-python/pyarray.hpp"
 
-#include <list>
-#include <functional>
-#include <sstream>
-
 #include "spacetime.hpp"
 #include "spacetime/python/WrapBase.hpp"
+
+#include <functional>
+#include <list>
+#include <sstream>
 
 namespace spacetime
 {
@@ -47,19 +47,20 @@ protected:
 
     using base_type::base_type;
 
-    WrapElementBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapElementBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
 
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
-            .def(py::self == py::self)
-            .def(py::self != py::self)
-            .def(py::self <  py::self)
-            .def(py::self <= py::self)
-            .def(py::self >  py::self)
-            .def(py::self >= py::self)
+            .def(py::self == py::self) // NOLINT(misc-redundant-expression)
+            .def(py::self != py::self) // NOLINT(misc-redundant-expression)
+            .def(py::self != py::self) // NOLINT(misc-redundant-expression)
+            .def(py::self <  py::self) // NOLINT(misc-redundant-expression)
+            .def(py::self <= py::self) // NOLINT(misc-redundant-expression)
+            .def(py::self >  py::self) // NOLINT(misc-redundant-expression)
+            .def(py::self >= py::self) // NOLINT(misc-redundant-expression)
             .def("duplicate", &wrapped_type::duplicate)
             .def_property_readonly("dup", &wrapped_type::duplicate)
             .def_property_readonly("x", &wrapped_type::x)
@@ -102,7 +103,7 @@ protected:
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
-    WrapCelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapCelmBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         using se_getter_type = typename wrapped_type::selm_type (wrapped_type::*)();
@@ -128,7 +129,7 @@ protected:
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
-    WrapSelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSelmBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         using value_type = typename wrapped_type::value_type;
@@ -174,8 +175,8 @@ public:
     using solver_type = ST;
 
     SolverElementIterator() = delete;
-    SolverElementIterator(std::shared_ptr<ST> const & sol, bool odd_plane, size_t starting, bool selm)
-      : m_solver(sol), m_odd_plane(odd_plane), m_current(starting), m_selm(selm)
+    SolverElementIterator(std::shared_ptr<ST> sol, bool odd_plane, size_t starting, bool selm)
+      : m_solver(std::move(sol)), m_odd_plane(odd_plane), m_current(starting), m_selm(selm)
     {}
 
     typename ST::celm_type next_celm()
@@ -186,9 +187,9 @@ public:
         {
             typename ST::celm_type ret = m_solver->celm(m_current, m_odd_plane);
             ++m_current;
-            return ret;
+            return ret; // NOLINT(readability-else-after-return)
         }
-        else
+        else // NOLINT(readability-else-after-return)
         {
             throw pybind11::stop_iteration();
         }
@@ -202,9 +203,9 @@ public:
         {
             typename ST::selm_type ret = m_solver->selm(m_current, m_odd_plane);
             ++m_current;
-            return ret;
+            return ret; // NOLINT(readability-else-after-return)
         }
-        else
+        else // NOLINT(readability-else-after-return)
         {
             throw pybind11::stop_iteration();
         }
@@ -257,7 +258,7 @@ public:
 
 protected:
 
-    WrapSolverBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSolverBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
 
@@ -265,7 +266,7 @@ protected:
 
         using elm_iter_type = SolverElementIterator<wrapped_type>;
         std::string elm_pyname = std::string(pyname) + "ElementIterator";
-        pybind11::class_< elm_iter_type >(mod, elm_pyname.c_str())
+        pybind11::class_< elm_iter_type >(*mod, elm_pyname.c_str())
             .def("__str__", &detail::to_str<elm_iter_type>)
             .def("__iter__", [](elm_iter_type & self){ return self; })
             .def(
@@ -364,7 +365,12 @@ class ModuleInitializer {
 
 public:
 
-    using init_type = std::function<PyObject*(pybind11::module&)>;
+    using init_type = std::function<PyObject*(pybind11::module*)>;
+
+    ModuleInitializer(ModuleInitializer const & ) = delete;
+    ModuleInitializer(ModuleInitializer       &&) = delete;
+    ModuleInitializer & operator=(ModuleInitializer const & ) = delete;
+    ModuleInitializer & operator=(ModuleInitializer       &&) = delete;
 
     static ModuleInitializer & get_instance()
     {
@@ -372,11 +378,11 @@ public:
         return inst;
     }
 
-    void initialize(pybind11::module & topmod)
+    void initialize(pybind11::module * topmod)
     {
         if (!m_initialized)
         {
-            for (init_type initializer: m_initializers)
+            for (init_type const & initializer : m_initializers)
             {
                 initializer(topmod);
             }
@@ -386,16 +392,16 @@ public:
 
     bool is_initialized() const { return m_initialized; }
 
-    ModuleInitializer & add(init_type init)
+    ModuleInitializer & add(init_type const & init)
     {
         m_initializers.push_back(init);
         return *this;
     }
 
     template< typename WST, typename WCET, typename WSET >
-    ModuleInitializer & add_solver(pybind11::module & mod, const std::string & name, const std::string & desc)
+    ModuleInitializer & add_solver(pybind11::module * mod, const std::string & name, const std::string & desc)
     {
-        using namespace spacetime::python;
+        using namespace spacetime::python; // NOLINT(google-build-using-namespace)
 
         WST::commit
         (
@@ -422,10 +428,7 @@ public:
 private:
 
     ModuleInitializer() = default;
-    ModuleInitializer(ModuleInitializer const & ) = delete;
-    ModuleInitializer(ModuleInitializer       &&) = delete;
-    ModuleInitializer & operator=(ModuleInitializer const & ) = delete;
-    ModuleInitializer & operator=(ModuleInitializer       &&) = delete;
+    ~ModuleInitializer() = default;
 
     bool m_initialized = false;
     std::list<init_type> m_initializers;

@@ -69,6 +69,7 @@ public:
     SolverBase(SolverBase       &&) = default;
     SolverBase & operator=(SolverBase const & ) = default;
     SolverBase & operator=(SolverBase       &&) = default;
+    ~SolverBase() = default;
 
     Grid const & grid() const { return m_field.grid(); }
     Grid       & grid()       { return m_field.grid(); }
@@ -105,13 +106,17 @@ public:
     real_type hdt() const { return m_field.hdt(); }
     real_type qdt() const { return m_field.qdt(); }
 
+    // NOLINTNEXTLINE(readability-const-return-type)
     CE const celm(sindex_type ielm, bool odd_plane) const { return m_field.celm<CE>(ielm, odd_plane); }
     CE       celm(sindex_type ielm, bool odd_plane)       { return m_field.celm<CE>(ielm, odd_plane); }
+    // NOLINTNEXTLINE(readability-const-return-type)
     CE const celm_at(sindex_type ielm, bool odd_plane) const { return m_field.celm_at<CE>(ielm, odd_plane); }
     CE       celm_at(sindex_type ielm, bool odd_plane)       { return m_field.celm_at<CE>(ielm, odd_plane); }
 
+    // NOLINTNEXTLINE(readability-const-return-type)
     SE const selm(sindex_type ielm, bool odd_plane) const { return m_field.selm<SE>(ielm, odd_plane); }
     SE       selm(sindex_type ielm, bool odd_plane)       { return m_field.selm<SE>(ielm, odd_plane); }
+    // NOLINTNEXTLINE(readability-const-return-type)
     SE const selm_at(sindex_type ielm, bool odd_plane) const { return m_field.selm_at<SE>(ielm, odd_plane); }
     SE       selm_at(sindex_type ielm, bool odd_plane)       { return m_field.selm_at<SE>(ielm, odd_plane); }
 
@@ -127,7 +132,7 @@ public:
     void march_full() { march_half_first(); march_half_second(); }
     void march(size_t steps) { for (size_t it=0; it<steps; ++it) { march_full(); } }
 
-protected:
+private:
 
     Field m_field;
 

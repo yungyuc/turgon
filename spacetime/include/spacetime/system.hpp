@@ -16,11 +16,12 @@ class Formatter
 
 public:
 
-    Formatter() {}
+    Formatter() = default; // NOLINT(fuchsia-default-arguments)
     Formatter(Formatter const & ) = delete;
     Formatter(Formatter       &&) = delete;
     Formatter & operator = (Formatter const & ) = delete;
     Formatter & operator = (Formatter       &&) = delete;
+    ~Formatter() = default;
 
     template <typename T>
     Formatter & operator << (T const & value)
@@ -30,13 +31,15 @@ public:
     }
 
     std::string str() const       { return m_stream.str(); }
+    // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
     operator std::string () const { return m_stream.str(); }
 
     enum ConvertToString
     {
         to_str
     };
-    std::string operator >> (ConvertToString) { return m_stream.str(); }
+
+    std::string operator >> (ConvertToString const &) { return m_stream.str(); }
 
 private:
 

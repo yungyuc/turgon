@@ -39,18 +39,21 @@ public:
 
 }; /* end class LinearScalarSelm */
 
+inline
 LinearScalarSelm::value_type LinearScalarSelm::xn(size_t iv) const
 {
     const value_type displacement = 0.5 * (x() + xneg()) - xctr();
     return dxneg() * (so0(iv) + displacement * so1(iv));
 }
 
+inline
 LinearScalarSelm::value_type LinearScalarSelm::xp(size_t iv) const
 {
     const value_type displacement = 0.5 * (x() + xpos()) - xctr();
     return dxpos() * (so0(iv) + displacement * so1(iv));
 }
 
+inline
 LinearScalarSelm::value_type LinearScalarSelm::tn(size_t iv) const
 {
     const value_type displacement = x() - xctr();
@@ -60,6 +63,7 @@ LinearScalarSelm::value_type LinearScalarSelm::tn(size_t iv) const
     return hdt() * ret;
 }
 
+inline
 LinearScalarSelm::value_type LinearScalarSelm::tp(size_t iv) const
 {
     const value_type displacement = x() - xctr();
@@ -69,6 +73,7 @@ LinearScalarSelm::value_type LinearScalarSelm::tp(size_t iv) const
     return hdt() * ret;
 }
 
+inline
 LinearScalarSelm::value_type LinearScalarSelm::so0p(size_t iv) const
 {
     value_type ret = so0(iv);
@@ -77,6 +82,7 @@ LinearScalarSelm::value_type LinearScalarSelm::so0p(size_t iv) const
     return ret;
 }
 
+inline
 LinearScalarSelm::value_type & LinearScalarSelm::update_cfl()
 {
     const value_type hdx = std::min(dxneg(), dxpos());

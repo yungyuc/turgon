@@ -16,11 +16,11 @@ matrix:
     - os: linux
       sudo: required
       services: docker
-      env: RUNMODE=docker
+      env: RUNMODE=docker USE_CLANG_TIDY=ON
     - os: linux
       sudo: required
       compiler: gcc
-      env: RUNMODE=travis
+      env: RUNMODE=travis USE_CLANG_TIDY=OFF
       addons:
         # If using C++11/14 see http://genbattle.bitbucket.org/blog/2016/01/17/c++-travis-ci/
         apt:
@@ -42,7 +42,7 @@ before_install:
         --workdir=${TRAVIS_BUILD_DIR} \
         $DOCKER)
 
-      SCRIPT_RUN_PREFIX="docker exec --tty $containerid"
+      SCRIPT_RUN_PREFIX="docker exec --env USE_CLANG_TIDY=${USE_CLANG_TIDY} --tty $containerid"
     else
       # Configure ssh
       ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
@@ -75,6 +75,8 @@ install:
       $SCRIPT_RUN_PREFIX $CXX --version
       $SCRIPT_RUN_PREFIX which $CC
       $SCRIPT_RUN_PREFIX $CC --version
+      $SCRIPT_RUN_PREFIX which clang-tidy
+      $SCRIPT_RUN_PREFIX clang-tidy -version
       $SCRIPT_RUN_PREFIX id
     fi
 
@@ -84,10 +86,13 @@ script:
     chmod -R 777 ${TRAVIS_BUILD_DIR}
     $SCRIPT_RUN_PREFIX rm -rf ${TRAVIS_BUILD_DIR}/spacetime/build
     $SCRIPT_RUN_PREFIX mkdir -p ${TRAVIS_BUILD_DIR}/spacetime/build
-    $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime/build ; cmake \
+    $SCRIPT_RUN_PREFIX sh -c "cd ${TRAVIS_BUILD_DIR}/spacetime/build ; \
+      cmake \
       -DPYTHON_EXECUTABLE:FILEPATH=`$SCRIPT_RUN_PREFIX which python3` \
       -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/spacetime \
       -DCMAKE_BUILD_TYPE=Release \
+      -DUSE_CLANG_TIDY=${USE_CLANG_TIDY} \
+      -DLINT_AS_ERRORS=ON \
       .."
     $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build install VERBOSE=${VERBOSITY:-0}
     $SCRIPT_RUN_PREFIX make -C ${TRAVIS_BUILD_DIR}/spacetime/build libst_gtests VERBOSE=${VERBOSITY:-0}

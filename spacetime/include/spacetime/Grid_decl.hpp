@@ -54,6 +54,7 @@ public:
 
     Grid(real_type xmin, real_type xmax, size_t ncelm, ctor_passkey const &);
 
+    // NOLINTNEXTLINE(hicpp-member-init,cppcoreguidelines-pro-type-member-init)
     Grid(array_type const & xloc, ctor_passkey const &) { init_from_array(xloc); }
 
     Grid() = delete;
@@ -61,6 +62,7 @@ public:
     Grid(Grid       &&) = default;
     Grid & operator=(Grid const & ) = default;
     Grid & operator=(Grid       &&) = default;
+    ~Grid() = default;
 
     real_type xmin() const { return m_xmin; }
     real_type xmax() const { return m_xmax; }
@@ -98,21 +100,21 @@ private:
      * Convert celm index to coordinate index.
      */
     size_t xindex_celm(sindex_type ielm) const { return 1 + BOUND_COUNT + (ielm << 1); }
-    size_t xindex_celm(sindex_type ielm, bool odd_plane) const { return xindex_celm(ielm) + odd_plane; }
+    size_t xindex_celm(sindex_type ielm, bool odd_plane) const { return xindex_celm(ielm) + (odd_plane ? 1 : 0); }
 
     /**
      * Convert selm index to coordinate index.
      */
     size_t xindex_selm(sindex_type ielm) const { return BOUND_COUNT + (ielm << 1); }
-    size_t xindex_selm(sindex_type ielm, bool odd_plane) const { return xindex_selm(ielm) + odd_plane; }
+    size_t xindex_selm(sindex_type ielm, bool odd_plane) const { return xindex_selm(ielm) + (odd_plane ? 1 : 0); }
 
     /**
      * Get pointer to an coordinate value using coordinate index.
      */
     real_type       * xptr()       { return m_xcoord.data(); }
     real_type const * xptr() const { return m_xcoord.data(); }
-    real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; }
-    real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; }
+    real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
 
     void init_from_array(array_type const & xloc);
 

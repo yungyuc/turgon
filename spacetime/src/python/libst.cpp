@@ -5,39 +5,40 @@
 
 #include "spacetime/python.hpp" // must be first
 
-#include <utility>
-#include <memory>
-#include <vector>
+#include "spacetime.hpp"
+
 #include <algorithm>
 #include <cstring>
-
-#include "spacetime.hpp"
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace
 {
 
-PyObject * initialize_spacetime(pybind11::module & mod)
+PyObject * initialize_spacetime(pybind11::module * mod)
 {
-    using namespace spacetime::python;
+    using namespace spacetime::python; // NOLINT(google-build-using-namespace)
     xt::import_numpy(); // or numpy c api segfault.
-    mod.doc() = "_libst: One-dimensional space-time CESE method code";
+    mod->doc() = "_libst: One-dimensional space-time CESE method code";
     WrapGrid::commit(mod, "Grid", "Spatial grid");
-    return mod.ptr();
+    return mod->ptr();
 }
 
 } /* end namespace */
 
-PYBIND11_MODULE(_libst, mod) {
-    using namespace spacetime::python;
+PYBIND11_MODULE(_libst, mod) // NOLINT
+{
+    using namespace spacetime::python; // NOLINT(google-build-using-namespace)
     ModuleInitializer::get_instance()
         .add(initialize_spacetime)
         .add_solver<WrapSolver, WrapCelm, WrapSelm>
-        (mod, "", "no equation")
+        (&mod, "", "no equation")
         .add_solver<WrapLinearScalarSolver, WrapLinearScalarCelm, WrapLinearScalarSelm>
-        (mod, "LinearScalar", "a linear scalar equation")
+        (&mod, "LinearScalar", "a linear scalar equation")
         .add_solver<WrapInviscidBurgersSolver, WrapInviscidBurgersCelm, WrapInviscidBurgersSelm>
-        (mod, "InviscidBurgers", "the inviscid Burgers equation")
-        .initialize(mod)
+        (&mod, "InviscidBurgers", "the inviscid Burgers equation")
+        .initialize(&mod)
     ;
 }
 

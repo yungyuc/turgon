@@ -44,11 +44,11 @@ public:
 
     value_type x() const { return *m_xptr; }
     value_type dx() const { return xpos() - xneg(); }
-    value_type xneg() const { return *(m_xptr-1); }
-    value_type xpos() const { return *(m_xptr+1); }
+    value_type xneg() const { return *(m_xptr-1); /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    value_type xpos() const { return *(m_xptr+1); /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
     value_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
-    void move(ssize_t offset) { m_xptr += offset; }
+    void move(ssize_t offset) { m_xptr += offset; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
     void move_at(ssize_t offset) { static_cast<ET *>(this)->move_at(offset); }
 
     void move_left() { move(-2); }
@@ -71,6 +71,8 @@ public:
 protected:
 
     size_t xindex() const;
+
+private:
 
     Field * m_field;
     value_type * m_xptr;

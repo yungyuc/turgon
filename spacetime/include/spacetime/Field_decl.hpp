@@ -42,11 +42,12 @@ public:
     Field(Field       &&) = default;
     Field & operator=(Field const & ) = default;
     Field & operator=(Field       &&) = default;
+    ~Field() = default;
 
     Field clone(bool grid=false) const
     {
         Field ret(*this);
-        ret.m_grid = clone_grid();
+        if (grid) { ret.m_grid = clone_grid(); }
         return ret;
     }
 
@@ -83,13 +84,17 @@ public:
     real_type hdt() const { return m_half_time_increment; }
     real_type qdt() const { return m_quarter_time_increment; }
 
+    // NOLINTNEXTLINE(readability-const-return-type)
     template< typename CE > CE const celm(sindex_type ielm, bool odd_plane) const { return CE(*this, ielm, odd_plane, typename CE::const_ctor_passkey()); }
     template< typename CE > CE       celm(sindex_type ielm, bool odd_plane)       { return CE(*this, ielm, odd_plane); }
+    // NOLINTNEXTLINE(readability-const-return-type)
     template< typename CE > CE const celm_at(sindex_type ielm, bool odd_plane) const;
     template< typename CE > CE       celm_at(sindex_type ielm, bool odd_plane);
 
+    // NOLINTNEXTLINE(readability-const-return-type)
     template< typename SE > SE const selm(sindex_type ielm, bool odd_plane) const { return SE(*this, ielm, odd_plane, typename SE::const_ctor_passkey()); }
     template< typename SE > SE       selm(sindex_type ielm, bool odd_plane)       { return SE(*this, ielm, odd_plane); }
+    // NOLINTNEXTLINE(readability-const-return-type)
     template< typename SE > SE const selm_at(sindex_type ielm, bool odd_plane) const;
     template< typename SE > SE       selm_at(sindex_type ielm, bool odd_plane);
 
@@ -101,10 +106,10 @@ private:
     array_type m_so1;
     array_type m_cfl;
 
-    real_type m_time_increment;
+    real_type m_time_increment = 0;
     // Cached value;
-    real_type m_half_time_increment;
-    real_type m_quarter_time_increment;
+    real_type m_half_time_increment = 0;
+    real_type m_quarter_time_increment = 0;
 
 }; /* end class Field */
 

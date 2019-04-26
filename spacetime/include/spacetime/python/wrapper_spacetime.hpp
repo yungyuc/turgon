@@ -21,7 +21,7 @@ WrapGrid
 
     friend base_type;
 
-    WrapGrid(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapGrid(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -47,7 +47,7 @@ WrapGrid
                 "xcoord",
                 static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::xcoord)
             )
-            .def_property_readonly_static("BOUND_COUNT", [](py::object){ return Grid::BOUND_COUNT; })
+            .def_property_readonly_static("BOUND_COUNT", [](py::object const &){ return Grid::BOUND_COUNT; })
         ;
     }
 
@@ -61,7 +61,7 @@ WrapField
 
     friend base_type;
 
-    WrapField(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapField(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -105,7 +105,7 @@ WrapSolver
     friend base_type;
     friend base_type::base_type;
 
-    WrapSolver(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSolver(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -133,7 +133,7 @@ WrapCelm
     using base_type = WrapCelmBase< WrapCelm, Celm >;
     friend base_type::base_type::base_type;
 
-    WrapCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapCelm(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {}
 
@@ -148,7 +148,7 @@ WrapSelm
     using base_type = WrapSelmBase< WrapSelm, Selm >;
     friend base_type::base_type::base_type;
 
-    WrapSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSelm(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {}
 

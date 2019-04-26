@@ -26,7 +26,7 @@ WrapInviscidBurgersSolver
     friend base_type;
     friend base_type::base_type;
 
-    WrapInviscidBurgersSolver(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapInviscidBurgersSolver(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -51,7 +51,7 @@ WrapInviscidBurgersCelm
     using base_type = WrapCelmBase< WrapInviscidBurgersCelm, InviscidBurgersCelm >;
     friend base_type::base_type::base_type;
 
-    WrapInviscidBurgersCelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapInviscidBurgersCelm(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {}
 
@@ -66,7 +66,7 @@ WrapInviscidBurgersSelm
     using base_type = WrapSelmBase< WrapInviscidBurgersSelm, InviscidBurgersSelm >;
     friend base_type::base_type::base_type;
 
-    WrapInviscidBurgersSelm(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapInviscidBurgersSelm(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {}
 

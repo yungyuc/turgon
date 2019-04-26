@@ -12,6 +12,7 @@
 namespace spacetime
 {
 
+inline
 Field::Field(std::shared_ptr<Grid> const & grid, size_t nvar, Field::value_type time_increment)
   : m_grid(grid)
   , m_so0(array_type(std::vector<size_t>{grid->xsize(), nvar}))
@@ -21,6 +22,7 @@ Field::Field(std::shared_ptr<Grid> const & grid, size_t nvar, Field::value_type 
     set_time_increment(time_increment);
 }
 
+inline
 void Field::set_time_increment(value_type time_increment)
 {
     m_time_increment = time_increment;
@@ -29,6 +31,7 @@ void Field::set_time_increment(value_type time_increment)
 }
 
 template< typename CE >
+// NOLINTNEXTLINE(readability-const-return-type)
 inline
 CE const Field::celm_at(sindex_type ielm, bool odd_plane) const
 {
@@ -59,6 +62,7 @@ CE Field::celm_at(sindex_type ielm, bool odd_plane)
 }
 
 template< typename SE >
+// NOLINTNEXTLINE(readability-const-return-type)
 inline
 SE const Field::selm_at(sindex_type ielm, bool odd_plane) const
 {
