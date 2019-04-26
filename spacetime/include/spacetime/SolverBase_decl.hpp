@@ -140,4 +140,15 @@ private:
 
 } /* end namespace spacetime */
 
+#define SPACETIME_DERIVED_SELM_BODY_DEFAULT \
+public: \
+    using base_type = Selm; \
+    using base_type::base_type; \
+    value_type xn(size_t iv) const; \
+    value_type xp(size_t iv) const; \
+    value_type tn(size_t iv) const; \
+    value_type tp(size_t iv) const; \
+    value_type so0p(size_t iv) const; \
+    value_type & update_cfl();
+
 /* vim: set et ts=4 sw=4: */
