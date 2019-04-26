@@ -1,18 +1,16 @@
-# This dockerfile builds a docker image for building turgon with gitlab ci:
-# https://gitlab.com/yungyuc/turgon/pipelines .
-#
-# To build the image locally, run:
+# This dockerfile builds a docker image for building turgon. To build the image
+# locally, run:
 #
 # ```
-# docker build . [-t registry.gitlab.com/yungyuc/turgon:latest]
+# docker build . [-t yungyuc/turgon:latest]
 # ```
 #
 # The public repository for this image is at:
-# https://gitlab.com/yungyuc/turgon/container_registry .  You can pull it
+# https://hub.docker.com/r/yungyuc/turgon .  You can pull it
 # using:
 #
 # ```
-# docker pull registry.gitlab.com/yungyuc/turgon
+# docker pull yungyuc/turgon
 # ```
 
 
@@ -29,7 +27,7 @@ RUN \
   apt-get -qy install tzdata && \
   ln -fs /usr/share/zoneinfo/Asia/Taipei /etc/localtime && \
   dpkg-reconfigure --frontend noninteractive tzdata && \
-  apt-get -qy install sudo build-essential make cmake libc6-dev gcc-7 g++-7 curl git && \
+  apt-get -qy install sudo build-essential make cmake libc6-dev gcc-7 g++-7 curl git clang-tidy && \
   rm -rf /var/lib/apt/lists/*
 
 # Install Python.
