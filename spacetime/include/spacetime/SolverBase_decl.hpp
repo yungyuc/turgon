@@ -132,7 +132,7 @@ public:
     void march_full() { march_half_first(); march_half_second(); }
     void march(size_t steps) { for (size_t it=0; it<steps; ++it) { march_full(); } }
 
-protected:
+private:
 
     Field m_field;
 

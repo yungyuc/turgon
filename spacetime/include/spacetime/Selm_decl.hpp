@@ -23,6 +23,7 @@ class Selm
 
 public:
 
+    // NOLINTNEXTLINE(google-runtime-references)
     Selm(Field & field, size_t index, bool odd_plane)
       : base_type(&field, field.grid().xptr_selm(index, odd_plane, Grid::SelmPK()))
     {}

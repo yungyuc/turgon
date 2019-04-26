@@ -113,8 +113,8 @@ private:
      */
     real_type       * xptr()       { return m_xcoord.data(); }
     real_type const * xptr() const { return m_xcoord.data(); }
-    real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; }
-    real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; }
+    real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
 
     void init_from_array(array_type const & xloc);
 

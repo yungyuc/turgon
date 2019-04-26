@@ -47,7 +47,7 @@ protected:
 
     using base_type::base_type;
 
-    WrapElementBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapElementBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -103,7 +103,7 @@ protected:
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
-    WrapCelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapCelmBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         using se_getter_type = typename wrapped_type::selm_type (wrapped_type::*)();
@@ -129,7 +129,7 @@ protected:
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
-    WrapSelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSelmBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         using value_type = typename wrapped_type::value_type;
@@ -258,7 +258,7 @@ public:
 
 protected:
 
-    WrapSolverBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
+    WrapSolverBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
 
@@ -266,7 +266,7 @@ protected:
 
         using elm_iter_type = SolverElementIterator<wrapped_type>;
         std::string elm_pyname = std::string(pyname) + "ElementIterator";
-        pybind11::class_< elm_iter_type >(mod, elm_pyname.c_str())
+        pybind11::class_< elm_iter_type >(*mod, elm_pyname.c_str())
             .def("__str__", &detail::to_str<elm_iter_type>)
             .def("__iter__", [](elm_iter_type & self){ return self; })
             .def(
@@ -365,7 +365,7 @@ class ModuleInitializer {
 
 public:
 
-    using init_type = std::function<PyObject*(pybind11::module&)>;
+    using init_type = std::function<PyObject*(pybind11::module*)>;
 
     ModuleInitializer(ModuleInitializer const & ) = delete;
     ModuleInitializer(ModuleInitializer       &&) = delete;
@@ -378,7 +378,7 @@ public:
         return inst;
     }
 
-    void initialize(pybind11::module & topmod)
+    void initialize(pybind11::module * topmod)
     {
         if (!m_initialized)
         {
@@ -399,7 +399,7 @@ public:
     }
 
     template< typename WST, typename WCET, typename WSET >
-    ModuleInitializer & add_solver(pybind11::module & mod, const std::string & name, const std::string & desc)
+    ModuleInitializer & add_solver(pybind11::module * mod, const std::string & name, const std::string & desc)
     {
         using namespace spacetime::python; // NOLINT(google-build-using-namespace)
 

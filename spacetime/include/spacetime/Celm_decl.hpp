@@ -26,13 +26,14 @@ public:
 
     using selm_type = Selm;
 
+    // NOLINTNEXTLINE(google-runtime-references)
     Celm(Field & field, size_t index, bool odd_plane)
       : base_type(&field, field.grid().xptr_celm(index, odd_plane, Grid::CelmPK()))
     {}
 
     class const_ctor_passkey { const_ctor_passkey() = default; friend Field; };
 
-    Celm(Field & field, size_t index, bool odd_plane, const_ctor_passkey)
+    Celm(Field const & field, size_t index, bool odd_plane, const_ctor_passkey)
       : Celm(*const_cast<Field*>(&field), index, odd_plane)
         // TODO: fix the workaround for field constness.
     {}

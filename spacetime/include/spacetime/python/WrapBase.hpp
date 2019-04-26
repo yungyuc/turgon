@@ -49,7 +49,7 @@ public:
       , pybind11::class_< wrapped_type, wrapped_base_type, holder_type >
     >::type;
 
-    static wrapper_type & commit(pybind11::module & mod, const char * pyname, const char * clsdoc) {
+    static wrapper_type & commit(pybind11::module * mod, const char * pyname, const char * clsdoc) {
         static wrapper_type derived(mod, pyname, clsdoc);
         return derived;
     }
@@ -79,9 +79,11 @@ public:
 
 protected:
 
-    WrapBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
-      : m_cls(mod, pyname, clsdoc)
+    WrapBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
+      : m_cls(*mod, pyname, clsdoc)
     {}
+
+private:
 
     class_ m_cls;
 

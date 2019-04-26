@@ -24,7 +24,7 @@ public:
     ~Formatter() = default;
 
     template <typename T>
-    Formatter & operator << (T const & value) // NOLINT(fuchsia-overloaded-operator)
+    Formatter & operator << (T const & value)
     {
         m_stream << value;
         return *this;
@@ -39,7 +39,6 @@ public:
         to_str
     };
 
-    // NOLINTNEXTLINE(fuchsia-overloaded-operator)
     std::string operator >> (ConvertToString const &) { return m_stream.str(); }
 
 private:
