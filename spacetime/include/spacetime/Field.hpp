@@ -13,7 +13,7 @@ namespace spacetime
 {
 
 inline
-Field::Field(std::shared_ptr<Grid> const & grid, size_t nvar, Field::value_type time_increment)
+Field::Field(std::shared_ptr<Grid> const & grid, Field::value_type time_increment, size_t nvar)
   : m_grid(grid)
   , m_so0(array_type(std::vector<size_t>{grid->xsize(), nvar}))
   , m_so1(array_type(std::vector<size_t>{grid->xsize(), nvar}))

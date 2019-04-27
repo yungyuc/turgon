@@ -48,7 +48,9 @@ protected:
         return std::make_shared<ST>(std::forward<Args>(args) ..., ctor_passkey());
     }
 
-    std::shared_ptr<ST> clone_impl(bool grid)
+public:
+
+    std::shared_ptr<ST> clone(bool grid=false)
     {
         auto ret = std::make_shared<ST>(*reinterpret_cast<ST*>(this));
         if (grid)
@@ -59,10 +61,14 @@ protected:
         return ret;
     }
 
-public:
-
-    SolverBase(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
-      : m_field(grid, nvar, time_increment) {}
+    SolverBase(
+        std::shared_ptr<Grid> const & grid
+      , value_type time_increment
+      , size_t nvar
+      , ctor_passkey const &
+    )
+      : m_field(grid, time_increment, nvar)
+    {}
 
     SolverBase() = delete;
     SolverBase(SolverBase const & ) = default;
@@ -139,5 +145,16 @@ private:
 }; /* end class SolverBase */
 
 } /* end namespace spacetime */
+
+#define SPACETIME_DERIVED_SELM_BODY_DEFAULT \
+public: \
+    using base_type = Selm; \
+    using base_type::base_type; \
+    value_type xn(size_t iv) const; \
+    value_type xp(size_t iv) const; \
+    value_type tn(size_t iv) const; \
+    value_type tp(size_t iv) const; \
+    value_type so0p(size_t iv) const; \
+    value_type & update_cfl();
 
 /* vim: set et ts=4 sw=4: */
