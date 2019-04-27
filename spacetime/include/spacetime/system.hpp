@@ -16,7 +16,7 @@ class Formatter
 
 public:
 
-    Formatter() = default; // NOLINT(fuchsia-default-arguments)
+    Formatter() = default; // NOLINT(fuchsia-default-arguments) not sure why it's needed
     Formatter(Formatter const & ) = delete;
     Formatter(Formatter       &&) = delete;
     Formatter & operator = (Formatter const & ) = delete;
@@ -31,7 +31,7 @@ public:
     }
 
     std::string str() const       { return m_stream.str(); }
-    // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+    // NOLINTNEXTLINE(google-explicit-constructor)
     operator std::string () const { return m_stream.str(); }
 
     enum ConvertToString

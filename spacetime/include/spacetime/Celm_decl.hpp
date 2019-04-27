@@ -26,19 +26,24 @@ public:
 
     using selm_type = Selm;
 
-    // NOLINTNEXTLINE(google-runtime-references)
-    Celm(Field & field, size_t index, bool odd_plane)
-      : base_type(&field, field.grid().xptr_celm(index, odd_plane, Grid::CelmPK()))
+    Celm(Field * field, size_t index, bool odd_plane)
+      : base_type(field, field->grid().xptr_celm(index, odd_plane, Grid::CelmPK()))
     {}
 
     class const_ctor_passkey { const_ctor_passkey() = default; friend Field; };
 
-    Celm(Field const & field, size_t index, bool odd_plane, const_ctor_passkey)
-      : Celm(*const_cast<Field*>(&field), index, odd_plane)
-        // TODO: fix the workaround for field constness.
+    Celm(Field const * field, size_t index, bool odd_plane, const_ctor_passkey)
+        // The only intention of this workaround is to let const Field to
+        // create const object derived from CelmBase. Do not abuse.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+      : Celm(const_cast<Field*>(field), index, odd_plane)
     {}
 
-    sindex_type index() const;
+    sindex_type index() const
+    {
+        static_assert(0 == (Grid::BOUND_COUNT % 2), "only work with even BOUND_COUNT");
+        return (static_cast<sindex_type>(xindex() - 1) >> 1) - 1;
+    }
 
     /**
      * Return true for even plane, false for odd plane (temporal).
@@ -101,16 +106,6 @@ public:
     value_type calc_so1(size_t iv) const;
 
 }; /* end class CelmBase */
-
-/**
- * Celm index.
- */
-inline
-sindex_type Celm::index() const
-{
-    static_assert(0 == (Grid::BOUND_COUNT % 2), "only work with even BOUND_COUNT");
-    return (static_cast<sindex_type>(xindex() - 1) >> 1) - 1;
-}
 
 } /* end namespace spacetime */
 

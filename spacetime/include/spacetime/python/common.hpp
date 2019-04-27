@@ -5,7 +5,7 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "pybind11/pybind11.h" // NOLINT(llvm-include-order) must be first
+#include "pybind11/pybind11.h" // must be first
 #include "pybind11/operators.h"
 #include "pybind11/stl.h"
 #include "xtensor-python/pyarray.hpp"
@@ -183,32 +183,20 @@ public:
     {
         size_t ncelm = m_solver->grid().ncelm();
         if (m_odd_plane) { --ncelm; }
-        if (m_current < ncelm)
-        {
-            typename ST::celm_type ret = m_solver->celm(m_current, m_odd_plane);
-            ++m_current;
-            return ret; // NOLINT(readability-else-after-return)
-        }
-        else // NOLINT(readability-else-after-return)
-        {
-            throw pybind11::stop_iteration();
-        }
+        if (m_current >= ncelm) { throw pybind11::stop_iteration(); }
+        typename ST::celm_type ret = m_solver->celm(m_current, m_odd_plane);
+        ++m_current;
+        return ret;
     }
 
     typename ST::selm_type next_selm()
     {
         size_t nselm = m_solver->grid().nselm();
         if (m_odd_plane) { --nselm; }
-        if (m_current < nselm)
-        {
-            typename ST::selm_type ret = m_solver->selm(m_current, m_odd_plane);
-            ++m_current;
-            return ret; // NOLINT(readability-else-after-return)
-        }
-        else // NOLINT(readability-else-after-return)
-        {
-            throw pybind11::stop_iteration();
-        }
+        if (m_current >= nselm) { throw pybind11::stop_iteration(); }
+        typename ST::selm_type ret = m_solver->selm(m_current, m_odd_plane);
+        ++m_current;
+        return ret;
     }
 
     bool is_selm() const { return m_selm; }

@@ -52,6 +52,9 @@ public:
 
     std::shared_ptr<ST> clone(bool grid=false)
     {
+        /* The only purpose of this reinterpret_cast is to workaround for
+         * static polymorphism. */
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         auto ret = std::make_shared<ST>(*reinterpret_cast<ST*>(this));
         if (grid)
         {

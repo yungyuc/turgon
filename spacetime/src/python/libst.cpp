@@ -18,10 +18,11 @@ namespace
 
 PyObject * initialize_spacetime(pybind11::module * mod)
 {
-    using namespace spacetime::python; // NOLINT(google-build-using-namespace)
-    xt::import_numpy(); // or numpy c api segfault.
+    namespace spy = spacetime::python;
+    xt::import_numpy(); // otherwise numpy c api segfault.
     mod->doc() = "_libst: One-dimensional space-time CESE method code";
-    WrapGrid::commit(mod, "Grid", "Spatial grid");
+    spy::WrapGrid::commit(mod, "Grid", "Spatial grid data");
+    spy::WrapField::commit(mod, "Field", "Solution data");
     return mod->ptr();
 }
 
@@ -29,14 +30,14 @@ PyObject * initialize_spacetime(pybind11::module * mod)
 
 PYBIND11_MODULE(_libst, mod) // NOLINT
 {
-    using namespace spacetime::python; // NOLINT(google-build-using-namespace)
-    ModuleInitializer::get_instance()
+    namespace spy = spacetime::python;
+    spy::ModuleInitializer::get_instance()
         .add(initialize_spacetime)
-        .add_solver<WrapSolver, WrapCelm, WrapSelm>
+        .add_solver<spy::WrapSolver, spy::WrapCelm, spy::WrapSelm>
         (&mod, "", "no equation")
-        .add_solver<WrapLinearScalarSolver, WrapLinearScalarCelm, WrapLinearScalarSelm>
+        .add_solver<spy::WrapLinearScalarSolver, spy::WrapLinearScalarCelm, spy::WrapLinearScalarSelm>
         (&mod, "LinearScalar", "a linear scalar equation")
-        .add_solver<WrapInviscidBurgersSolver, WrapInviscidBurgersCelm, WrapInviscidBurgersSelm>
+        .add_solver<spy::WrapInviscidBurgersSolver, spy::WrapInviscidBurgersCelm, spy::WrapInviscidBurgersSelm>
         (&mod, "InviscidBurgers", "the inviscid Burgers equation")
         .initialize(&mod)
     ;

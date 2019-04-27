@@ -6,8 +6,6 @@ Checks: >
     hicpp-avoid-goto,hicpp-exception-baseclass,hicpp-multiway-paths-covered,
     hicpp-no-assembler,hicpp-signed-bitwise,
     -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-    -cppcoreguidelines-pro-type-reinterpret-cast,
-    -cppcoreguidelines-pro-type-const-cast,
     -google-readability-todo,
     -hicpp-signed-bitwise,
     -llvm-header-guard,
