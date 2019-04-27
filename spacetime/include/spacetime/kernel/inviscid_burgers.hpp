@@ -28,6 +28,25 @@ class InviscidBurgersSelm
     SPACETIME_DERIVED_SELM_BODY_DEFAULT
 }; /* end class FelmBase */
 
+using InviscidBurgersCelm = CelmBase<InviscidBurgersSelm>;
+
+class InviscidBurgersSolver
+  : public SolverBase<InviscidBurgersSolver, InviscidBurgersCelm, InviscidBurgersSelm>
+{
+
+public:
+
+    using base_type = SolverBase<InviscidBurgersSolver, InviscidBurgersCelm, InviscidBurgersSelm>;
+    using base_type::base_type;
+
+    static std::shared_ptr<InviscidBurgersSolver>
+    construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
+    {
+        return construct_impl(grid, time_increment, 1);
+    }
+
+}; /* end class InviscidBurgersSolver */
+
 /**
  * Flux for the negative branch on the x-plane. (Flux direction in forward t.)
  */
@@ -97,29 +116,6 @@ InviscidBurgersSelm::value_type & InviscidBurgersSelm::update_cfl()
     this->cfl() = std::fabs(so0(0)) * field().hdt() / hdx;
     return this->cfl();
 }
-
-using InviscidBurgersCelm = CelmBase<InviscidBurgersSelm>;
-
-class InviscidBurgersSolver
-  : public SolverBase<InviscidBurgersSolver, InviscidBurgersCelm, InviscidBurgersSelm>
-{
-
-public:
-
-    using base_type = SolverBase<InviscidBurgersSolver, InviscidBurgersCelm, InviscidBurgersSelm>;
-    using base_type::base_type;
-
-    static std::shared_ptr<InviscidBurgersSolver> construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
-    {
-        return construct_impl(grid, 1, time_increment);
-    }
-
-    std::shared_ptr<InviscidBurgersSolver> clone(bool grid=false)
-    {
-        return clone_impl(grid);
-    }
-
-}; /* end class InviscidBurgersSolver */
 
 } /* end namespace spacetime */
 

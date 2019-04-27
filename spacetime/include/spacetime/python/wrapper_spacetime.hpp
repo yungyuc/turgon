@@ -112,12 +112,10 @@ WrapSolver
         (*this)
             .def
             (
-                py::init
-                (
-                    [](std::shared_ptr<Grid> const & grid, size_t nvar, typename wrapped_type::value_type time_increment)
-                    { return wrapped_type::construct(grid, nvar, time_increment); }
-                )
-              , py::arg("grid"), py::arg("nvar"), py::arg("time_increment")
+                py::init(static_cast<std::shared_ptr<wrapped_type> (*) (
+                    std::shared_ptr<Grid> const &, typename wrapped_type::value_type, size_t
+                )>(&wrapped_type::construct))
+              , py::arg("grid"), py::arg("time_increment"), py::arg("nvar")
             )
         ;
     }

@@ -32,9 +32,9 @@ WrapInviscidBurgersSolver
         namespace py = pybind11;
         (*this)
             .def(
-                py::init([](std::shared_ptr<Grid> const & grid, typename wrapped_type::value_type time_increment) {
-                    return wrapped_type::construct(grid, time_increment);
-                })
+                py::init(static_cast<std::shared_ptr<wrapped_type> (*) (
+                    std::shared_ptr<Grid> const &, typename wrapped_type::value_type
+                )>(&wrapped_type::construct))
               , py::arg("grid"), py::arg("time_increment")
             )
         ;

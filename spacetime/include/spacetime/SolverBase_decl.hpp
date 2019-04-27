@@ -48,7 +48,9 @@ protected:
         return std::make_shared<ST>(std::forward<Args>(args) ..., ctor_passkey());
     }
 
-    std::shared_ptr<ST> clone_impl(bool grid)
+public:
+
+    std::shared_ptr<ST> clone(bool grid=false)
     {
         auto ret = std::make_shared<ST>(*reinterpret_cast<ST*>(this));
         if (grid)
@@ -59,10 +61,14 @@ protected:
         return ret;
     }
 
-public:
-
-    SolverBase(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment, ctor_passkey const &)
-      : m_field(grid, nvar, time_increment) {}
+    SolverBase(
+        std::shared_ptr<Grid> const & grid
+      , value_type time_increment
+      , size_t nvar
+      , ctor_passkey const &
+    )
+      : m_field(grid, time_increment, nvar)
+    {}
 
     SolverBase() = delete;
     SolverBase(SolverBase const & ) = default;

@@ -25,6 +25,25 @@ class LinearScalarSelm
     SPACETIME_DERIVED_SELM_BODY_DEFAULT
 }; /* end class LinearScalarSelm */
 
+using LinearScalarCelm = CelmBase<LinearScalarSelm>;
+
+class LinearScalarSolver
+  : public SolverBase<LinearScalarSolver, LinearScalarCelm, LinearScalarSelm>
+{
+
+public:
+
+    using base_type = SolverBase<LinearScalarSolver, LinearScalarCelm, LinearScalarSelm>;
+    using base_type::base_type;
+
+    static std::shared_ptr<LinearScalarSolver>
+    construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
+    {
+        return construct_impl(grid, time_increment, 1);
+    }
+
+}; /* end class LinearScalarSolver */
+
 inline
 LinearScalarSelm::value_type LinearScalarSelm::xn(size_t iv) const
 {
@@ -75,29 +94,6 @@ LinearScalarSelm::value_type & LinearScalarSelm::update_cfl()
     this->cfl() = field().hdt() / hdx;
     return this->cfl();
 }
-
-using LinearScalarCelm = CelmBase<LinearScalarSelm>;
-
-class LinearScalarSolver
-  : public SolverBase<LinearScalarSolver, LinearScalarCelm, LinearScalarSelm>
-{
-
-public:
-
-    using base_type = SolverBase<LinearScalarSolver, LinearScalarCelm, LinearScalarSelm>;
-    using base_type::base_type;
-
-    static std::shared_ptr<LinearScalarSolver> construct(std::shared_ptr<Grid> const & grid, value_type time_increment)
-    {
-        return construct_impl(grid, 1, time_increment);
-    }
-
-    std::shared_ptr<LinearScalarSolver> clone(bool grid=false)
-    {
-        return clone_impl(grid);
-    }
-
-}; /* end class LinearScalarSolver */
 
 } /* end namespace spacetime */
 

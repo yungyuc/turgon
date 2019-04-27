@@ -35,7 +35,7 @@ public:
     using value_type = Grid::value_type;
     using array_type = Grid::array_type;
 
-    Field(std::shared_ptr<Grid> const & grid, size_t nvar, value_type time_increment);
+    Field(std::shared_ptr<Grid> const & grid, value_type time_increment, size_t nvar);
 
     Field() = delete;
     Field(Field const & ) = default;
