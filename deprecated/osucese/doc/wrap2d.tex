@@ -1,0 +1,57 @@
+\documentclass[letterpaper,12pt,dvips]{article}
+\usepackage[textwidth=6.5in,textheight=9in]{geometry}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{vector}
+\usepackage{graphicx}     % From LaTeX distribution
+%\usepackage{subfigure}    % From CTAN/macros/latex/contrib/supported/subfigure
+\usepackage{pst-all}      % From PSTricks
+\usepackage{pst-poly}     % From pstricks/contrib/pst-poly
+\usepackage{multido}      % From PSTricks
+\usepackage[center,footnotesize]{caption}
+
+\numberwithin{equation}{section}
+
+\begin{document}
+
+\title{Pre-processor and Pre-Post-Processor for NASA 2D CESE code}
+\author{Yung-Yu Chen}
+\date{2008.12.2}
+
+\maketitle
+
+\tableofcontents
+%\listoffigures
+
+\hspace{.5cm}
+
+\section{NASA 2D CESE Code}
+
+\section{Pre/Pre-Post-Processing}
+
+MESHED version 0.0.1 (mercurial revision id: \verb+7e8ef5002a8b+).
+
+\begin{thebibliography}{99}
+\bibitem{b:chang95} Chang, S.-C. (1995), 
+``The Method of Space-Time Conservation Element and Solution Element -- 
+A New Approach for Solving the Navier-Stokes and Euler Equation.''
+Journal of Computational Physics 119(2): 295-324.
+\bibitem{b:chang02} Chang, S.-C. (2002, July),
+``Courant number insensitive ce/se schemes.'' AIAA Paper 2002-3890.
+\bibitem{b:chang03} Chang, S.-C. and Wang, X.-Y. (2003), 
+``Multi-dimensional courant number insensitive ce/se euler solvers for 
+applications involving highly nonuniform meshes,'' 
+AIAA Paper 2003-5285.
+\bibitem{b:chang05} Chang, S.-C., Wu, Y., Yang, V., and Wang, X.-Y., 
+``Local time-stepping procedures for the space-time conservation element 
+and solution element method,'' 
+International Journal of Computational Fluid Dynamics, 
+vol. 19, no. 5, pp. 359-380, July 2005.
+\bibitem{b:chang08} Chang, S.-C., not yet published script.
+\bibitem{b:Python} \url{http://www.python.org/}.
+\end{thebibliography}
+
+\end{document}
