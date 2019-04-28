@@ -5,7 +5,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{color}
-\usepackage{vector}
+%\usepackage{vector}
 \usepackage{graphicx}     % From LaTeX distribution
 %\usepackage{subfigure}    % From CTAN/macros/latex/contrib/supported/subfigure
 \usepackage{pst-all}      % From PSTricks
@@ -14,6 +14,8 @@
 \usepackage[center,footnotesize]{caption}
 
 \graphicspath{{../result_simple/}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
 
 \numberwithin{equation}{section}
 
