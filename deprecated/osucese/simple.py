@@ -10,6 +10,9 @@ is implemented.
 import sys
 log = sys.stdout.write
 
+import matplotlib
+matplotlib.use('TkAgg')
+
 def draw(x, val, anap, idx, 
         color, theylabel, thetitle="", thexlabel=""):
     """
@@ -74,21 +77,21 @@ def initialize(solver, gamma, r1, v1, p1, r2, v2, p2, nx, xratio):
     # initialize.
     dx2 = 1.0/(nx-1)
     dx  = dx2*2
-    nx1 = (nx-1)/2 + 1
-    nx2 = (nx-1)/2
+    nx1 = (nx-1)//2 + 1
+    nx2 = (nx-1)//2
     x[ ::2] = arange(nx1, dtype=float)*dx - 0.5
     x[1::2] = arange(nx2, dtype=float)*dx + dx2 - 0.5
     L = (x[-1]-x[0])/2
-    n = nx/2/2
+    n = nx//2//2
     if xratio != 1.0:
         dx = (xratio-1)/(xratio**n-1)*L
     else:
         dx = L/n
     for i in range(n):
-        x[nx/2+2*(i+1)] =  x[nx/2+2*i] + xratio**i*dx
-        x[nx/2+2*i+1  ] = (x[nx/2+2*i] + x[nx/2+2*(i+1)]) / 2
-        x[nx/2-2*(i+1)] = -x[nx/2+2*(i+1)]
-        x[nx/2-2*i-1  ] = -x[nx/2+2*i+1  ]
+        x[nx//2+2*(i+1)] =  x[nx//2+2*i] + xratio**i*dx
+        x[nx//2+2*i+1  ] = (x[nx//2+2*i] + x[nx//2+2*(i+1)]) / 2
+        x[nx//2-2*(i+1)] = -x[nx//2+2*(i+1)]
+        x[nx//2-2*i-1  ] = -x[nx//2+2*i+1  ]
     u[0,:nx1] = r1
     u[0,nx1:] = r2
     u[1,:nx1] = r1*v1
@@ -152,14 +155,14 @@ def simulate(nx, xratio, dt, nstep, solver, casename=None):
     log("Final time           = %g seconds.\n" % (nstep*dt))
     log("Spatial mesh ratio   = %f .\n" % xratio)
     log("Maximum mesh ratio   = %f .\n" % ((cese.x[-1]-cese.x[-2]) / \
-        (cese.x[len(cese.x)/2+1]-cese.x[len(cese.x)/2])))
+        (cese.x[len(cese.x)//2+1]-cese.x[len(cese.x)//2])))
 
     ################################################################
     # Time marching.
     ################################################################
     istep = 0
     aCFL  = 0.0
-    pstep = 5000/(nx/200 or 1)
+    pstep = 5000//(nx//200 or 1)
     while istep < nstep:
         if istep > 0 and istep%(pstep*60) == 0:
             log(" %d\n"%istep)
@@ -186,7 +189,7 @@ def simulate(nx, xratio, dt, nstep, solver, casename=None):
     ################################################################
     # Analytic solution.
     ################################################################
-    xshift = cese.x[len(cese.x)/2+1] - cese.x[len(cese.x)/2]
+    xshift = cese.x[len(cese.x)//2+1] - cese.x[len(cese.x)//2]
     anap = AnaShockTube(gamma, (0.5, r2, p2, v2), (-0.5, r1, p1, v1), 
         xshift=xshift)
     anap.calculate(istep*dt)

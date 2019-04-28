@@ -21,7 +21,7 @@ class AnaShockTube(object):
         (position, density, pressure, speed) in the expansion wave between 
         region 3 and 4.
     """
-    def __init__(self, gamma, (x1, r1, p1, u1), (x4, r4, p4, u4), 
+    def __init__(self, gamma, v1, v4,
             xshift=0.0, nx=101):
         """
         @param gamma: Ratio of specific heat.
@@ -41,6 +41,8 @@ class AnaShockTube(object):
         self.gamma = gamma
         self.vn = zeros((4,4), dtype=float)  # xn, rn, pn, un
         self.ve = zeros((4,nx), dtype=float) # xe, re, pe, ue
+        x1, r1, p1, u1 = v1
+        x4, r4, p4, u4 = v4
         self.vn[0] = x1, r1, p1, u1
         self.vn[3] = x4, r4, p4, u4
         self.xshift = xshift
