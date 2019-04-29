@@ -1,104 +1,8 @@
 
-@inproceedings{chang_multi-dimensional_2003,
-	address = {Huntsville, Alabama},
-	title = {Multi-{Dimensional} {Courant} {Number} {Insensitive} {CE}/{SE} {Euler} {Solvers} for {Applications} {Involving} {Highly} {Nonuniform} {Meshes}},
-	shorttitle = {{AIAA} {Paper} 2003-5285},
-	booktitle = {39th {AIAA}/{ASME}/{SAE}/{ASEE} {Joint} {Propulsion} {Conference} and {Exhibit}},
-	author = {Chang, Sin-Chung and Wang, Xiao-Yen},
-	month = jul,
-	year = {2003},
-	keywords = {cese, cfd, multi-dimension},
-	file = {chang_03_multidimensional.pdf:/Users/yungyuc/Zotero/storage/R4AUQIGK/chang_03_multidimensional.pdf:application/pdf}
-}
-
-@inproceedings{chang_courant_2002,
-	address = {Indianapolis, Indiana},
-	title = {Courant {Number} {Insensitive} {CE}/{SE} {Schemes}},
-	shorttitle = {{AIAA} {Paper} 2002-3890},
-	booktitle = {38th {AIAA}/{ASME}/{SAE}/{ASEE} {Joint} {Propulsion} {Conference} and {Exhibit}},
+@unpublished{chang_not_2008,
+	title = {Not yet published manuscript},
 	author = {Chang, Sin-Chung},
-	month = jul,
-	year = {2002},
-	keywords = {cese, cfd},
-	file = {chang_02_courant.pdf:/Users/yungyuc/Zotero/storage/QUXXTFVT/chang_02_courant.pdf:application/pdf}
-}
-
-@article{wang_2d_1999,
-	title = {A 2D {Non}-{Splitting} {Unstructured} {Triangular} {Mesh} {Euler} {Solver} {Based} on the {Space}-{Time} {Conservation} {Element} and {Solution} {Element} {Method}},
-	volume = {8},
-	number = {2},
-	journal = {Computational Fluid Dynamics JOURNAL},
-	author = {Wang, Xiao-Yen and Chang, Sin-Chung},
-	year = {1999},
-	keywords = {cese, cfd},
-	pages = {309--325},
-	file = {wang_99_2d.pdf:/Users/yungyuc/Zotero/storage/KC8Z955B/wang_99_2d.pdf:application/pdf}
-}
-
-@article{chang_method_1995,
-	title = {The {Method} of {Space}-{Time} {Conservation} {Element} and {Solution} {Element} -- {A} {New} {Approach} for {Solving} the {Navier}-{Stokes} and {Euler} {Equations}},
-	volume = {119},
-	issn = {0021-9991},
-	doi = {10.1006/jcph.1995.1137},
-	abstract = {A new numerical framework for solving conservation laws is being developed. This new framework differs substantially in both concept and methodology from the well-established methods, i.e., finite difference, finite volume, finite element, and spectral methods. It is conceptually simple and designed to overcome several key limitations of the above traditional methods. A two-level scheme for solving the convection-diffusion equation [not partial differential]u/[not partial differential]t + a [not partial differential]u/[not partial differential]x - [mu] [not partial differential]2u/[not partial differential]x2 = 0 ([mu] {\textgreater}= 0) is constructed and used to illuminate major differences between the present method and those mentioned above. This explicit scheme, referred to as the a-[mu] scheme, has two independent marching variables unj and (ux)nj which are the numerical analogues of u and [not partial differential]u/[not partial differential]x at (j, n), respectively. The a-[mu] scheme has the unusual property that its stability is limited only by the CFL condition, i.e., it is independent of [mu]. Also it can be shown that the amplification factors of the a -[mu] scheme are identical to those of the Leapfrog scheme if [mu] = O, and to those of the DuFort-Frankel scheme if a = O. These coincidences are unexpected because the a-[mu] scheme and the above classical schemes are derived from completely different perspectives, and the a -[mu] scheme does not reduce to the above classical schemes in the limiting cases. The a-[mu] scheme is extended to solve the 1D time-dependent Navier-Stokes equations of a perfect gas. Stability of this explicit solver also is limited only by the CFL condition. In spite of the fact that it does not use (i) any techniques related to the high-resolution upwind methods, and (ii) any ad hoc parameter, the current Navier-Stokes solver is capable of generating highly accurate shock tube solutions. Particularly, for high-Reynolds-number flows, shock discontinuities can be resolved within one mesh interval. The inviscid ([mu] = 0) a-[mu] scheme is reversible in time. It also is neutrally stable, i.e., free from numerical dissipation. Such a scheme generally cannot be extended to solve the Euler equations. Thus, the inviscid version is modified. Stability of this modified scheme, referred to as the a-[var epsilon] scheme, is limited by the CFL condition and 0 {\textless}= [var epsilon] {\textless}= 1, where [var epsilon] is a special parameter that controls numerical dissipation. Moreover, if [var epsilon] = 0, the amplification factors of the a-[var epsilon] scheme are identical to those of the Leapfrog scheme, which has no numerical dissipation. On the other hand, if [var epsilon] = 1, the two amplification factors of the a-[var epsilon] scheme become the same function of the Courant number and the phase angle. Unexpectedly, this function also is the amplification factor of the highly diffusive Lax scheme. Note that, because the Lax scheme is very diffusive and it uses a mesh that is staggered in time, a two-level scheme using such a mesh is often associated with a highly diffusive scheme. The a-[var epsilon] scheme, which also uses a mesh staggering in time, demonstrates that it can also be a scheme with no numerical dissipation. The Euler extension of the a -[var epsilon] scheme has stability conditions similar to those of the a -epsiv; scheme itself. It has the unusual property that numerical dissipation at all mesh points can be controlled by a set of local parameters, Moreover, it is capable of generating accurate shock tube solutions with the CFL number ranging from close to 1 to 0.022},
-	number = {2},
-	urldate = {2008-12-13},
-	journal = {Journal of Computational Physics},
-	author = {Chang, Sin-Chung},
-	month = jul,
-	year = {1995},
-	keywords = {cese},
-	pages = {295--324},
-	file = {chang95.pdf:/Users/yungyuc/Zotero/storage/3QDY9AIY/chang95.pdf:application/pdf}
-}
-
-@article{mavriplis_unstructured_1997,
-	title = {Unstructured {Grid} {Techniques}},
-	volume = {29},
-	copyright = {Copyright © 1997 by Annual Reviews Inc. All rights reserved},
-	url = {http://arjournals.annualreviews.org/doi/abs/10.1146/annurev.fluid.29.1.473?prevSearch=%5Bauthor%3A+Mavriplis%2C+D.+J.%5D&searchHistoryKey=},
-	doi = {10.1146/annurev.fluid.29.1.473},
-	abstract = {An overview of the current state of the art in unstructured mesh techniques for computational fluid dynamics is given. The topics of mesh generation and adaptation, spatial discretization, and solution techniques for steady flows are covered. Remaining difficulties in these areas are highlighted, and directions for future work are outlined.},
-	urldate = {2008-12-19},
-	journal = {Annual Review of Fluid Mechanics},
-	author = {Mavriplis, D. J.},
-	month = jan,
-	year = {1997},
-	keywords = {computational; fluid; Navier-Stokes; aerodynamic; mesh; multigrid},
-	file = {Mavriplis - 1997 - Unstructured Grid Techniques.pdf:/Users/yungyuc/Zotero/storage/6LDRJTM2/Mavriplis - 1997 - Unstructured Grid Techniques.pdf:application/pdf}
-}
-
-@book{berg_computational_2010,
-	edition = {Softcover reprint of hardcover 3rd ed. 2008},
-	title = {Computational {Geometry}: {Algorithms} and {Applications}},
-	isbn = {3-642-09681-6},
-	shorttitle = {Computational {Geometry}},
-	publisher = {Springer},
-	author = {Berg, Mark de and Cheong, Otfried and Kreveld, Marc van and Overmars, Mark},
-	month = nov,
-	year = {2010},
-	file = {Berg - Computational Geometry--Algorithms & Applications (3rd Ed).pdf:/Users/yungyuc/Zotero/storage/GJFD6CUA/Berg - Computational Geometry--Algorithms & Applications (3rd Ed).pdf:application/pdf}
-}
-
-@phdthesis{chen_multi-physics_2011,
-	title = {A {Multi}-{Physics} {Software} {Framework} on {Hybrid} {Parallel} {Computing} for {High}-{Fidelity} {Solutions} of {Conservation} {Laws}},
-	url = {https://etd.ohiolink.edu/pg_10?0::NO:10:P10_ETD_SUBID:74766},
-	language = {en},
-	urldate = {2018-03-20},
-	school = {The Ohio State University},
-	author = {Chen, Yung-Yu},
-	year = {2011},
-	file = {Chen - 2011 - A Multi-Physics Software Framework on Hybrid Paral.pdf:/Users/yungyuc/Zotero/storage/XQ6R3IPS/Chen - 2011 - A Multi-Physics Software Framework on Hybrid Paral.pdf:application/pdf}
-}
-
-@book{lax_hyperbolic_1973,
-	title = {Hyperbolic {Systems} of {Conservation} {Laws} and the {Mathematical} {Theory} of {Shock} {Waves}},
-	isbn = {0-89871-177-0},
-	url = {http://epubs.siam.org/doi/book/10.1137/1.9781611970562},
-	publisher = {Society for Industrial and Applied Mathematics},
-	author = {Lax, Peter D.},
-	year = {1973},
-	file = {Lax, Peter D. - Hyperbolic Systems of Conservation Laws and the Mathematical Theory of Shock Waves.pdf:/Users/yungyuc/Zotero/storage/9A4RNGX9/Lax, Peter D. - Hyperbolic Systems of Conservation Laws and the Mathematical Theory of Shock Waves.pdf:application/pdf}
+	year = {2008}
 }
 
 @article{chang_local_2005,
@@ -119,8 +23,117 @@
 	file = {Chang et al. - 2005 - Local time-stepping procedures for the space-time.pdf:/Users/yungyuc/Zotero/storage/VLIQGCVR/Chang et al. - 2005 - Local time-stepping procedures for the space-time .pdf:application/pdf}
 }
 
-@unpublished{chang_not_2008,
-	title = {Not yet published manuscript},
+@book{lax_hyperbolic_1973,
+	title = {Hyperbolic {Systems} of {Conservation} {Laws} and the {Mathematical} {Theory} of {Shock} {Waves}},
+	isbn = {0-89871-177-0},
+	url = {http://epubs.siam.org/doi/book/10.1137/1.9781611970562},
+	publisher = {Society for Industrial and Applied Mathematics},
+	author = {Lax, Peter D.},
+	year = {1973},
+	file = {Lax, Peter D. - Hyperbolic Systems of Conservation Laws and the Mathematical Theory of Shock Waves.pdf:/Users/yungyuc/Zotero/storage/9A4RNGX9/Lax, Peter D. - Hyperbolic Systems of Conservation Laws and the Mathematical Theory of Shock Waves.pdf:application/pdf}
+}
+
+@phdthesis{chen_multi-physics_2011,
+	title = {A {Multi}-{Physics} {Software} {Framework} on {Hybrid} {Parallel} {Computing} for {High}-{Fidelity} {Solutions} of {Conservation} {Laws}},
+	url = {https://etd.ohiolink.edu/pg_10?0::NO:10:P10_ETD_SUBID:74766},
+	language = {en},
+	urldate = {2018-03-20},
+	school = {The Ohio State University},
+	author = {Chen, Yung-Yu},
+	year = {2011},
+	file = {Chen - 2011 - A Multi-Physics Software Framework on Hybrid Paral.pdf:/Users/yungyuc/Zotero/storage/XQ6R3IPS/Chen - 2011 - A Multi-Physics Software Framework on Hybrid Paral.pdf:application/pdf}
+}
+
+@book{berg_computational_2010,
+	edition = {Softcover reprint of hardcover 3rd ed. 2008},
+	title = {Computational {Geometry}: {Algorithms} and {Applications}},
+	isbn = {3-642-09681-6},
+	shorttitle = {Computational {Geometry}},
+	publisher = {Springer},
+	author = {Berg, Mark de and Cheong, Otfried and Kreveld, Marc van and Overmars, Mark},
+	month = nov,
+	year = {2010},
+	file = {Berg - Computational Geometry--Algorithms & Applications (3rd Ed).pdf:/Users/yungyuc/Zotero/storage/GJFD6CUA/Berg - Computational Geometry--Algorithms & Applications (3rd Ed).pdf:application/pdf}
+}
+
+@article{mavriplis_unstructured_1997,
+	title = {Unstructured {Grid} {Techniques}},
+	volume = {29},
+	copyright = {Copyright © 1997 by Annual Reviews Inc. All rights reserved},
+	url = {http://arjournals.annualreviews.org/doi/abs/10.1146/annurev.fluid.29.1.473?prevSearch=%5Bauthor%3A+Mavriplis%2C+D.+J.%5D&searchHistoryKey=},
+	doi = {10.1146/annurev.fluid.29.1.473},
+	abstract = {An overview of the current state of the art in unstructured mesh techniques for computational fluid dynamics is given. The topics of mesh generation and adaptation, spatial discretization, and solution techniques for steady flows are covered. Remaining difficulties in these areas are highlighted, and directions for future work are outlined.},
+	urldate = {2008-12-19},
+	journal = {Annual Review of Fluid Mechanics},
+	author = {Mavriplis, D. J.},
+	month = jan,
+	year = {1997},
+	keywords = {computational; fluid; Navier-Stokes; aerodynamic; mesh; multigrid},
+	file = {Mavriplis - 1997 - Unstructured Grid Techniques.pdf:/Users/yungyuc/Zotero/storage/6LDRJTM2/Mavriplis - 1997 - Unstructured Grid Techniques.pdf:application/pdf}
+}
+
+@inproceedings{chang_courant_2002,
+	address = {Indianapolis, Indiana},
+	title = {Courant {Number} {Insensitive} {CE}/{SE} {Schemes}},
+	shorttitle = {{AIAA} {Paper} 2002-3890},
+	booktitle = {38th {AIAA}/{ASME}/{SAE}/{ASEE} {Joint} {Propulsion} {Conference} and {Exhibit}},
 	author = {Chang, Sin-Chung},
-	year = {2008}
+	month = jul,
+	year = {2002},
+	keywords = {cfd, cese},
+	file = {chang_02_courant.pdf:/Users/yungyuc/Zotero/storage/QUXXTFVT/chang_02_courant.pdf:application/pdf}
+}
+
+@inproceedings{chang_multi-dimensional_2003,
+	address = {Huntsville, Alabama},
+	title = {Multi-{Dimensional} {Courant} {Number} {Insensitive} {CE}/{SE} {Euler} {Solvers} for {Applications} {Involving} {Highly} {Nonuniform} {Meshes}},
+	shorttitle = {{AIAA} {Paper} 2003-5285},
+	booktitle = {39th {AIAA}/{ASME}/{SAE}/{ASEE} {Joint} {Propulsion} {Conference} and {Exhibit}},
+	author = {Chang, Sin-Chung and Wang, Xiao-Yen},
+	month = jul,
+	year = {2003},
+	keywords = {cfd, cese, multi-dimension},
+	file = {chang_03_multidimensional.pdf:/Users/yungyuc/Zotero/storage/R4AUQIGK/chang_03_multidimensional.pdf:application/pdf}
+}
+
+@article{chang_method_1995,
+	title = {The {Method} of {Space}-{Time} {Conservation} {Element} and {Solution} {Element} -- {A} {New} {Approach} for {Solving} the {Navier}-{Stokes} and {Euler} {Equations}},
+	volume = {119},
+	issn = {0021-9991},
+	doi = {10.1006/jcph.1995.1137},
+	abstract = {A new numerical framework for solving conservation laws is being developed. This new framework differs substantially in both concept and methodology from the well-established methods, i.e., finite difference, finite volume, finite element, and spectral methods. It is conceptually simple and designed to overcome several key limitations of the above traditional methods. A two-level scheme for solving the convection-diffusion equation [not partial differential]u/[not partial differential]t + a [not partial differential]u/[not partial differential]x - [mu] [not partial differential]2u/[not partial differential]x2 = 0 ([mu] {\textgreater}= 0) is constructed and used to illuminate major differences between the present method and those mentioned above. This explicit scheme, referred to as the a-[mu] scheme, has two independent marching variables unj and (ux)nj which are the numerical analogues of u and [not partial differential]u/[not partial differential]x at (j, n), respectively. The a-[mu] scheme has the unusual property that its stability is limited only by the CFL condition, i.e., it is independent of [mu]. Also it can be shown that the amplification factors of the a -[mu] scheme are identical to those of the Leapfrog scheme if [mu] = O, and to those of the DuFort-Frankel scheme if a = O. These coincidences are unexpected because the a-[mu] scheme and the above classical schemes are derived from completely different perspectives, and the a -[mu] scheme does not reduce to the above classical schemes in the limiting cases. The a-[mu] scheme is extended to solve the 1D time-dependent Navier-Stokes equations of a perfect gas. Stability of this explicit solver also is limited only by the CFL condition. In spite of the fact that it does not use (i) any techniques related to the high-resolution upwind methods, and (ii) any ad hoc parameter, the current Navier-Stokes solver is capable of generating highly accurate shock tube solutions. Particularly, for high-Reynolds-number flows, shock discontinuities can be resolved within one mesh interval. The inviscid ([mu] = 0) a-[mu] scheme is reversible in time. It also is neutrally stable, i.e., free from numerical dissipation. Such a scheme generally cannot be extended to solve the Euler equations. Thus, the inviscid version is modified. Stability of this modified scheme, referred to as the a-[var epsilon] scheme, is limited by the CFL condition and 0 {\textless}= [var epsilon] {\textless}= 1, where [var epsilon] is a special parameter that controls numerical dissipation. Moreover, if [var epsilon] = 0, the amplification factors of the a-[var epsilon] scheme are identical to those of the Leapfrog scheme, which has no numerical dissipation. On the other hand, if [var epsilon] = 1, the two amplification factors of the a-[var epsilon] scheme become the same function of the Courant number and the phase angle. Unexpectedly, this function also is the amplification factor of the highly diffusive Lax scheme. Note that, because the Lax scheme is very diffusive and it uses a mesh that is staggered in time, a two-level scheme using such a mesh is often associated with a highly diffusive scheme. The a-[var epsilon] scheme, which also uses a mesh staggering in time, demonstrates that it can also be a scheme with no numerical dissipation. The Euler extension of the a -[var epsilon] scheme has stability conditions similar to those of the a -epsiv; scheme itself. It has the unusual property that numerical dissipation at all mesh points can be controlled by a set of local parameters, Moreover, it is capable of generating accurate shock tube solutions with the CFL number ranging from close to 1 to 0.022},
+	number = {2},
+	urldate = {2008-12-13},
+	journal = {Journal of Computational Physics},
+	author = {Chang, Sin-Chung},
+	month = jul,
+	year = {1995},
+	keywords = {cese},
+	pages = {295--324},
+	file = {chang95.pdf:/Users/yungyuc/Zotero/storage/3QDY9AIY/chang95.pdf:application/pdf}
+}
+
+@article{wang_2d_1999,
+	title = {A 2D {Non}-{Splitting} {Unstructured} {Triangular} {Mesh} {Euler} {Solver} {Based} on the {Space}-{Time} {Conservation} {Element} and {Solution} {Element} {Method}},
+	volume = {8},
+	number = {2},
+	journal = {Computational Fluid Dynamics JOURNAL},
+	author = {Wang, Xiao-Yen and Chang, Sin-Chung},
+	year = {1999},
+	keywords = {cfd, cese},
+	pages = {309--325},
+	file = {wang_99_2d.pdf:/Users/yungyuc/Zotero/storage/KC8Z955B/wang_99_2d.pdf:application/pdf}
+}
+
+@techreport{chang_new_1991,
+	title = {A new numerical framework for solving conservation laws: {The} method of space-time conservation element and solution element},
+	shorttitle = {A new numerical framework for solving conservation laws},
+	url = {http://ntrs.nasa.gov/search.jsp?R=15822&id=8&as=false&or=false&qs=Ntt%3DA%2Bnew%2Bnumerical%2Bframework%2Bfor%2Bsolving%2Bconservation%2Blaws%253a%2BThe%2Bmethod%2Bof%2Bspace-time%2Bconservation%2Belement%2Band%2Bsolution%2Belement%26Ntk%3Dall%26Ntx%3Dmode%2Bmatchall%26Ns%3DHarvestDate%257c1%26N%3D0},
+	abstract = {A new numerical framework for solving conservation laws is being developed. It employs: (1) a nontraditional formulation of the conservation laws in which space and time are treated on the same footing, and (2) a nontraditional use of discrete variables such as numerical marching can be carried out by using a set of relations that represents both local and global flux conservation.},
+	number = {E-6403; NAS 1.15:104495; NASA-TM-104495},
+	author = {Chang, Sin-Chung and To, Wai-Ming},
+	month = aug,
+	year = {1991},
+	pages = {115},
+	file = {TM104495.pdf:/Users/yungyuc/Zotero/storage/2W4NGLVB/TM104495.pdf:application/pdf}
 }
