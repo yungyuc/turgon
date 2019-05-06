@@ -15,6 +15,9 @@
 namespace spacetime
 {
 
+/* FIXME: The naming of Celm and CelmBase is confusing: Celm is the base class
+ * of CelmBase. */
+
 /**
  * A compound conservation celm.
  */
@@ -75,6 +78,7 @@ public:
 
     value_type calc_so0(size_t /*iv*/) const { return 0.0; }
     value_type calc_so1(size_t /*iv*/) const { return 0.0; }
+    template<size_t ALPHA> value_type calc_so1_alpha(size_t /*iv*/) const { return 0.0; }
 
 }; /* end class Celm */
 
@@ -103,7 +107,8 @@ public:
     SE       selm_tp()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
 
     value_type calc_so0(size_t iv) const;
-    value_type calc_so1(size_t iv) const;
+    value_type calc_so1(size_t iv) const { return calc_so1_alpha<2>(iv); }
+    template<size_t ALPHA> value_type calc_so1_alpha(size_t iv) const;
 
 }; /* end class CelmBase */
 

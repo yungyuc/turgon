@@ -279,8 +279,43 @@ are the Taylor expansion to $t^{n+\frac{1}{2}}$ with respect to
 $\mathrm{SE}(j\pm\frac{1}{2}, n)$.  Equations (\ref{e:formula:u}) and
 (\ref{e:formula:ux:c}) together form the $c$-scheme.
 
-\section{Weighting Function}
-\label{s:cese:wei}
+A weighting function should be introduced to treat discontinuity in space.
+Equations (\ref{e:formula:u}) and (\ref{e:formula:ux:c}) are called the
+$c$-scheme because Eq.~(\ref{e:formula:ux:c}) uses central-differencing to
+approximate $(u_x)_j^{n+\frac{1}{2}}$.  It is second-order accurate but doesn't
+give correct result when the solution variable $u$ is discontinuous between
+$x_{j-\frac{1}{2}}$ and $x_{j+\frac{1}{2}}$.  To define the weighting function,
+let
+\begin{align*}
+  (u_{x\pm})_j^{n+\frac{1}{2}} \defeq
+    \pm\frac{
+      (u')_{j\pm\frac{1}{2}}^n - u_j^{n+\frac{1}{2}}
+    }{\Delta x_j^{\pm}}
+\end{align*}
+be the spatial differences in the two intervals $[x_j, x_{j+\frac{1}{2}}]$ and
+$[x_{j-\frac{1}{2}}, x_j]$, respectively.  The weighted average of the spatial
+difference can then be calculated with
+\begin{align*}
+  (u_x^w)_j^{n+\frac{1}{2}} =
+  W\left(
+    (u_{x-})_j^{n+\frac{1}{2}}, (u_{x+})_j^{n+\frac{1}{2}}
+  \right)
+\end{align*}
+where $W$ is the weighting function.  When there is discontinuity in $u$
+between $x_{j-\frac{1}{2}}$ and $x_{j+\frac{1}{2}}$, the weighting function
+should detect it and approximate the spatial differencing properly.  A choice
+of the weighting function is
+\begin{align}
+  W_{\alpha} =
+    \frac{|u_{x+}|^{\alpha}u_{x-} + |u_{x-}|^{\alpha}u_{x+}}
+         {|u_{x-}|^{\alpha} + |u_{x+}|^{\alpha}},
+  \label{e:formula:wa}
+\end{align}
+where $\alpha \in \mathbb{R}$ is a constant parameter and $|u_{x-}|^{\alpha} +
+|u_{x+}|^{\alpha} > 0$.  $\alpha$ is often picked as a positive integer, e.g.,
+2, for saving computation cycles.  For non-linear equations or discontinuous
+initial conditions, a weighting function, e.g., Eq.~(\ref{e:formula:wa}), is
+necessary to keep the solution from diverging.
 
 \section{CFL Insensitive Scheme}
 \label{s:cese:ctau}

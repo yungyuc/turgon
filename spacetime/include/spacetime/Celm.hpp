@@ -7,6 +7,8 @@
 
 #include "spacetime/Celm_decl.hpp"
 
+#include "spacetime/math.hpp"
+
 namespace spacetime
 {
 
@@ -37,8 +39,9 @@ typename CelmBase<SE>::value_type CelmBase<SE>::calc_so0(size_t iv) const
 }
 
 template< typename SE >
+template< size_t ALPHA >
 inline
-typename CelmBase<SE>::value_type CelmBase<SE>::calc_so1(size_t iv) const
+typename CelmBase<SE>::value_type CelmBase<SE>::calc_so1_alpha(size_t iv) const
 {
     // Fetch value.
     const SE se_xn = selm_xn();
@@ -46,11 +49,11 @@ typename CelmBase<SE>::value_type CelmBase<SE>::calc_so1(size_t iv) const
     const value_type upn = se_xn.so0p(iv); // u' at left SE
     const value_type upp = se_xp.so0p(iv); // u' at right SE
     const value_type utp = selm_tp().so0(iv); // u at top SE
-    // alpha-scheme. (alpha = 2)
+    // alpha-scheme.
     const value_type duxn = (utp - upn) / se_xn.dxpos();
     const value_type duxp = (upp - utp) / se_xp.dxneg();
-    const value_type fan = duxn*duxn;
-    const value_type fap = duxp*duxp;
+    const value_type fan = pow<ALPHA>(std::fabs(duxn));
+    const value_type fap = pow<ALPHA>(std::fabs(duxp));
     constexpr value_type tiny = std::numeric_limits<value_type>::min();
     return (fap*duxn + fan*duxp) / (fap + fan + tiny);
 }

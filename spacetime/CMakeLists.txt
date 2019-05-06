@@ -64,6 +64,7 @@ set(SPACETIME_HEADERS
     include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
+    include/spacetime/math.hpp
     # Physical kernels.
     include/spacetime/kernel/linear_scalar.hpp
     include/spacetime/kernel/inviscid_burgers.hpp

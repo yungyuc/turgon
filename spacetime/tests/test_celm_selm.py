@@ -122,6 +122,15 @@ class CelmTC(unittest.TestCase):
         self.assertEqual(0, self.ce0.selm_tn.index)
         self.assertTrue(self.ce0.selm_tn.on_odd_plane)
 
+    def test_calc_so(self):
+
+        self.assertEqual(0, self.ce0.calc_so0(0))
+        self.assertEqual(0, self.ce0.calc_so1_alpha0(0))
+        self.assertEqual(0, self.ce0.calc_so1_alpha1(0))
+        self.assertEqual(0, self.ce0.calc_so1_alpha2(0))
+        with self.assertRaises(AttributeError):
+            self.ce0.calc_so1_alpha3
+
 
 class SelmTC(unittest.TestCase):
 

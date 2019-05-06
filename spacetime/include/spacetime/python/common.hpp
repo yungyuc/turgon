@@ -107,12 +107,29 @@ protected:
       : base_type(mod, pyname, clsdoc)
     {
         using se_getter_type = typename wrapped_type::selm_type (wrapped_type::*)();
+        using calc_so_type = typename wrapped_type::value_type (wrapped_type::*)(size_t) const;
+#define DECL_ST_WRAP_CALC_SO1_ALPHA(ALPHA) \
+            .def \
+            ( \
+                "calc_so1_alpha" #ALPHA, \
+                [](wrapped_type const & self, size_t iv) \
+                { \
+                    return self.template calc_so1_alpha<ALPHA>(iv); \
+                } \
+            )
+
         (*this)
             .def_property_readonly("selm_xn", static_cast<se_getter_type>(&wrapped_type::selm_xn))
             .def_property_readonly("selm_xp", static_cast<se_getter_type>(&wrapped_type::selm_xp))
             .def_property_readonly("selm_tn", static_cast<se_getter_type>(&wrapped_type::selm_tn))
             .def_property_readonly("selm_tp", static_cast<se_getter_type>(&wrapped_type::selm_tp))
+            .def("calc_so0", static_cast<calc_so_type>(&wrapped_type::calc_so0))
+            DECL_ST_WRAP_CALC_SO1_ALPHA(0)
+            DECL_ST_WRAP_CALC_SO1_ALPHA(1)
+            DECL_ST_WRAP_CALC_SO1_ALPHA(2)
         ;
+
+#undef DECL_ST_WRAP_CALC_SO1_ALPHA
     }
 
 }; /* end class WrapCelmBase */
