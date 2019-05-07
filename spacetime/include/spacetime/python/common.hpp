@@ -309,6 +309,30 @@ protected:
         { self.set_ ## NAME(iv, arr, odd_plane); } \
       , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
     )
+#define DECL_ST_WRAP_MARCH_ALPHA(ALPHA) \
+    .def \
+    ( \
+        "march_half_so1_alpha"#ALPHA \
+      , [](wrapped_type & self, bool odd_plane) \
+        { return self.template march_half_so1_alpha<ALPHA>(odd_plane); } \
+      , py::arg("odd_plane") \
+    ) \
+    .def \
+    ( \
+        "march_half1_alpha"#ALPHA \
+      , [](wrapped_type & self) { self.template march_half1_alpha<ALPHA>(); } \
+    ) \
+    .def \
+    ( \
+        "march_half2_alpha"#ALPHA \
+      , [](wrapped_type & self) { self.template march_half2_alpha<ALPHA>(); } \
+    ) \
+    .def \
+    ( \
+        "march_alpha"#ALPHA \
+      , [](wrapped_type & self, size_t steps) { self.template march_alpha<ALPHA>(steps); } \
+      , py::arg("steps") \
+    )
 
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
@@ -349,16 +373,15 @@ protected:
             DECL_ST_WRAP_ARRAY_ACCESS_1D(so1)
             .def("update_cfl", &wrapped_type::update_cfl, py::arg("odd_plane"))
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
-            .def("march_half_so1", &wrapped_type::march_half_so1, py::arg("odd_plane"))
             .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)
             .def("treat_boundary_so1", &wrapped_type::treat_boundary_so1)
             .def("setup_march", &wrapped_type::setup_march)
-            .def("march_half_first", &wrapped_type::march_half_first)
-            .def("march_half_second", &wrapped_type::march_half_second)
-            .def("march_full", &wrapped_type::march_full)
-            .def("march", &wrapped_type::march, py::arg("steps"))
+            DECL_ST_WRAP_MARCH_ALPHA(0)
+            DECL_ST_WRAP_MARCH_ALPHA(1)
+            DECL_ST_WRAP_MARCH_ALPHA(2)
         ;
 
+#undef DECL_ST_WRAP_MARCH_ALPHA
 #undef DECL_ST_WRAP_ARRAY_ACCESS_1D
 #undef DECL_ST_WRAP_ARRAY_ACCESS_0D
 

@@ -82,7 +82,7 @@ class LinearScalarSolverTC(unittest.TestCase):
             self.svr.get_so1(1, odd_plane=True)
 
         # The odd-plane value is uninitialized before marching.
-        self.svr.march_full()
+        self.svr.march_alpha2(steps=1)
 
         v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=True)]
         v2 = self.svr.get_so0(0, odd_plane=True).tolist()
@@ -103,7 +103,7 @@ class LinearScalarSolverTC(unittest.TestCase):
 
     def test_march(self):
 
-        self.svr.march(self.nstep*self.cycle)
+        self.svr.march_alpha2(self.nstep*self.cycle)
         np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
                                    rtol=0, atol=1.e-14)
         ones = np.ones(self.svr.grid.nselm, dtype='float64')
@@ -118,18 +118,18 @@ class LinearScalarSolverTC(unittest.TestCase):
             self.svr.march_half_so0(odd_plane=False)
             self.svr.treat_boundary_so0()
             self.svr.update_cfl(odd_plane=True)
-            self.svr.march_half_so1(odd_plane=False)
+            self.svr.march_half_so1_alpha2(odd_plane=False)
             self.svr.treat_boundary_so1()
             # second half step.
             self.svr.march_half_so0(odd_plane=True)
             self.svr.update_cfl(odd_plane=False)
-            self.svr.march_half_so1(odd_plane=True)
+            self.svr.march_half_so1_alpha2(odd_plane=True)
 
         svr2 = self._build_solver(self.resolution)[-1]
 
         for it in range(self.nstep*self.cycle):
             _march()
-            svr2.march_full()
+            svr2.march_alpha2(steps=1)
             self.assertEqual(self.svr.get_so0(0).tolist(),
                             svr2.get_so0(0).tolist())
 

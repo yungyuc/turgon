@@ -131,15 +131,14 @@ public:
 
     void update_cfl(bool odd_plane);
     void march_half_so0(bool odd_plane);
-    void march_half_so1(bool odd_plane);
+    template <size_t ALPHA> void march_half_so1_alpha(bool odd_plane);
     void treat_boundary_so0();
     void treat_boundary_so1();
 
     void setup_march() { update_cfl(false); }
-    void march_half_first();
-    void march_half_second();
-    void march_full() { march_half_first(); march_half_second(); }
-    void march(size_t steps) { for (size_t it=0; it<steps; ++it) { march_full(); } }
+    template <size_t ALPHA> void march_half1_alpha();
+    template <size_t ALPHA> void march_half2_alpha();
+    template <size_t ALPHA> void march_alpha(size_t steps);
 
 private:
 

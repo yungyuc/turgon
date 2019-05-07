@@ -1,4 +1,4 @@
-# Build spacetime Python extension:
+# Build spacetime Python extension (even when the timestamp is clean):
 #   make
 # Run Python tests:
 #   make pytest
@@ -8,6 +8,8 @@
 #   make test
 # Build verbosely:
 #   make VERBOSE=1
+# Build with clang-tidy
+#   make USE_CLANG_TIDY=ON
 
 USE_CLANG_TIDY ?= OFF
 CMAKE_BUILD_TYPE ?= Release
@@ -28,7 +30,15 @@ endif
 pyextsuffix := $(shell python3-config --extension-suffix)
 
 .PHONY: default
-default: $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix)
+default: buildext
+
+.PHONY: clean
+clean:
+	make -C $(BUILD_PATH) clean
+
+.PHONY: cmakeclean
+cmakeclean:
+	rm -rf $(BUILD_PATH)
 
 .PHONY: test
 test: gtest pytest
@@ -56,7 +66,12 @@ $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix): $(BUILD_PATH)/_libst$(pyextsuffix)
 	make -C $(BUILD_PATH) VERBOSE=$(VERBOSE) install
 	touch $@
 
+.PHONY: buildext
+buildext: $(BUILD_PATH)/_libst$(pyextsuffix)
+	make -C $(BUILD_PATH) VERBOSE=$(VERBOSE) install
+
 $(BUILD_PATH)/Makefile: CMakelists.txt Makefile
+	mkdir -p $(BUILD_PATH) ; \
 	cd $(BUILD_PATH) ; \
 	cmake $(SPACETIME_ROOT) \
 		-DCMAKE_INSTALL_PREFIX=$(SPACETIME_ROOT) \
