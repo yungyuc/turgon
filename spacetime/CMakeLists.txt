@@ -11,8 +11,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile commands")
 
 option(BUILD_GTESTS "build libst google-test suite" ON)
+option(HIDE_SYMBOL "hide the symbols of python wrapper" OFF)
+option(DEBUG_SYMBOL "add debug information" ON)
+
+message(STATUS "BUILD_GTESTS: ${BUILD_GTESTS}")
+message(STATUS "HIDE_SYMBOL: ${HIDE_SYMBOL}")
+message(STATUS "DEBUG_SYMBOL: ${DEBUG_SYMBOL}")
+
 option(USE_CLANG_TIDY "use clang-tidy" OFF)
 option(LINT_AS_ERRORS "clang-tidy warnings as errors" OFF)
+
+if(DEBUG_SYMBOL)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
 find_program(
     CLANG_TIDY_EXE
@@ -92,6 +105,11 @@ pybind11_add_module(
     ${SPACETIME_HEADERS}
     ${SPACETIME_PY_HEADERS}
 )
+if(HIDE_SYMBOL)
+    set_target_properties(_libst PROPERTIES CXX_VISIBILITY_PRESET "hidden")
+else()
+    set_target_properties(_libst PROPERTIES CXX_VISIBILITY_PRESET "default")
+endif()
 install(TARGETS _libst DESTINATION libst)
 
 if(CLANG_TIDY_EXE AND USE_CLANG_TIDY)

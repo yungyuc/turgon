@@ -11,11 +11,17 @@
 # Build with clang-tidy
 #   make USE_CLANG_TIDY=ON
 
+HIDE_SYMBOL ?= OFF
+DEBUG_SYMBOL ?= ON
 USE_CLANG_TIDY ?= OFF
 CMAKE_BUILD_TYPE ?= Release
-BUILD_PATH ?= build/dev37
 SPACETIME_ROOT ?= $(PWD)
 VERBOSE ?=
+ifeq ($(CMAKE_BUILD_TYPE), Debug)
+	BUILD_PATH ?= build/dbg37
+else
+	BUILD_PATH ?= build/dev37
+endif
 
 PYTEST ?= $(shell which py.test-3)
 ifeq ($(PYTEST),)
@@ -76,4 +82,6 @@ $(BUILD_PATH)/Makefile: CMakelists.txt Makefile
 	cmake $(SPACETIME_ROOT) \
 		-DCMAKE_INSTALL_PREFIX=$(SPACETIME_ROOT) \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) \
+		-DHIDE_SYMBOL=$(HIDE_SYMBOL) \
+		-DDEBUG_SYMBOL=$(DEBUG_SYMBOL) \
 		-DUSE_CLANG_TIDY=$(USE_CLANG_TIDY) -DLINT_AS_ERRORS=ON
