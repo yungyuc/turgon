@@ -5,7 +5,8 @@
 
 namespace st = spacetime;
 
-TEST(CopyTest, Grid) {
+TEST(CopyTest, Grid)
+{
 
     std::shared_ptr<st::Grid> grid=st::Grid::construct(0, 100, 100);
     st::Grid copied_grid(*grid);
@@ -13,7 +14,9 @@ TEST(CopyTest, Grid) {
 
 }
 
-TEST(CopyTest, Solver) {
+TEST(CopyTest, Solver)
+{
+
     std::shared_ptr<st::Grid> grid=st::Grid::construct(0, 100, 100);
 
     std::shared_ptr<st::Solver> sol=st::Solver::construct(grid, 1, 1);
@@ -27,7 +30,8 @@ TEST(CopyTest, Solver) {
 
 }
 
-TEST(SolverTest, Celm) {
+TEST(SolverTest, Celm)
+{
 
     std::shared_ptr<st::Grid> grid=st::Grid::construct(0, 100, 100);
     std::shared_ptr<st::Solver> sol=st::Solver::construct(grid, 1, 1);
@@ -43,7 +47,8 @@ TEST(SolverTest, Celm) {
 
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
