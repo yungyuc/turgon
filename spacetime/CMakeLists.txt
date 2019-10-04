@@ -46,15 +46,35 @@ else()
     message(STATUS "not use clang-tidy")
 endif()
 
-find_package(pybind11 REQUIRED)
-find_package(NumPy REQUIRED)
-find_package(xtl REQUIRED)
-find_package(xsimd REQUIRED)
-find_package(xtensor REQUIRED)
-find_package(xtensor-python REQUIRED)
+option(pybind11_path "pybind11 path")
+find_package(pybind11 REQUIRED PATHS ${pybind11_path})
+message(STATUS "pybind11_INCLUDE_DIRS: ${pybind11_INCLUDE_DIRS}")
+include_directories(${pybind11_INCLUDE_DIRS})
 
-include_directories(${xtensor_INCLUDE_DIRS})
+find_package(NumPy REQUIRED)
+message(STATUS "NUMPY_INCLUDE_DIR: ${NUMPY_INCLUDE_DIR}")
 include_directories(${NUMPY_INCLUDE_DIR})
+
+find_package(xtl)
+if(DEFINED xtl_FOUND)
+  include_directories(BEFORE ${xtl_INCLUDE_DIR})
+endif()
+
+find_package(xsimd)
+if(DEFINED xsimd_FOUND)
+  include_directories(BEFORE ${xsimd_INCLUDE_DIR})
+endif()
+
+find_package(xtensor)
+if(DEFINED xtensor_FOUND)
+  include_directories(BEFORE ${xtensor_INCLUDE_DIR})
+endif()
+
+find_package(xtensor-python)
+if(DEFINED xtensor-python_FOUND)
+  include_directories(BEFORE ${xtensor-python_INCLUDE_DIR})
+endif()
+
 include_directories("include")
 
 set(SPACETIME_HEADERS
