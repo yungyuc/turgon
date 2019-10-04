@@ -70,12 +70,11 @@ $(BUILD_PATH)/_libst$(pyextsuffix): $(BUILD_PATH)/Makefile
 	touch $@
 
 $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix): $(BUILD_PATH)/_libst$(pyextsuffix)
-	make -C $(BUILD_PATH) VERBOSE=$(VERBOSE) install
+	make -C $(BUILD_PATH) VERBOSE=$(VERBOSE) _libst_py
 	touch $@
 
 .PHONY: buildext
-buildext: $(BUILD_PATH)/_libst$(pyextsuffix)
-	make -C $(BUILD_PATH) VERBOSE=$(VERBOSE) install
+buildext: $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix)
 
 $(BUILD_PATH)/Makefile: CMakelists.txt Makefile
 	mkdir -p $(BUILD_PATH) ; \

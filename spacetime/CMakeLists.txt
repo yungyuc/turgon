@@ -27,6 +27,8 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
+set(PYLIBST_PATH "${PROJECT_SOURCE_DIR}/libst")
+
 find_program(
     CLANG_TIDY_EXE
     NAMES "clang-tidy"
@@ -130,7 +132,10 @@ if(HIDE_SYMBOL)
 else()
     set_target_properties(_libst PROPERTIES CXX_VISIBILITY_PRESET "default")
 endif()
-install(TARGETS _libst DESTINATION libst)
+
+add_custom_target(_libst_py
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_libst> ${PYLIBST_PATH}
+    DEPENDS _libst)
 
 if(CLANG_TIDY_EXE AND USE_CLANG_TIDY)
     set_target_properties(
