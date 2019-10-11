@@ -5,23 +5,23 @@
 # Build and install xtensor-python.
 
 INSTALL_PREFIX=${INSTALL_PREFIX:-/usr}
-INSTALL_VERSION=${INSTALL_VERSION:-master}
 
 install() {
 
   githuborg=$1
   pkgname=$2
-  cmakeargs="${@:3}"
-  pkgbranch=${INSTALL_VERSION}
+  pkgbranch=$3
+  cmakeargs="${@:4}"
   pkgfull=$pkgname-$pkgbranch
   pkgrepo=https://github.com/$githuborg/$pkgname.git
+  repotar=https://github.com/$githuborg/$pkgname/archive/$pkgbranch.tar.gz
 
   workdir=$(mktemp -d /tmp/build.XXXXXXXXX)
   echo "Work directory: $workdir"
   mkdir -p $workdir
   pushd $workdir
-  curl -sSL -o $pkgfull.tar.gz \
-    https://github.com/$githuborg/$pkgname/archive/$pkgbranch.tar.gz
+  echo "remote tarball: $repotar"
+  curl -sSL -o $pkgfull.tar.gz $repotar
   rm -rf $pkgfull
   tar xf $pkgfull.tar.gz
   cd $pkgfull
@@ -40,7 +40,8 @@ pybind11() {
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
   cmakeargs+=("-DPYTHON_EXECUTABLE:FILEPATH=`which python3`")
   cmakeargs+=("-DPYBIND11_TEST=OFF")
-  install pybind pybind11 "${cmakeargs[@]}"
+  install ${PYBIND_ORG:-pybind} pybind11 ${PYBIND_BRANCH:-master} \
+    "${cmakeargs[@]}"
 
 }
 
@@ -48,7 +49,8 @@ xtl() {
 
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
-  install QuantStack xtl "${cmakeargs[@]}"
+  install ${XTL_ORG:-QuantStack} xtl ${XTL_BRANCH:-master} \
+    "${cmakeargs[@]}"
 
 }
 
@@ -57,7 +59,8 @@ xsimd() {
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
   cmakeargs+=("-DBUILD_TESTS=OFF")
-  install QuantStack xsimd "${cmakeargs[@]}"
+  install ${XSIMD_ORG:-QuantStack} xsimd ${XSIMD_BRANCH:-master} \
+    "${cmakeargs[@]}"
 
 }
 
@@ -65,7 +68,8 @@ xtensor() {
 
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
-  install QuantStack xtensor "${cmakeargs[@]}"
+  install ${XTENSOR_ORG:-QuantStack} xtensor ${XTENSOR_BRANCH:-master} \
+    "${cmakeargs[@]}"
 
 }
 
@@ -73,7 +77,8 @@ xtensor_python() {
 
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
-  install QuantStack xtensor-python "${cmakeargs[@]}"
+  install ${XTENSOR_PYTHON_ORG:-QuantStack} xtensor-python \
+    ${XTENSOR_PYTHON_BRANCH:-master} "${cmakeargs[@]}"
 
 }
 
