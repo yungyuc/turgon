@@ -76,6 +76,7 @@ public:
     Selm const selm_tp() const { return field().selm<Selm>(index()+(on_odd_plane()?1:0), !on_odd_plane()); }
     Selm       selm_tp()       { return field().selm<Selm>(index()+(on_odd_plane()?1:0), !on_odd_plane()); }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     value_type calc_so0(size_t /*iv*/) const { return 0.0; }
     template<size_t ALPHA> value_type calc_so1_alpha(size_t /*iv*/) const { return 0.0; }
 

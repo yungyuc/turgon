@@ -63,9 +63,13 @@ public:
     value_type const & cfl() const { return field().cfl(xindex()); }
     value_type       & cfl()       { return field().cfl(xindex()); }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     value_type xn(size_t /*iv*/) const { return 0.0; }
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     value_type xp(size_t /*iv*/) const { return 0.0; }
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     value_type tn(size_t /*iv*/) const { return 0.0; }
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     value_type tp(size_t /*iv*/) const { return 0.0; }
 
     value_type so0p(size_t iv) const { return so0(iv); }
