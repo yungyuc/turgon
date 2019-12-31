@@ -11,8 +11,8 @@ install() {
   githuborg=$1
   pkgname=$2
   pkgbranch=$3
-  cmakeargs="${@:4}"
-  pkgfull=$pkgname-$pkgbranch
+  pkgfull=$4
+  cmakeargs="${@:5}"
   pkgrepo=https://github.com/$githuborg/$pkgname.git
   repotar=https://github.com/$githuborg/$pkgname/archive/$pkgbranch.tar.gz
 
@@ -40,8 +40,8 @@ pybind11() {
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
   cmakeargs+=("-DPYTHON_EXECUTABLE:FILEPATH=`which python3`")
   cmakeargs+=("-DPYBIND11_TEST=OFF")
-  install ${PYBIND_ORG:-pybind} pybind11 ${PYBIND_BRANCH:-master} \
-    "${cmakeargs[@]}"
+  install ${PYBIND_ORG:-pybind} pybind11 ${PYBIND_BRANCH:-v2.4.3} \
+    ${PYBIND_LOCAL:-pybind11-2.4.3} "${cmakeargs[@]}"
 
 }
 
@@ -49,8 +49,8 @@ xtl() {
 
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
-  install ${XTL_ORG:-QuantStack} xtl ${XTL_BRANCH:-master} \
-    "${cmakeargs[@]}"
+  install ${XTL_ORG:-xtensor-stack} xtl ${XTL_BRANCH:-0.6.9} \
+    ${XTL_LOCAL:-xtl-0.6.9} "${cmakeargs[@]}"
 
 }
 
@@ -59,8 +59,8 @@ xsimd() {
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
   cmakeargs+=("-DBUILD_TESTS=OFF")
-  install ${XSIMD_ORG:-QuantStack} xsimd ${XSIMD_BRANCH:-master} \
-    "${cmakeargs[@]}"
+  install ${XSIMD_ORG:-xtensor-stack} xsimd ${XSIMD_BRANCH:-7.4.4} \
+    ${XSIMD_LOCAL:-xsimd-7.4.4} "${cmakeargs[@]}"
 
 }
 
@@ -68,8 +68,8 @@ xtensor() {
 
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
-  install ${XTENSOR_ORG:-QuantStack} xtensor ${XTENSOR_BRANCH:-master} \
-    "${cmakeargs[@]}"
+  install ${XTENSOR_ORG:-xtensor-stack} xtensor ${XTENSOR_BRANCH:-0.21.2} \
+    ${XTENSOR_LOCAL:-xtensor-0.21.2} "${cmakeargs[@]}"
 
 }
 
@@ -77,8 +77,9 @@ xtensor_python() {
 
   cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
   cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
-  install ${XTENSOR_PYTHON_ORG:-QuantStack} xtensor-python \
-    ${XTENSOR_PYTHON_BRANCH:-master} "${cmakeargs[@]}"
+  install ${XTENSOR_PYTHON_ORG:-xtensor-stack} xtensor-python \
+    ${XTENSOR_PYTHON_BRANCH:-0.24.1} \
+    ${XTENSOR_PYTHON_LOCAL:-xtensor-python-0.24.1} "${cmakeargs[@]}"
 
 }
 
@@ -94,8 +95,8 @@ elif [ $1 == "xtensor-python" ]; then
   xtensor_python
 elif [ $1 == "everything" ]; then
   pybind11
-  xtl
   xsimd
+  xtl
   xtensor
   xtensor_python
 fi
