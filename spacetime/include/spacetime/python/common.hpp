@@ -29,6 +29,72 @@ template<class T> std::string to_str(T const & self) { return Formatter() << sel
 
 } /* end namespace detail */
 
+template <typename T>
+pybind11::array_t<typename T::value_type> make_pyarray(T const & xarr)
+{
+    namespace py = pybind11;
+    using value_type = typename T::value_type;
+    constexpr size_t itemsize = sizeof(value_type);
+
+    py::array_t<value_type> pyarr({ xarr.shape()[0] }, { itemsize });
+    auto r = pyarr.template mutable_unchecked<1>();
+
+    for (size_t it=0; it<r.shape(0); ++it)
+    {
+        r(it) = xarr(it);
+    }
+
+    return pyarr;
+}
+
+template <typename T>
+xt::xarray<T, xt::layout_type::row_major> make_xarray(pybind11::array_t<T> const & parr)
+{
+    auto r = parr.template unchecked<1>();
+    xt::xarray<T, xt::layout_type::row_major>
+    xarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))});
+
+    for (size_t it=0; it<r.shape(0); ++it)
+    {
+        xarr(it) = r(it);
+    }
+
+    return xarr;
+}
+
+template <typename T>
+pybind11::array view_pyarray(xt::xarray<T, xt::layout_type::row_major> & xarr, pybind11::object pyobj)
+{
+    namespace py = pybind11;
+    constexpr size_t itemsize = sizeof(T);
+    py::array pyarr;
+
+    if (1 == xarr.shape().size())
+    {
+        pyarr = py::array
+        (
+            py::detail::npy_format_descriptor<T>::dtype()
+          , { xarr.shape()[0] }
+          , { itemsize }
+          , xarr.data()
+          , pyobj
+        );
+    }
+    else
+    {
+        pyarr = py::array
+        (
+            py::detail::npy_format_descriptor<T>::dtype()
+          , { xarr.shape()[0], xarr.shape()[1] }
+          , { xarr.shape()[1] * itemsize, itemsize }
+          , xarr.data()
+          , pyobj
+        );
+    }
+
+    return pyarr;
+}
+
 template<class WT, class ET>
 class
 WrapElementBase
@@ -295,76 +361,34 @@ protected:
     ( \
         "get_" #NAME \
       , [](wrapped_type & self, bool odd_plane) \
-        { \
-            auto sarr = self.get_ ## NAME(odd_plane); \
-            using value_type = typename wrapped_type::value_type; \
-            constexpr size_t itemsize = sizeof(value_type); \
-            py::array_t<value_type> rarr({ sarr.shape()[0] }, { itemsize }); \
-            auto r = rarr.template mutable_unchecked<1>(); \
-            for (size_t it=0; it<r.shape(0); ++it) \
-            { r(it) = sarr(it); } \
-            return rarr; \
-        } \
+        { return make_pyarray(self.get_ ## NAME(odd_plane)); } \
       , py::arg("odd_plane")=false \
     ) \
     .def \
     ( \
         "set_" #NAME \
       , [](wrapped_type & self, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { \
-            auto r = arr.template unchecked<1>(); \
-            typename wrapped_type::array_type sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))}); \
-            for (size_t it=0; it<r.shape(0); ++it) \
-            { sarr(it) = r(it); } \
-            self.set_ ## NAME(sarr, odd_plane); \
-        } \
+        { self.set_ ## NAME(make_xarray(arr), odd_plane); } \
       , py::arg("arr"), py::arg("odd_plane")=false \
     )
 #define DECL_ST_WRAP_ARRAY_ACCESS_1D(NAME) \
     .def_property_readonly \
     ( \
         #NAME \
-      , [](wrapped_type & self) \
-        { \
-            using value_type = typename wrapped_type::value_type; \
-            constexpr size_t itemsize = sizeof(value_type); \
-            return py::array \
-            ( \
-                py::detail::npy_format_descriptor<value_type>::dtype() \
-              , { self.grid().xsize(), self.nvar() } \
-              , { self.nvar() * itemsize, itemsize } \
-              , self.NAME().data() \
-              , py::cast(self) \
-            ); \
-        } \
+      , [](wrapped_type & self) { return view_pyarray(self.NAME(), py::cast(self)); } \
     ) \
     .def \
     ( \
         "get_" #NAME \
       , [](wrapped_type & self, size_t iv, bool odd_plane) \
-        { \
-            auto sarr = self.get_ ## NAME(iv, odd_plane); \
-            using value_type = typename wrapped_type::value_type; \
-            constexpr size_t itemsize = sizeof(value_type); \
-            py::array_t<value_type> rarr({ sarr.shape()[0] }, { itemsize }); \
-            auto r = rarr.template mutable_unchecked<1>(); \
-            for (size_t it=0; it<r.shape(0); ++it) \
-            { r(it) = sarr(it); } \
-            return rarr; \
-        } \
+        { return make_pyarray(self.get_ ## NAME(iv, odd_plane)); } \
       , py::arg("iv"), py::arg("odd_plane")=false \
     ) \
     .def \
     ( \
         "set_" #NAME \
       , [](wrapped_type & self, size_t iv, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { \
-            auto r = arr.template unchecked<1>(); \
-            typename wrapped_type::array_type sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))}); \
-            for (size_t it=0; it<r.shape(0); ++it) \
-            { sarr(it) = r(it); } \
-            self.set_ ## NAME(iv, sarr, odd_plane); \
-        } \
+        { self.set_ ## NAME(iv, make_xarray(arr), odd_plane); } \
       , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
     )
 #define DECL_ST_WRAP_MARCH_ALPHA(ALPHA) \

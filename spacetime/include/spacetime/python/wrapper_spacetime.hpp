@@ -52,19 +52,7 @@ WrapGrid
             .def_property_readonly
             (
                 "xcoord"
-              , [](wrapped_type & self)
-                {
-                    using value_type = typename wrapped_type::value_type;
-                    constexpr size_t itemsize = sizeof(value_type);
-                    return py::array
-                    (
-                        py::detail::npy_format_descriptor<value_type>::dtype()
-                      , { self.xsize() }
-                      , { itemsize }
-                      , self.xcoord().data()
-                      , py::cast(self)
-                    );
-                }
+              , [](wrapped_type & self) { return view_pyarray(self.xcoord(), py::cast(self)); }
             )
             .def_property_readonly_static("BOUND_COUNT", [](py::object const &){ return Grid::BOUND_COUNT; })
         ;
