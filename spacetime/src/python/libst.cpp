@@ -19,7 +19,7 @@ namespace
 PyObject * initialize_spacetime(pybind11::module * mod)
 {
     namespace spy = spacetime::python;
-    xt::import_numpy(); // otherwise numpy c api segfault.
+    import_array1(nullptr); // or numpy c api segfault.
     mod->doc() = "_libst: One-dimensional space-time CESE method code";
     spy::WrapGrid::commit(mod, "Grid", "Spatial grid data");
     spy::WrapField::commit(mod, "Field", "Solution data");

@@ -8,7 +8,7 @@
 #include "pybind11/pybind11.h" // must be first
 #include "pybind11/operators.h"
 #include "pybind11/stl.h"
-#include "xtensor-python/pyarray.hpp"
+#include "pybind11/numpy.h"
 
 #include "spacetime.hpp"
 #include "spacetime/python/WrapBase.hpp"
@@ -291,22 +291,80 @@ protected:
 
 #define DECL_ST_WRAP_ARRAY_ACCESS_0D(NAME) \
     .def_property_readonly(#NAME, static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME)) \
-    .def("get_" #NAME, &wrapped_type::get_ ## NAME, py::arg("odd_plane")=false) \
+    .def \
+    ( \
+        "get_" #NAME \
+      , [](wrapped_type & self, bool odd_plane) \
+        { \
+            auto sarr = self.get_ ## NAME(odd_plane); \
+            using value_type = typename wrapped_type::value_type; \
+            constexpr size_t itemsize = sizeof(value_type); \
+            py::array_t<value_type> rarr({ sarr.shape()[0] }, { itemsize }); \
+            auto r = rarr.template mutable_unchecked<1>(); \
+            for (size_t it=0; it<r.shape(0); ++it) \
+            { r(it) = sarr(it); } \
+            return rarr; \
+        } \
+      , py::arg("odd_plane")=false \
+    ) \
     .def \
     ( \
         "set_" #NAME \
-      , [](wrapped_type & self, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { self.set_ ## NAME(arr, odd_plane); } \
+      , [](wrapped_type & self, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
+        { \
+            auto r = arr.template unchecked<1>(); \
+            typename wrapped_type::array_type sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))}); \
+            for (size_t it=0; it<r.shape(0); ++it) \
+            { sarr(it) = r(it); } \
+            self.set_ ## NAME(sarr, odd_plane); \
+        } \
       , py::arg("arr"), py::arg("odd_plane")=false \
     )
 #define DECL_ST_WRAP_ARRAY_ACCESS_1D(NAME) \
-    .def_property_readonly(#NAME, static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME)) \
-    .def("get_" #NAME, &wrapped_type::get_ ## NAME, py::arg("iv"), py::arg("odd_plane")=false) \
+    .def_property_readonly \
+    ( \
+        #NAME \
+      , [](wrapped_type & self) \
+        { \
+            using value_type = typename wrapped_type::value_type; \
+            constexpr size_t itemsize = sizeof(value_type); \
+            return py::array \
+            ( \
+                py::detail::npy_format_descriptor<value_type>::dtype() \
+              , { self.grid().xsize(), self.nvar() } \
+              , { self.nvar() * itemsize, itemsize } \
+              , self.NAME().data() \
+              , py::cast(self) \
+            ); \
+        } \
+    ) \
+    .def \
+    ( \
+        "get_" #NAME \
+      , [](wrapped_type & self, size_t iv, bool odd_plane) \
+        { \
+            auto sarr = self.get_ ## NAME(iv, odd_plane); \
+            using value_type = typename wrapped_type::value_type; \
+            constexpr size_t itemsize = sizeof(value_type); \
+            py::array_t<value_type> rarr({ sarr.shape()[0] }, { itemsize }); \
+            auto r = rarr.template mutable_unchecked<1>(); \
+            for (size_t it=0; it<r.shape(0); ++it) \
+            { r(it) = sarr(it); } \
+            return rarr; \
+        } \
+      , py::arg("iv"), py::arg("odd_plane")=false \
+    ) \
     .def \
     ( \
         "set_" #NAME \
-      , [](wrapped_type & self, size_t iv, xt::pyarray<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { self.set_ ## NAME(iv, arr, odd_plane); } \
+      , [](wrapped_type & self, size_t iv, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
+        { \
+            auto r = arr.template unchecked<1>(); \
+            typename wrapped_type::array_type sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))}); \
+            for (size_t it=0; it<r.shape(0); ++it) \
+            { sarr(it) = r(it); } \
+            self.set_ ## NAME(iv, sarr, odd_plane); \
+        } \
       , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
     )
 #define DECL_ST_WRAP_MARCH_ALPHA(ALPHA) \
@@ -339,7 +397,22 @@ protected:
             .def("clone", &wrapped_type::clone, py::arg("grid")=false)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
             .def("x", &wrapped_type::x, py::arg("odd_plane")=false)
-            .def("xctr", &wrapped_type::xctr, py::arg("odd_plane")=false)
+            .def
+            (
+                "xctr"
+              , [](wrapped_type & self, bool odd_plane)
+                {
+                    auto sarr = self.xctr(odd_plane);
+                    using value_type = typename wrapped_type::value_type;
+                    constexpr size_t itemsize = sizeof(value_type);
+                    py::array_t<value_type> rarr({ sarr.shape()[0] }, { itemsize });
+                    auto r = rarr.template mutable_unchecked<1>();
+                    for (size_t it=0; it<r.shape(0); ++it)
+                    { r(it) = sarr(it); }
+                    return rarr;
+                }
+              , py::arg("odd_plane")=false
+            )
             .def_property_readonly("nvar", &wrapped_type::nvar)
             .def_property(
                 "time_increment"

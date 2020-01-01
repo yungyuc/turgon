@@ -27,14 +27,20 @@ WrapGrid
         namespace py = pybind11;
         (*this)
             .def(
-                py::init([](real_type xmin, real_type xmax, size_t nelm) {
+                py::init([](real_type xmin, real_type xmax, size_t nelm)
+                {
                     return Grid::construct(xmin, xmax, nelm);
                 }),
                 py::arg("xmin"), py::arg("xmax"), py::arg("nelm")
             )
             .def(
-                py::init([](xt::pyarray<wrapped_type::value_type> & xloc) {
-                    return Grid::construct(xloc);
+                py::init([](py::array_t<wrapped_type::value_type> & xloc)
+                {
+                    auto r = xloc.template unchecked<1>();
+                    typename wrapped_type::array_type arr(std::vector<size_t>{static_cast<size_t>(r.shape(0))});
+                    for (size_t it=0; it<r.shape(0); ++it)
+                    { arr(it) = r(it); }
+                    return Grid::construct(arr);
                 }),
                 py::arg("xloc")
             )
@@ -43,9 +49,22 @@ WrapGrid
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("ncelm", &wrapped_type::ncelm)
             .def_property_readonly("nselm", &wrapped_type::nselm)
-            .def_property_readonly(
-                "xcoord",
-                static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::xcoord)
+            .def_property_readonly
+            (
+                "xcoord"
+              , [](wrapped_type & self)
+                {
+                    using value_type = typename wrapped_type::value_type;
+                    constexpr size_t itemsize = sizeof(value_type);
+                    return py::array
+                    (
+                        py::detail::npy_format_descriptor<value_type>::dtype()
+                      , { self.xsize() }
+                      , { itemsize }
+                      , self.xcoord().data()
+                      , py::cast(self)
+                    );
+                }
             )
             .def_property_readonly_static("BOUND_COUNT", [](py::object const &){ return Grid::BOUND_COUNT; })
         ;

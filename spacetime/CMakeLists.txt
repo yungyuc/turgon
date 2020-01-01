@@ -72,11 +72,6 @@ if(DEFINED xtensor_FOUND)
   include_directories(BEFORE ${xtensor_INCLUDE_DIR})
 endif()
 
-find_package(xtensor-python)
-if(DEFINED xtensor-python_FOUND)
-  include_directories(BEFORE ${xtensor-python_INCLUDE_DIR})
-endif()
-
 include_directories("include")
 
 set(SPACETIME_HEADERS

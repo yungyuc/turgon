@@ -98,5 +98,4 @@ elif [ $1 == "everything" ]; then
   xsimd
   xtl
   xtensor
-  xtensor_python
 fi
