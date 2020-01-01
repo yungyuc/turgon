@@ -67,7 +67,7 @@ install:
     if [[ "$RUNMODE" != "docker" ]] ; then
       $SCRIPT_RUN_PREFIX sudo bash ${TRAVIS_BUILD_DIR}/contrib/depend/apt.xenial.sh
     fi
-  - $SCRIPT_RUN_PREFIX sudo env XTENSOR_PYTHON_ORG=yungyuc XTENSOR_PYTHON_BRANCH=fix-is-contiguous ${TRAVIS_BUILD_DIR}/contrib/depend/install.sh everything
+  - $SCRIPT_RUN_PREFIX sudo env ${TRAVIS_BUILD_DIR}/contrib/depend/install.sh everything
   - |
     # Debugging information
     if [ -n "$DEBUG" ] ; then

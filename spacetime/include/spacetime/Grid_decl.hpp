@@ -99,12 +99,14 @@ private:
     /**
      * Convert celm index to coordinate index.
      */
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     size_t xindex_celm(sindex_type ielm) const { return 1 + BOUND_COUNT + (ielm << 1); }
     size_t xindex_celm(sindex_type ielm, bool odd_plane) const { return xindex_celm(ielm) + (odd_plane ? 1 : 0); }
 
     /**
      * Convert selm index to coordinate index.
      */
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     size_t xindex_selm(sindex_type ielm) const { return BOUND_COUNT + (ielm << 1); }
     size_t xindex_selm(sindex_type ielm, bool odd_plane) const { return xindex_selm(ielm) + (odd_plane ? 1 : 0); }
 
