@@ -95,6 +95,22 @@ pybind11::array view_pyarray(xt::xarray<T, xt::layout_type::row_major> & xarr, p
     return pyarr;
 }
 
+template <typename T>
+pybind11::array view_pyarray(Array<T> & buf, pybind11::object pyobj)
+{
+    namespace py = pybind11;
+    constexpr size_t itemsize = sizeof(T);
+
+    return py::array
+    (
+        py::detail::npy_format_descriptor<T>::dtype()
+      , { buf.size() }
+      , { itemsize }
+      , buf.data()
+      , pyobj
+    );
+}
+
 template<class WT, class ET>
 class
 WrapElementBase

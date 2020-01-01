@@ -16,6 +16,7 @@
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase_decl.hpp"
+#include "spacetime/Buffer.hpp"
 
 namespace spacetime
 {
@@ -32,6 +33,8 @@ public:
     // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
     using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
+    //using buffer_type = Buffer<value_type>;
+    //using array_type = buffer_type;
     constexpr static size_t BOUND_COUNT = 2;
     static_assert(BOUND_COUNT >= 2, "BOUND_COUNT must be greater or equal to 2");
 

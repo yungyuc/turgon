@@ -1,6 +1,7 @@
 Checks: >
     *,-clang-analyzer-alpha.*,-hicpp-*,
     -modernize-use-trailing-return-type,
+    -modernize-loop-convert,
     -cppcoreguidelines-avoid-magic-numbers,
     -cppcoreguidelines-non-private-member-variables-in-classes,
     -fuchsia-overloaded-operator,-fuchsia-default-arguments*,
