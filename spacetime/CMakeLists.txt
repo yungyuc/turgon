@@ -82,6 +82,7 @@ set(SPACETIME_HEADERS
     include/spacetime/Celm_decl.hpp
     include/spacetime/ElementBase.hpp
     include/spacetime/ElementBase_decl.hpp
+    include/spacetime/Buffer.hpp
     include/spacetime/Grid.hpp
     include/spacetime/Grid_decl.hpp
     include/spacetime/Field.hpp

@@ -8,6 +8,7 @@
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/math.hpp"
+#include "spacetime/Buffer.hpp"
 #include "spacetime/ElementBase.hpp"
 #include "spacetime/Grid.hpp"
 #include "spacetime/Celm.hpp"
