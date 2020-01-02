@@ -14,7 +14,7 @@ namespace spacetime
 {
 
 /**
- * Untyped and unresizeable memory buffer for data storage.
+ * Untyped and unresizeable memory buffer for contiguous data storage.
  */
 class ConcreteBuffer
   : public std::enable_shared_from_this<ConcreteBuffer>
@@ -67,28 +67,18 @@ public:
 
     ConcreteBuffer & operator=(ConcreteBuffer &&) = delete;
 
-    explicit operator bool() const { return bool(m_data); }
+    explicit operator bool() const noexcept { return bool(m_data); }
 
-    size_t nbytes() const { return m_nbytes; }
-    size_t size() const { return nbytes(); }
+    size_t nbytes() const noexcept { return m_nbytes; }
+    size_t size() const noexcept { return nbytes(); }
 
     /* Backdoor */
-    char const * data() const { return data<char>(); }
-    char       * data()       { return data<char>(); }
-
-    template< typename T >
-    T const * data() const
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        return reinterpret_cast<T const *>(m_data.get());
-    }
-
-    template< typename T >
-    T * data()
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        return reinterpret_cast<T*>(m_data.get());
-    }
+    char const * data() const noexcept { return data<char>(); }
+    char       * data()       noexcept { return data<char>(); }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    template<typename T> T const * data() const noexcept { return reinterpret_cast<T*>(m_data.get()); }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    template<typename T> T       * data()       noexcept { return reinterpret_cast<T*>(m_data.get()); }
 
 private:
 

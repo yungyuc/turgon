@@ -37,16 +37,22 @@ public:
         }
     }
 
-    small_vector(std::initializer_list<T> init)
-      : small_vector(init.size())
-    {
-        std::copy_n(init.begin(), m_size, begin());
-    }
-
     explicit small_vector(std::vector<T> const & vector)
       : small_vector(vector.size())
     {
         std::copy_n(vector.begin(), m_size, begin());
+    }
+
+    template< class InputIt > small_vector(InputIt first, InputIt last)
+      : small_vector(last-first)
+    {
+        std::copy(first, last, begin());
+    }
+
+    small_vector(std::initializer_list<T> init)
+      : small_vector(init.size())
+    {
+        std::copy_n(init.begin(), m_size, begin());
     }
 
     small_vector() { m_head = m_data.data(); }
@@ -166,12 +172,10 @@ public:
     iterator end() noexcept { return m_head + m_size; }
     const_iterator begin() const noexcept { return m_head; }
     const_iterator end() const noexcept { return m_head + m_size; }
-    const_iterator cbegin() const noexcept { return m_head; }
-    const_iterator cend() const noexcept { return m_head + m_size; }
+    const_iterator cbegin() const noexcept { return begin(); }
+    const_iterator cend() const noexcept { return end(); }
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     T const & operator[](size_t it) const { return m_head[it]; }
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     T       & operator[](size_t it)       { return m_head[it]; }
 
     T const & at(size_t it) const { validate_range(it); return (*this)[it]; }

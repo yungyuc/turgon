@@ -16,6 +16,50 @@
 namespace spacetime
 {
 
+class Ruler
+{
+
+public:
+
+    using value_type = double;
+    using array_type = SimpleArray<value_type>;
+
+    explicit Ruler(size_t ncoord)
+      : m_coord(ncoord)
+      , m_idmax(ncoord-1)
+    {}
+
+    Ruler() = default;
+    Ruler(Ruler const & ) = default;
+    Ruler(Ruler       &&) = default;
+    Ruler & operator=(Ruler const & ) = default;
+    Ruler & operator=(Ruler       &&) = default;
+    ~Ruler() = default;
+
+    explicit operator bool () const { return bool(m_coord); }
+
+    size_t ncoord() const { return m_idmax - m_idmin + 1; }
+
+    size_t size() const { return m_coord.size(); }
+    value_type const & operator[] (size_t it) const { return m_coord[it]; }
+    value_type       & operator[] (size_t it)       { return m_coord[it]; }
+    value_type const & at(size_t it) const { return m_coord.at(it); }
+    value_type       & at(size_t it)       { return m_coord.at(it); }
+
+    array_type const & coord() const { return m_coord; }
+    array_type       & coord()       { return m_coord; }
+
+    value_type const * data() const { return m_coord.data(); }
+    value_type       * data()       { return m_coord.data(); }
+
+private:
+
+    array_type m_coord;
+    size_t m_idmin = 0; // left internal boundary.
+    size_t m_idmax = 0; // right internal boundary.
+
+}; /* end class Ruler */
+
 class Celm;
 class Selm;
 
@@ -27,7 +71,7 @@ public:
 
     // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
-    using array_type = SimpleArray<value_type>;
+    using array_type = Ruler::array_type;
     constexpr static size_t BOUND_COUNT = 2;
     static_assert(BOUND_COUNT >= 2, "BOUND_COUNT must be greater or equal to 2");
 
@@ -65,10 +109,10 @@ public:
     size_t ncelm() const { return m_ncelm; }
     size_t nselm() const { return m_ncelm+1; }
 
-    size_t xsize() const { return m_xcoord.size(); }
+    size_t xsize() const { return m_ruler.size(); }
 
-    array_type const & xcoord() const { return m_xcoord; }
-    array_type       & xcoord()       { return m_xcoord; }
+    array_type const & xcoord() const { return m_ruler.coord(); }
+    array_type       & xcoord()       { return m_ruler.coord(); }
 
 public:
 
@@ -109,10 +153,10 @@ private:
     /**
      * Get pointer to an coordinate value using coordinate index.
      */
-    real_type       * xptr()       { return m_xcoord.data(); }
-    real_type const * xptr() const { return m_xcoord.data(); }
-    real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
-    real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    real_type       * xptr()       { return m_ruler.data(); }
+    real_type const * xptr() const { return m_ruler.data(); }
+    real_type       * xptr(size_t xindex)       { return m_ruler.data() + xindex; }
+    real_type const * xptr(size_t xindex) const { return m_ruler.data() + xindex; }
 
     void init_from_array(array_type const & xloc);
 
@@ -120,7 +164,7 @@ private:
     real_type m_xmax;
     size_t m_ncelm;
 
-    array_type m_xcoord;
+    Ruler m_ruler;
 
     template<class ET> friend class ElementBase;
 

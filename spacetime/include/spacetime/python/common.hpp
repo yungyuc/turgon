@@ -50,48 +50,28 @@ pybind11::array_t<typename T::value_type> make_pyarray(T const & xarr)
 template <typename T>
 SimpleArray<T> make_Array(pybind11::array_t<T> const & parr)
 {
-    auto r = parr.template unchecked<1>();
-    SimpleArray<T> sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))});
-
-    for (size_t it=0; it<r.shape(0); ++it)
-    {
-        sarr(it) = r(it);
-    }
-
+    SimpleArray<T> sarr(small_vector<size_t>(parr.shape(), parr.shape()+parr.ndim()));
+    std::copy_n(parr.data(), sarr.size(), sarr.begin());
     return sarr;
 }
 
 template <typename T>
-pybind11::array view_pyarray(SimpleArray<T> & arr, pybind11::object pyobj)
+pybind11::array view_pyarray(SimpleArray<T> & arr)
 {
     namespace py = pybind11;
-    constexpr size_t itemsize = sizeof(T);
-    py::array pyarr;
 
-    if (1 == arr.shape().size())
-    {
-        pyarr = py::array
-        (
-            py::detail::npy_format_descriptor<T>::dtype()
-          , { arr.shape()[0] }
-          , { itemsize }
-          , arr.data()
-          , pyobj
-        );
-    }
-    else
-    {
-        pyarr = py::array
-        (
-            py::detail::npy_format_descriptor<T>::dtype()
-          , { arr.shape()[0], arr.shape()[1] }
-          , { arr.shape()[1] * itemsize, itemsize }
-          , arr.data()
-          , pyobj
-        );
-    }
+    std::vector<size_t> shape(arr.shape().begin(), arr.shape().end());
+    std::vector<size_t> stride(arr.stride().begin(), arr.stride().end());
+    for(size_t & v: stride) { v *= arr.itemsize(); }
 
-    return pyarr;
+    return py::array
+    (
+        py::detail::npy_format_descriptor<T>::dtype()
+      , shape
+      , stride
+      , arr.data()
+      , py::cast(arr.buffer().shared_from_this())
+    );
 }
 
 template<class WT, class ET>
@@ -374,7 +354,7 @@ protected:
     .def_property_readonly \
     ( \
         #NAME \
-      , [](wrapped_type & self) { return view_pyarray(self.NAME(), py::cast(self)); } \
+      , [](wrapped_type & self) { return view_pyarray(self.NAME()); } \
     ) \
     .def \
     ( \

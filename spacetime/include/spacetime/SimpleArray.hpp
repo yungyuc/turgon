@@ -35,6 +35,11 @@ size_t buffer_offset(S const & strides, Args ... args)
     return detail::buffer_offset_impl<0>(strides, args...);
 }
 
+
+/**
+ * Simple array type for contiguous memory storage. The copy semantics performs
+ * data copy. The move semantics invalidates the existing memory buffer.
+ */
 template < typename T >
 class SimpleArray
 {
@@ -43,6 +48,8 @@ public:
 
     using value_type = T;
     using shape_type = small_vector<size_t>;
+    using iterator = T *;
+    using const_iterator = T const *;
 
     static constexpr size_t ITEMSIZE = sizeof(value_type);
 
@@ -54,14 +61,62 @@ public:
       , m_stride{1}
     {}
 
-    explicit SimpleArray(std::vector<size_t> const & shape)
-      : m_shape(shape)
-      , m_stride(calc_stride(m_shape))
+    template< class InputIt > SimpleArray(InputIt first, InputIt last)
+      : SimpleArray(last-first)
     {
-        if (!m_shape.empty())
+        std::copy(first, last, data());
+    }
+
+    // NOLINTNEXTLINE(modernize-pass-by-value)
+    explicit SimpleArray(small_vector<size_t> const & shape)
+      : m_shape(shape), m_stride(calc_stride(m_shape))
+    {
+        if (!m_shape.empty()) { m_buffer = ConcreteBuffer::construct(m_shape[0] * m_stride[0] * ITEMSIZE); }
+    }
+
+    explicit SimpleArray(std::shared_ptr<ConcreteBuffer> const & buffer)
+    {
+        if (buffer)
         {
-            m_buffer = ConcreteBuffer::construct(m_shape[0] * m_stride[0] * ITEMSIZE);
+            const size_t nitem = buffer->nbytes() / ITEMSIZE;
+            if (buffer->nbytes() != nitem * ITEMSIZE)
+            {
+                throw std::runtime_error("SimpleArray: input buffer size must be divisible");
+            }
+            m_shape.push_back(nitem);
+            m_stride.push_back(1);
+            m_buffer = buffer;
         }
+        else
+        {
+            throw std::runtime_error("SimpleArray: buffer cannot be null");
+        }
+    }
+
+    // NOLINTNEXTLINE(modernize-pass-by-value)
+    explicit SimpleArray
+    (
+        small_vector<size_t> const & shape
+      , std::shared_ptr<ConcreteBuffer> const & buffer
+    )
+      : SimpleArray(buffer)
+    {
+        if (buffer)
+        {
+            m_shape = shape;
+            m_stride = calc_stride(m_shape);
+            const size_t nbytes = m_shape[0] * m_stride[0] * ITEMSIZE;
+            if (nbytes != buffer->nbytes())
+            {
+                std::runtime_error("SimpleArray: input buffer size differs from shape");
+            }
+        }
+    }
+
+    explicit SimpleArray(std::vector<size_t> const & shape)
+      : m_shape(shape), m_stride(calc_stride(m_shape))
+    {
+        if (!m_shape.empty()) { m_buffer = ConcreteBuffer::construct(m_shape[0] * m_stride[0] * ITEMSIZE); }
     }
 
     static shape_type calc_stride(shape_type const & shape)
@@ -120,45 +175,70 @@ public:
 
     ~SimpleArray() = default;
 
-    explicit operator bool() const { return bool(m_buffer); }
+    explicit operator bool() const noexcept { return bool(m_buffer) && bool(*m_buffer); }
 
-    size_t nbytes() const { return m_buffer ? m_buffer->nbytes() : 0; }
-    size_t size() const { return nbytes() / ITEMSIZE; }
+    size_t nbytes() const noexcept { return m_buffer ? m_buffer->nbytes() : 0; }
+    size_t size() const noexcept { return nbytes() / ITEMSIZE; }
 
-    value_type const & operator[](size_t it) const { return data(it); }
-    value_type       & operator[](size_t it)       { return data(it); }
+    iterator begin() noexcept { return data(); }
+    iterator end() noexcept { return data() + size(); }
+    const_iterator begin() const noexcept { return data(); }
+    const_iterator end() const noexcept { return data() + size(); }
+    const_iterator cbegin() const noexcept { return begin(); }
+    const_iterator cend() const noexcept { return end(); }
+
+    value_type const & operator[](size_t it) const noexcept { return data(it); }
+    value_type       & operator[](size_t it)       noexcept { return data(it); }
 
     value_type const & at(size_t it) const { validate_range(it); return data(it); }
     value_type       & at(size_t it)       { validate_range(it); return data(it); }
 
-    size_t ndim() const { return m_shape.size(); }
-    shape_type shape() const { return m_shape; }
-    size_t shape(size_t it) const { return m_shape[it]; }
+    size_t ndim() const noexcept { return m_shape.size(); }
+    shape_type const & shape() const { return m_shape; }
+    size_t   shape(size_t it) const noexcept { return m_shape[it]; }
+    size_t & shape(size_t it)       noexcept { return m_shape[it]; }
+    shape_type const & stride() const { return m_stride; }
+    size_t   stride(size_t it) const noexcept { return m_stride[it]; }
+    size_t & stride(size_t it)       noexcept { return m_stride[it]; }
 
-    template<class ... Args>
+    template < typename U >
+    SimpleArray<U> reshape(shape_type const & shape) const
+    {
+        return SimpleArray<U>(shape, m_buffer);
+    }
+
+    SimpleArray reshape(shape_type const & shape) const
+    {
+        return SimpleArray(shape, m_buffer);
+    }
+
+    SimpleArray reshape() const
+    {
+        return SimpleArray(m_shape, m_buffer);
+    }
+
+    template < typename ... Args >
     value_type const & operator()(Args ... args) const { return data(buffer_offset(m_stride, args...)); }
 
-    template<class ... Args>
+    template < typename ... Args >
     value_type       & operator()(Args ... args)       { return data(buffer_offset(m_stride, args...)); }
 
     /* Backdoor */
     value_type const * data() const { return buffer().template data<value_type>(); }
     value_type       * data()       { return buffer().template data<value_type>(); }
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     value_type const & data(size_t it) const { return data()[it]; }
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     value_type       & data(size_t it)       { return data()[it]; }
-
-private:
 
     ConcreteBuffer const & buffer() const { return *m_buffer; }
     ConcreteBuffer       & buffer()       { return *m_buffer; }
+
+private:
 
     void validate_range(size_t it) const
     {
         if (it >= size())
         {
-            throw std::out_of_range("Buffer: index out of range");
+            throw std::out_of_range("SimpleArray: index out of range");
         }
     }
 
