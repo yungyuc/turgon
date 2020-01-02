@@ -57,21 +57,6 @@ find_package(NumPy REQUIRED)
 message(STATUS "NUMPY_INCLUDE_DIR: ${NUMPY_INCLUDE_DIR}")
 include_directories(${NUMPY_INCLUDE_DIR})
 
-find_package(xtl)
-if(DEFINED xtl_FOUND)
-  include_directories(BEFORE ${xtl_INCLUDE_DIR})
-endif()
-
-find_package(xsimd)
-if(DEFINED xsimd_FOUND)
-  include_directories(BEFORE ${xsimd_INCLUDE_DIR})
-endif()
-
-find_package(xtensor)
-if(DEFINED xtensor_FOUND)
-  include_directories(BEFORE ${xtensor_INCLUDE_DIR})
-endif()
-
 include_directories("include")
 
 set(SPACETIME_HEADERS
@@ -93,6 +78,7 @@ set(SPACETIME_HEADERS
     include/spacetime/SolverBase_decl.hpp
     include/spacetime/Solver.hpp
     include/spacetime/io.hpp
+    include/spacetime/small_vector.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
     include/spacetime/math.hpp

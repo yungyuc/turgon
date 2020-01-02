@@ -5,9 +5,12 @@
  * BSD 3-Clause License, see LICENSE.txt
  */
 
+#include "spacetime/small_vector.hpp"
+
 #include <type_traits>
 #include <stdexcept>
 #include <memory>
+#include <array>
 
 namespace spacetime
 {
@@ -52,8 +55,19 @@ public:
     Buffer() = delete;
     Buffer(Buffer const & ) = delete;
     Buffer(Buffer       &&) = delete;
-    Buffer & operator=(Buffer const & ) = delete;
-    Buffer & operator=(Buffer       &&) = delete;
+
+    Buffer & operator=(Buffer const & other)
+    {
+        if (this != &other)
+        {
+            if (size() != other.size())
+            { throw std::out_of_range("Buffer size mismatch"); }
+            std::copy_n(other.data(), size(), data());
+        }
+        return *this;
+    }
+
+    Buffer & operator=(Buffer &&) = delete;
 
     explicit operator bool() const { return bool(m_data); }
 
@@ -103,16 +117,27 @@ private:
 
 }; /* end class Buffer */
 
-template < size_t D, typename S, typename Arg, typename ... Args>
+namespace detail
+{
+
+template < size_t D, typename S >
+size_t buffer_offset_impl(S const &)
+{
+    return 0;
+}
+
+template < size_t D, typename S, typename Arg, typename ... Args >
 size_t buffer_offset_impl(S const & strides, Arg arg, Args ... args)
 {
     return arg * strides[D] + buffer_offset_impl<D+1>(strides, args...);
 }
 
-template < typename S, typename ... Args>
+} /* end namespace detail */
+
+template < typename S, typename ... Args >
 size_t buffer_offset(S const & strides, Args ... args)
 {
-    return buffer_offset_impl<0>(strides, args...);
+    return detail::buffer_offset_impl<0>(strides, args...);
 }
 
 template < typename T >
@@ -122,82 +147,117 @@ class Array
 public:
 
     using value_type = T;
-    using shape_type = std::vector<size_t>;
+    using shape_type = small_vector<size_t>;
 
-    constexpr static size_t ITEMSIZE = sizeof(value_type);
+    static constexpr size_t ITEMSIZE = sizeof(value_type);
 
-    constexpr static size_t itemsize() { return ITEMSIZE; }
+    static constexpr size_t itemsize() { return ITEMSIZE; }
 
     explicit Array(size_t length)
-      : m_mb(Buffer::construct(length * ITEMSIZE))
+      : m_buffer(Buffer::construct(length * ITEMSIZE))
       , m_shape{length}
       , m_stride{1}
     {}
 
     explicit Array(std::vector<size_t> const & shape)
       : m_shape(shape)
+      , m_stride(calc_stride(m_shape))
     {
-        m_stride.resize(shape.size());
-        for (size_t it=shape.size()-1; it>=0; --it)
+        if (!m_shape.empty())
         {
-            size_t offset = 1;
-            for (size_t jt=it+1; jt<shape.size(); ++jt)
+            m_buffer = Buffer::construct(m_shape[0] * m_stride[0] * ITEMSIZE);
+        }
+    }
+
+    static shape_type calc_stride(shape_type const & shape)
+    {
+        shape_type stride(shape.size());
+        if (!shape.empty())
+        {
+            stride[shape.size()-1] = 1;
+            for (size_t it=shape.size()-1; it>0; --it)
             {
-                offset *= shape[jt];
+                stride[it-1] = stride[it] * shape[it];
             }
-            m_stride[it] = offset;
         }
-        size_t nelem = 1;
-        for (size_t it=0; it<shape.size(); ++it)
+        return stride;
+    }
+
+    Array(std::initializer_list<T> init)
+      : Array(init.size())
+    {
+        std::copy_n(init.begin(), init.size(), data());
+    }
+
+    Array() = default;
+
+    Array(Array const & other)
+      : m_buffer(other.m_buffer->clone())
+      , m_shape(other.m_shape)
+      , m_stride(other.m_stride)
+    {}
+
+    Array(Array && other) noexcept
+      : m_buffer(std::move(other.m_buffer))
+      , m_shape(std::move(other.m_shape))
+      , m_stride(std::move(other.m_stride))
+    {}
+
+    Array & operator=(Array const & other)
+    {
+        if (this != &other)
         {
-            nelem *= shape[it];
+            *m_buffer = *(other.m_buffer); // Size is checked inside.
         }
-        m_mb = Buffer::construct(nelem * ITEMSIZE);
+        return *this;
+    }
+
+    Array & operator=(Array && other) noexcept
+    {
+        if (this != &other)
+        {
+            m_buffer = std::move(other.m_buffer);
+            m_shape = std::move(other.m_shape);
+            m_stride = std::move(other.m_stride);
+        }
+        return *this;
     }
 
     ~Array() = default;
 
-    Array() = delete;
-    Array(Array const & ) = delete;
-    Array(Array       &&) = delete;
-    Array & operator=(Array const & ) = delete;
-    Array & operator=(Array       &&) = delete;
+    explicit operator bool() const { return bool(m_buffer); }
 
-    size_t length() const { return m_mb->nbytes() / ITEMSIZE; }
-    size_t size() const { return length(); }
+    size_t nbytes() const { return m_buffer ? m_buffer->nbytes() : 0; }
+    size_t size() const { return nbytes() / ITEMSIZE; }
 
-    value_type const & operator[](size_t it) const { return mb().template data<value_type>()[it]; }
-    value_type       & operator[](size_t it)       { return mb().template data<value_type>()[it]; }
+    value_type const & operator[](size_t it) const { return data(it); }
+    value_type       & operator[](size_t it)       { return data(it); }
 
-    value_type const & at(size_t it) const { validate_range(it); return (*this)[it]; }
-    value_type       & at(size_t it)       { validate_range(it); return (*this)[it]; }
+    value_type const & at(size_t it) const { validate_range(it); return data(it); }
+    value_type       & at(size_t it)       { validate_range(it); return data(it); }
 
     size_t ndim() const { return m_shape.size(); }
-    std::vector<size_t> shape() const { return m_shape; }
+    shape_type shape() const { return m_shape; }
     size_t shape(size_t it) const { return m_shape[it]; }
 
     template<class ... Args>
-    value_type const & operator()(Args ... args) const
-    {
-        return data()[buffer_offset(m_stride, args...)];
-    }
+    value_type const & operator()(Args ... args) const { return data(buffer_offset(m_stride, args...)); }
 
     template<class ... Args>
-    value_type & operator()(Args ... args)
-    {
-        return data()[buffer_offset(m_stride, args...)];
-    }
+    value_type       & operator()(Args ... args)       { return data(buffer_offset(m_stride, args...)); }
 
     /* Backdoor */
-    value_type const * data() const { return mb().data(); }
-    value_type       * data()       { return mb().data(); }
-
-protected:
-
-    Buffer const & mb() const { return *m_mb; }
-    Buffer       & mb()       { return *m_mb; }
+    value_type const * data() const { return buffer().template data<value_type>(); }
+    value_type       * data()       { return buffer().template data<value_type>(); }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    value_type const & data(size_t it) const { return data()[it]; }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    value_type       & data(size_t it)       { return data()[it]; }
 
 private:
+
+    Buffer const & buffer() const { return *m_buffer; }
+    Buffer       & buffer()       { return *m_buffer; }
 
     void validate_range(size_t it) const
     {
@@ -207,7 +267,7 @@ private:
         }
     }
 
-    std::shared_ptr<Buffer> m_mb;
+    std::shared_ptr<Buffer> m_buffer;
     shape_type m_shape;
     shape_type m_stride;
 

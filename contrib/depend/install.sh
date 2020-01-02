@@ -95,7 +95,4 @@ elif [ $1 == "xtensor-python" ]; then
   xtensor_python
 elif [ $1 == "everything" ]; then
   pybind11
-  xsimd
-  xtl
-  xtensor
 fi
