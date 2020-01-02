@@ -5,117 +5,12 @@
  * BSD 3-Clause License, see LICENSE.txt
  */
 
-#include "spacetime/small_vector.hpp"
+#include "spacetime/ConcreteBuffer.hpp"
 
-#include <type_traits>
 #include <stdexcept>
-#include <memory>
-#include <array>
 
 namespace spacetime
 {
-
-/**
- * Untyped and unresizeable memory buffer for data storage.
- */
-class Buffer
-  : public std::enable_shared_from_this<Buffer>
-{
-
-private:
-
-    struct ctor_passkey {};
-
-public:
-
-    static std::shared_ptr<Buffer> construct(size_t nbytes)
-    {
-        return std::make_shared<Buffer>(nbytes, ctor_passkey());
-    }
-
-    static std::shared_ptr<Buffer> construct() { return construct(0); }
-
-    std::shared_ptr<Buffer> clone() const
-    {
-        std::shared_ptr<Buffer> ret = construct(nbytes());
-        std::copy_n(data(), size(), (*ret).data());
-        return ret;
-    }
-
-    /**
-     * \param[in] length Memory buffer length.
-     */
-    Buffer(size_t nbytes, const ctor_passkey &)
-      : m_nbytes(nbytes)
-      , m_data(allocate(nbytes))
-    {}
-
-    ~Buffer() = default;
-
-    Buffer() = delete;
-    Buffer(Buffer const & ) = delete;
-    Buffer(Buffer       &&) = delete;
-
-    Buffer & operator=(Buffer const & other)
-    {
-        if (this != &other)
-        {
-            if (size() != other.size())
-            { throw std::out_of_range("Buffer size mismatch"); }
-            std::copy_n(other.data(), size(), data());
-        }
-        return *this;
-    }
-
-    Buffer & operator=(Buffer &&) = delete;
-
-    explicit operator bool() const { return bool(m_data); }
-
-    size_t nbytes() const { return m_nbytes; }
-    size_t size() const { return nbytes(); }
-
-    /* Backdoor */
-    char const * data() const { return data<char>(); }
-    char       * data()       { return data<char>(); }
-
-    template< typename T >
-    T const * data() const
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        return reinterpret_cast<T const *>(m_data.get());
-    }
-
-    template< typename T >
-    T * data()
-    {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        return reinterpret_cast<T*>(m_data.get());
-    }
-
-private:
-
-    // NOLINTNEXTLINE(modernize-avoid-c-arrays,cppcoreguidelines-avoid-c-arrays)
-    using unique_ptr_type = std::unique_ptr<char, std::default_delete<char[]>>;
-    static_assert(sizeof(size_t) == sizeof(unique_ptr_type), "sizeof(Buffer::m_data) must be a word");
-
-    static unique_ptr_type allocate(size_t nbytes)
-    {
-        unique_ptr_type ret;
-        if (0 != nbytes)
-        {
-            ret = unique_ptr_type(new char[nbytes]);
-        }
-        else
-        {
-            ret = unique_ptr_type();
-        }
-        return ret;
-    }
-
-    size_t m_nbytes;
-    unique_ptr_type m_data;
-
-}; /* end class Buffer */
 
 namespace detail
 {
@@ -141,7 +36,7 @@ size_t buffer_offset(S const & strides, Args ... args)
 }
 
 template < typename T >
-class Array
+class SimpleArray
 {
 
 public:
@@ -153,19 +48,19 @@ public:
 
     static constexpr size_t itemsize() { return ITEMSIZE; }
 
-    explicit Array(size_t length)
-      : m_buffer(Buffer::construct(length * ITEMSIZE))
+    explicit SimpleArray(size_t length)
+      : m_buffer(ConcreteBuffer::construct(length * ITEMSIZE))
       , m_shape{length}
       , m_stride{1}
     {}
 
-    explicit Array(std::vector<size_t> const & shape)
+    explicit SimpleArray(std::vector<size_t> const & shape)
       : m_shape(shape)
       , m_stride(calc_stride(m_shape))
     {
         if (!m_shape.empty())
         {
-            m_buffer = Buffer::construct(m_shape[0] * m_stride[0] * ITEMSIZE);
+            m_buffer = ConcreteBuffer::construct(m_shape[0] * m_stride[0] * ITEMSIZE);
         }
     }
 
@@ -183,27 +78,27 @@ public:
         return stride;
     }
 
-    Array(std::initializer_list<T> init)
-      : Array(init.size())
+    SimpleArray(std::initializer_list<T> init)
+      : SimpleArray(init.size())
     {
         std::copy_n(init.begin(), init.size(), data());
     }
 
-    Array() = default;
+    SimpleArray() = default;
 
-    Array(Array const & other)
+    SimpleArray(SimpleArray const & other)
       : m_buffer(other.m_buffer->clone())
       , m_shape(other.m_shape)
       , m_stride(other.m_stride)
     {}
 
-    Array(Array && other) noexcept
+    SimpleArray(SimpleArray && other) noexcept
       : m_buffer(std::move(other.m_buffer))
       , m_shape(std::move(other.m_shape))
       , m_stride(std::move(other.m_stride))
     {}
 
-    Array & operator=(Array const & other)
+    SimpleArray & operator=(SimpleArray const & other)
     {
         if (this != &other)
         {
@@ -212,7 +107,7 @@ public:
         return *this;
     }
 
-    Array & operator=(Array && other) noexcept
+    SimpleArray & operator=(SimpleArray && other) noexcept
     {
         if (this != &other)
         {
@@ -223,7 +118,7 @@ public:
         return *this;
     }
 
-    ~Array() = default;
+    ~SimpleArray() = default;
 
     explicit operator bool() const { return bool(m_buffer); }
 
@@ -256,8 +151,8 @@ public:
 
 private:
 
-    Buffer const & buffer() const { return *m_buffer; }
-    Buffer       & buffer()       { return *m_buffer; }
+    ConcreteBuffer const & buffer() const { return *m_buffer; }
+    ConcreteBuffer       & buffer()       { return *m_buffer; }
 
     void validate_range(size_t it) const
     {
@@ -267,11 +162,11 @@ private:
         }
     }
 
-    std::shared_ptr<Buffer> m_buffer;
+    std::shared_ptr<ConcreteBuffer> m_buffer;
     shape_type m_shape;
     shape_type m_stride;
 
-}; /* end class Array */
+}; /* end class SimpleArray */
 
 } /* end namespace spacetime */
 

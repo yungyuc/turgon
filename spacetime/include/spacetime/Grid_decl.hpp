@@ -11,7 +11,7 @@
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase_decl.hpp"
-#include "spacetime/Buffer.hpp"
+#include "spacetime/SimpleArray.hpp"
 
 namespace spacetime
 {
@@ -27,7 +27,7 @@ public:
 
     // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
-    using array_type = Array<value_type>;
+    using array_type = SimpleArray<value_type>;
     constexpr static size_t BOUND_COUNT = 2;
     static_assert(BOUND_COUNT >= 2, "BOUND_COUNT must be greater or equal to 2");
 

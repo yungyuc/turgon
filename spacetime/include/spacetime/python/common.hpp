@@ -48,10 +48,10 @@ pybind11::array_t<typename T::value_type> make_pyarray(T const & xarr)
 }
 
 template <typename T>
-Array<T> make_Array(pybind11::array_t<T> const & parr)
+SimpleArray<T> make_Array(pybind11::array_t<T> const & parr)
 {
     auto r = parr.template unchecked<1>();
-    Array<T> sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))});
+    SimpleArray<T> sarr(std::vector<size_t>{static_cast<size_t>(r.shape(0))});
 
     for (size_t it=0; it<r.shape(0); ++it)
     {
@@ -62,7 +62,7 @@ Array<T> make_Array(pybind11::array_t<T> const & parr)
 }
 
 template <typename T>
-pybind11::array view_pyarray(Array<T> & arr, pybind11::object pyobj)
+pybind11::array view_pyarray(SimpleArray<T> & arr, pybind11::object pyobj)
 {
     namespace py = pybind11;
     constexpr size_t itemsize = sizeof(T);
@@ -485,7 +485,9 @@ protected:
 
 }; /* end class WrapSolverBase */
 
-class ModuleInitializer {
+class
+SPACETIME_PYTHON_WRAPPER_VISIBILITY
+ModuleInitializer {
 
 public:
 

@@ -65,23 +65,24 @@ set(SPACETIME_HEADERS
     # Framework.
     include/spacetime/Celm.hpp
     include/spacetime/Celm_decl.hpp
+    include/spacetime/ConcreteBuffer.hpp
     include/spacetime/ElementBase.hpp
     include/spacetime/ElementBase_decl.hpp
-    include/spacetime/Buffer.hpp
     include/spacetime/Grid.hpp
     include/spacetime/Grid_decl.hpp
     include/spacetime/Field.hpp
     include/spacetime/Field_decl.hpp
+    include/spacetime/io.hpp
+    include/spacetime/math.hpp
     include/spacetime/Selm.hpp
     include/spacetime/Selm_decl.hpp
+    include/spacetime/SimpleArray.hpp
+    include/spacetime/small_vector.hpp
     include/spacetime/SolverBase.hpp
     include/spacetime/SolverBase_decl.hpp
     include/spacetime/Solver.hpp
-    include/spacetime/io.hpp
-    include/spacetime/small_vector.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
-    include/spacetime/math.hpp
     # Physical kernels.
     include/spacetime/kernel/linear_scalar.hpp
     include/spacetime/kernel/inviscid_burgers.hpp

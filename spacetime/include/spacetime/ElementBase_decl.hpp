@@ -7,7 +7,7 @@
 
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
-#include "spacetime/Buffer.hpp"
+#include "spacetime/SimpleArray.hpp"
 
 namespace spacetime
 {
@@ -22,7 +22,7 @@ class ElementBase
 public:
 
     using value_type = real_type;
-    using array_type = Array<value_type>;
+    using array_type = SimpleArray<value_type>;
     using base_type = ElementBase;
     using element_type = ET;
 
