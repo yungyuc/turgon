@@ -83,8 +83,8 @@ public:
             {
                 throw std::runtime_error("SimpleArray: input buffer size must be divisible");
             }
-            m_shape.push_back(nitem);
-            m_stride.push_back(1);
+            m_shape = shape_type{nitem};
+            m_stride = shape_type{1};
             m_buffer = buffer;
         }
         else
