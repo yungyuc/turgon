@@ -68,17 +68,17 @@ void Grid::init_from_array(array_type const & xloc)
     m_xmax = xloc[m_ncelm];
     // Mark the boundary of conservation celms.
     const size_t nx = m_ncelm*2+(1+BOUND_COUNT*2);
-    m_ruler = Ruler(nx);
+    m_agrid = AscendantGrid1d(nx);
     // Fill x-coordinates at CE boundary.
     for (size_t it=0; it<xloc.size(); ++it)
     {
-        m_ruler[it*2+BOUND_COUNT] = xloc[it];
+        m_agrid[it*2+BOUND_COUNT] = xloc[it];
     }
     // Fill x-coordinates at CE center.
     for (size_t it=0; it<m_ncelm; ++it)
     {
         const size_t ref = it*2 + BOUND_COUNT + 1;
-        m_ruler[ref] = (m_ruler[ref-1] + m_ruler[ref+1])/2;
+        m_agrid[ref] = (m_agrid[ref-1] + m_agrid[ref+1])/2;
     }
     // Fill the front and back value.
     for (size_t it=1; it<=BOUND_COUNT; ++it)
@@ -86,12 +86,12 @@ void Grid::init_from_array(array_type const & xloc)
         // Front value.
         {
             constexpr size_t ref = BOUND_COUNT;
-            m_ruler[ref-it] = m_ruler[ref] + m_ruler[ref] - m_ruler[ref+it];
+            m_agrid[ref-it] = m_agrid[ref] + m_agrid[ref] - m_agrid[ref+it];
         }
         // Back value.
         {
             const size_t ref = nx - BOUND_COUNT - 1;
-            m_ruler[ref+it] = m_ruler[ref] + m_ruler[ref] - m_ruler[ref-it];
+            m_agrid[ref+it] = m_agrid[ref] + m_agrid[ref] - m_agrid[ref-it];
         }
     }
 }

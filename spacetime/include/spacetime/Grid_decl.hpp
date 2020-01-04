@@ -16,7 +16,10 @@
 namespace spacetime
 {
 
-class Ruler
+/**
+ * 1D grid whose coordnate ascend with index.
+ */
+class AscendantGrid1d
 {
 
 public:
@@ -24,17 +27,17 @@ public:
     using value_type = double;
     using array_type = SimpleArray<value_type>;
 
-    explicit Ruler(size_t ncoord)
+    explicit AscendantGrid1d(size_t ncoord)
       : m_coord(ncoord)
       , m_idmax(ncoord-1)
     {}
 
-    Ruler() = default;
-    Ruler(Ruler const & ) = default;
-    Ruler(Ruler       &&) = default;
-    Ruler & operator=(Ruler const & ) = default;
-    Ruler & operator=(Ruler       &&) = default;
-    ~Ruler() = default;
+    AscendantGrid1d() = default;
+    AscendantGrid1d(AscendantGrid1d const & ) = default;
+    AscendantGrid1d(AscendantGrid1d       &&) = default;
+    AscendantGrid1d & operator=(AscendantGrid1d const & ) = default;
+    AscendantGrid1d & operator=(AscendantGrid1d       &&) = default;
+    ~AscendantGrid1d() = default;
 
     explicit operator bool () const { return bool(m_coord); }
 
@@ -58,7 +61,7 @@ private:
     size_t m_idmin = 0; // left internal boundary.
     size_t m_idmax = 0; // right internal boundary.
 
-}; /* end class Ruler */
+}; /* end class AscendantGrid1d */
 
 class Celm;
 class Selm;
@@ -71,7 +74,7 @@ public:
 
     // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
-    using array_type = Ruler::array_type;
+    using array_type = AscendantGrid1d::array_type;
     constexpr static size_t BOUND_COUNT = 2;
     static_assert(BOUND_COUNT >= 2, "BOUND_COUNT must be greater or equal to 2");
 
@@ -109,10 +112,10 @@ public:
     size_t ncelm() const { return m_ncelm; }
     size_t nselm() const { return m_ncelm+1; }
 
-    size_t xsize() const { return m_ruler.size(); }
+    size_t xsize() const { return m_agrid.size(); }
 
-    array_type const & xcoord() const { return m_ruler.coord(); }
-    array_type       & xcoord()       { return m_ruler.coord(); }
+    array_type const & xcoord() const { return m_agrid.coord(); }
+    array_type       & xcoord()       { return m_agrid.coord(); }
 
 public:
 
@@ -153,10 +156,10 @@ private:
     /**
      * Get pointer to an coordinate value using coordinate index.
      */
-    real_type       * xptr()       { return m_ruler.data(); }
-    real_type const * xptr() const { return m_ruler.data(); }
-    real_type       * xptr(size_t xindex)       { return m_ruler.data() + xindex; }
-    real_type const * xptr(size_t xindex) const { return m_ruler.data() + xindex; }
+    real_type       * xptr()       { return m_agrid.data(); }
+    real_type const * xptr() const { return m_agrid.data(); }
+    real_type       * xptr(size_t xindex)       { return m_agrid.data() + xindex; }
+    real_type const * xptr(size_t xindex) const { return m_agrid.data() + xindex; }
 
     void init_from_array(array_type const & xloc);
 
@@ -164,7 +167,7 @@ private:
     real_type m_xmax;
     size_t m_ncelm;
 
-    Ruler m_ruler;
+    AscendantGrid1d m_agrid;
 
     template<class ET> friend class ElementBase;
 
