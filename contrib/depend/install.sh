@@ -4,7 +4,11 @@
 #
 # Build and install xtensor-python.
 
+if [ "$(uname)" == "Darwin" ] ; then
+INSTALL_PREFIX=${INSTALL_PREFIX:-/usr/local}
+else
 INSTALL_PREFIX=${INSTALL_PREFIX:-/usr}
+fi
 
 install() {
 
@@ -42,6 +46,16 @@ pybind11() {
   cmakeargs+=("-DPYBIND11_TEST=OFF")
   install ${PYBIND_ORG:-pybind} pybind11 ${PYBIND_BRANCH:-v2.4.3} \
     ${PYBIND_LOCAL:-pybind11-2.4.3} "${cmakeargs[@]}"
+
+}
+
+modmesh() {
+
+  cmakeargs=("-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}")
+  cmakeargs+=("-DCMAKE_BUILD_TYPE=Release")
+  cmakeargs+=("-DPYTHON_EXECUTABLE:FILEPATH=`which python3`")
+  install ${MODMESH_ORG:-solvcon} modmesh ${MODMESH_BRANCH:-master} \
+    ${MODMESH_LOCAL:-modmesh-master} "${cmakeargs[@]}"
 
 }
 
@@ -95,4 +109,5 @@ elif [ $1 == "xtensor-python" ]; then
   xtensor_python
 elif [ $1 == "everything" ]; then
   pybind11
+  modmesh
 fi

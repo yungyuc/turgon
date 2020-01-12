@@ -13,6 +13,8 @@
 #include "spacetime.hpp"
 #include "spacetime/python/WrapBase.hpp"
 
+#include "modmesh/modmesh.hpp"
+
 #include <functional>
 #include <list>
 #include <sstream>
@@ -48,15 +50,15 @@ pybind11::array_t<typename T::value_type> make_pyarray(T const & xarr)
 }
 
 template <typename T>
-SimpleArray<T> make_Array(pybind11::array_t<T> const & parr)
+modmesh::SimpleArray<T> make_Array(pybind11::array_t<T> const & parr)
 {
-    SimpleArray<T> sarr(small_vector<size_t>(parr.shape(), parr.shape()+parr.ndim()));
+    modmesh::SimpleArray<T> sarr(modmesh::small_vector<size_t>(parr.shape(), parr.shape()+parr.ndim()));
     std::copy_n(parr.data(), sarr.size(), sarr.begin());
     return sarr;
 }
 
 template <typename T>
-pybind11::array view_pyarray(SimpleArray<T> & arr)
+pybind11::array view_pyarray(modmesh::SimpleArray<T> & arr)
 {
     namespace py = pybind11;
 

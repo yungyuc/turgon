@@ -1,6 +1,9 @@
 # Copyright (c) 2018, Yung-Yu Chen <yyc@solvcon.net>
 
 cmake_minimum_required(VERSION 3.9)
+
+cmake_policy(SET CMP0074 NEW)
+
 project(spacetime)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
@@ -57,6 +60,10 @@ find_package(NumPy REQUIRED)
 message(STATUS "NUMPY_INCLUDE_DIR: ${NUMPY_INCLUDE_DIR}")
 include_directories(${NUMPY_INCLUDE_DIR})
 
+find_package(modmesh REQUIRED)
+message(STATUS "modmesh_INCLUDE_DIR: ${modmesh_INCLUDE_DIR}")
+include_directories(${modmesh_INCLUDE_DIR})
+
 include_directories("include")
 
 set(SPACETIME_HEADERS
@@ -65,7 +72,6 @@ set(SPACETIME_HEADERS
     # Framework.
     include/spacetime/Celm.hpp
     include/spacetime/Celm_decl.hpp
-    include/spacetime/ConcreteBuffer.hpp
     include/spacetime/ElementBase.hpp
     include/spacetime/ElementBase_decl.hpp
     include/spacetime/Grid.hpp
@@ -76,8 +82,6 @@ set(SPACETIME_HEADERS
     include/spacetime/math.hpp
     include/spacetime/Selm.hpp
     include/spacetime/Selm_decl.hpp
-    include/spacetime/SimpleArray.hpp
-    include/spacetime/small_vector.hpp
     include/spacetime/SolverBase.hpp
     include/spacetime/SolverBase_decl.hpp
     include/spacetime/Solver.hpp

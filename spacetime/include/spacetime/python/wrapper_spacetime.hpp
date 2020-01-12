@@ -15,20 +15,6 @@ namespace python
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapConcreteBuffer
-  : public WrapBase< WrapConcreteBuffer, ConcreteBuffer, std::shared_ptr<ConcreteBuffer> >
-{
-
-    friend base_type;
-
-    WrapConcreteBuffer(pybind11::module * mod, const char * pyname, const char * clsdoc)
-      : base_type(mod, pyname, clsdoc)
-    {}
-
-}; /* end class WrapConcreteBuffer */
-
-class
-SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapGrid
   : public WrapBase< WrapGrid, Grid, std::shared_ptr<Grid> >
 {

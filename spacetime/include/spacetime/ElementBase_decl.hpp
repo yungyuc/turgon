@@ -5,9 +5,10 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include "modmesh/modmesh.hpp"
+
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
-#include "spacetime/SimpleArray.hpp"
 
 namespace spacetime
 {
@@ -22,7 +23,7 @@ class ElementBase
 public:
 
     using value_type = real_type;
-    using array_type = SimpleArray<value_type>;
+    using array_type = modmesh::SimpleArray<value_type>;
     using base_type = ElementBase;
     using element_type = ET;
 
