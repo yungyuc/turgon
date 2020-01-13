@@ -8,14 +8,11 @@
 #include <memory>
 #include <vector>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xview.hpp"
-#include "xtensor/xstrided_view.hpp"
-
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/ElementBase_decl.hpp"
+
+#include "modmesh/modmesh.hpp"
 
 namespace spacetime
 {
@@ -31,7 +28,7 @@ public:
 
     // Remove the two aliases duplicated in ElementBase.
     using value_type = real_type;
-    using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
+    using array_type = modmesh::AscendantGrid1d::array_type;
     constexpr static size_t BOUND_COUNT = 2;
     static_assert(BOUND_COUNT >= 2, "BOUND_COUNT must be greater or equal to 2");
 
@@ -69,10 +66,10 @@ public:
     size_t ncelm() const { return m_ncelm; }
     size_t nselm() const { return m_ncelm+1; }
 
-    size_t xsize() const { return m_xcoord.size(); }
+    size_t xsize() const { return m_agrid.size(); }
 
-    array_type const & xcoord() const { return m_xcoord; }
-    array_type       & xcoord()       { return m_xcoord; }
+    array_type const & xcoord() const { return m_agrid.coord(); }
+    array_type       & xcoord()       { return m_agrid.coord(); }
 
 public:
 
@@ -113,10 +110,10 @@ private:
     /**
      * Get pointer to an coordinate value using coordinate index.
      */
-    real_type       * xptr()       { return m_xcoord.data(); }
-    real_type const * xptr() const { return m_xcoord.data(); }
-    real_type       * xptr(size_t xindex)       { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
-    real_type const * xptr(size_t xindex) const { return m_xcoord.data() + xindex; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    real_type       * xptr()       { return m_agrid.data(); }
+    real_type const * xptr() const { return m_agrid.data(); }
+    real_type       * xptr(size_t xindex)       { return m_agrid.data() + xindex; }
+    real_type const * xptr(size_t xindex) const { return m_agrid.data() + xindex; }
 
     void init_from_array(array_type const & xloc);
 
@@ -124,7 +121,7 @@ private:
     real_type m_xmax;
     size_t m_ncelm;
 
-    array_type m_xcoord;
+    modmesh::AscendantGrid1d m_agrid;
 
     template<class ET> friend class ElementBase;
 

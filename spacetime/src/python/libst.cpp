@@ -4,6 +4,7 @@
  */
 
 #include "spacetime/python.hpp" // must be first
+#include "modmesh/python/python.hpp"
 
 #include "spacetime.hpp"
 
@@ -19,8 +20,10 @@ namespace
 PyObject * initialize_spacetime(pybind11::module * mod)
 {
     namespace spy = spacetime::python;
-    xt::import_numpy(); // otherwise numpy c api segfault.
+    namespace mpy = modmesh::python;
+    import_array1(nullptr); // or numpy c api segfault.
     mod->doc() = "_libst: One-dimensional space-time CESE method code";
+    mpy::WrapConcreteBuffer::commit(*mod, "ConcreteBuffer", "ConcreteBuffer");
     spy::WrapGrid::commit(mod, "Grid", "Spatial grid data");
     spy::WrapField::commit(mod, "Field", "Solution data");
     return mod->ptr();

@@ -5,7 +5,7 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "xtensor/xarray.hpp"
+#include "modmesh/modmesh.hpp"
 
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
@@ -23,7 +23,7 @@ class ElementBase
 public:
 
     using value_type = real_type;
-    using array_type = xt::xarray<value_type, xt::layout_type::row_major>;
+    using array_type = modmesh::SimpleArray<value_type>;
     using base_type = ElementBase;
     using element_type = ET;
 
@@ -44,11 +44,11 @@ public:
 
     value_type x() const { return *m_xptr; }
     value_type dx() const { return xpos() - xneg(); }
-    value_type xneg() const { return *(m_xptr-1); /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
-    value_type xpos() const { return *(m_xptr+1); /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    value_type xneg() const { return *(m_xptr-1); }
+    value_type xpos() const { return *(m_xptr+1); }
     value_type xctr() const { return static_cast<ET const *>(this)->xctr(); }
 
-    void move(ssize_t offset) { m_xptr += offset; /*NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)*/ }
+    void move(ssize_t offset) { m_xptr += offset; }
     void move_at(ssize_t offset) { static_cast<ET *>(this)->move_at(offset); }
 
     void move_left() { move(-2); }

@@ -8,11 +8,6 @@
 #include <memory>
 #include <vector>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xview.hpp"
-
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/Grid_decl.hpp"
