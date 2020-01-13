@@ -5,6 +5,8 @@
  * BSD 3-Clause License, see COPYING
  */
 
+#include "modmesh/modmesh.hpp"
+
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
 #include "spacetime/math.hpp"

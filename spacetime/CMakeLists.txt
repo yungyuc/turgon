@@ -1,6 +1,9 @@
 # Copyright (c) 2018, Yung-Yu Chen <yyc@solvcon.net>
 
 cmake_minimum_required(VERSION 3.9)
+
+cmake_policy(SET CMP0074 NEW)
+
 project(spacetime)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
@@ -57,25 +60,9 @@ find_package(NumPy REQUIRED)
 message(STATUS "NUMPY_INCLUDE_DIR: ${NUMPY_INCLUDE_DIR}")
 include_directories(${NUMPY_INCLUDE_DIR})
 
-find_package(xtl)
-if(DEFINED xtl_FOUND)
-  include_directories(BEFORE ${xtl_INCLUDE_DIR})
-endif()
-
-find_package(xsimd)
-if(DEFINED xsimd_FOUND)
-  include_directories(BEFORE ${xsimd_INCLUDE_DIR})
-endif()
-
-find_package(xtensor)
-if(DEFINED xtensor_FOUND)
-  include_directories(BEFORE ${xtensor_INCLUDE_DIR})
-endif()
-
-find_package(xtensor-python)
-if(DEFINED xtensor-python_FOUND)
-  include_directories(BEFORE ${xtensor-python_INCLUDE_DIR})
-endif()
+find_package(modmesh REQUIRED)
+message(STATUS "modmesh_INCLUDE_DIR: ${modmesh_INCLUDE_DIR}")
+include_directories(${modmesh_INCLUDE_DIR})
 
 include_directories("include")
 
@@ -91,15 +78,15 @@ set(SPACETIME_HEADERS
     include/spacetime/Grid_decl.hpp
     include/spacetime/Field.hpp
     include/spacetime/Field_decl.hpp
+    include/spacetime/io.hpp
+    include/spacetime/math.hpp
     include/spacetime/Selm.hpp
     include/spacetime/Selm_decl.hpp
     include/spacetime/SolverBase.hpp
     include/spacetime/SolverBase_decl.hpp
     include/spacetime/Solver.hpp
-    include/spacetime/io.hpp
     include/spacetime/system.hpp
     include/spacetime/type.hpp
-    include/spacetime/math.hpp
     # Physical kernels.
     include/spacetime/kernel/linear_scalar.hpp
     include/spacetime/kernel/inviscid_burgers.hpp

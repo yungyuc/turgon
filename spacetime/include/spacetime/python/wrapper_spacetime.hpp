@@ -26,26 +26,36 @@ WrapGrid
     {
         namespace py = pybind11;
         (*this)
-            .def(
-                py::init([](real_type xmin, real_type xmax, size_t nelm) {
-                    return Grid::construct(xmin, xmax, nelm);
-                }),
-                py::arg("xmin"), py::arg("xmax"), py::arg("nelm")
+            .def
+            (
+                py::init
+                (
+                    [](real_type xmin, real_type xmax, size_t nelm)
+                    {
+                        return Grid::construct(xmin, xmax, nelm);
+                    }
+                )
+              , py::arg("xmin"), py::arg("xmax"), py::arg("nelm")
             )
-            .def(
-                py::init([](xt::pyarray<wrapped_type::value_type> & xloc) {
-                    return Grid::construct(xloc);
-                }),
-                py::arg("xloc")
+            .def
+            (
+                py::init
+                (
+                    [](py::array_t<wrapped_type::value_type> & xloc)
+                    {
+                        return Grid::construct(make_Array(xloc));
+                    }
+                )
+              , py::arg("xloc")
             )
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("xmin", &wrapped_type::xmin)
             .def_property_readonly("xmax", &wrapped_type::xmax)
             .def_property_readonly("ncelm", &wrapped_type::ncelm)
             .def_property_readonly("nselm", &wrapped_type::nselm)
-            .def_property_readonly(
-                "xcoord",
-                static_cast<wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::xcoord)
+            .def_property_readonly
+            (
+                "xcoord", [](wrapped_type & self) { return view_pyarray(self.xcoord()); }
             )
             .def_property_readonly_static("BOUND_COUNT", [](py::object const &){ return Grid::BOUND_COUNT; })
         ;
@@ -69,23 +79,26 @@ WrapField
             .def("__str__", &detail::to_str<wrapped_type>)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
             .def_property_readonly("nvar", &wrapped_type::nvar)
-            .def_property(
-                "time_increment",
-                &wrapped_type::time_increment,
-                &wrapped_type::set_time_increment
+            .def_property
+            (
+                "time_increment"
+              , &wrapped_type::time_increment
+              , &wrapped_type::set_time_increment
              )
             .def_property_readonly("dt", &wrapped_type::dt)
             .def_property_readonly("hdt", &wrapped_type::hdt)
             .def_property_readonly("qdt", &wrapped_type::qdt)
-            .def(
-                "celm",
-                static_cast<Celm (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::celm_at<Celm>),
-                py::arg("ielm"), py::arg("odd_plane")=false
+            .def
+            (
+                "celm"
+              , static_cast<Celm (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::celm_at<Celm>)
+              , py::arg("ielm"), py::arg("odd_plane")=false
             )
-            .def(
-                "selm",
-                static_cast<Selm (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::selm_at<Selm>),
-                py::arg("ielm"), py::arg("odd_plane")=false
+            .def
+            (
+                "selm"
+              , static_cast<Selm (wrapped_type::*)(sindex_type, bool)>(&wrapped_type::selm_at<Selm>)
+              , py::arg("ielm"), py::arg("odd_plane")=false
             )
         ;
     }
