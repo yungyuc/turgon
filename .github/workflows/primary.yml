@@ -1,6 +1,10 @@
 name: primary
 
-on: [push]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 17 * * *'
 
 jobs:
   build:
