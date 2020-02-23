@@ -1,6 +1,6 @@
 # Copyright (c) 2018, Yung-Yu Chen <yyc@solvcon.net>
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.15.4)
 
 cmake_policy(SET CMP0074 NEW)
 
