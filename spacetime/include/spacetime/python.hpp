@@ -27,19 +27,19 @@ void add_solver(pybind11::module & mod, const std::string & name, const std::str
 {
     WST::commit
     (
-        &mod
+        mod
       , (name + "Solver").c_str()
       , ("Solving algorithm of " + desc).c_str()
     );
     WCET::commit
     (
-        &mod
+        mod
       , (name + "Celm").c_str()
       , ("Conservation element of " + desc).c_str()
     );
     WSET::commit
     (
-        &mod
+        mod
       , (name + "Selm").c_str()
       , ("Solution element of " + desc).c_str()
     );
@@ -54,8 +54,8 @@ inline void initialize_impl(pybind11::module & mod)
 
     mpy::initialize(mod); // numpy is imported here as early as possible or it crashes.
 
-    spy::WrapGrid::commit(&mod, "Grid", "Spatial grid data");
-    spy::WrapField::commit(&mod, "Field", "Solution data");
+    spy::WrapGrid::commit(mod, "Grid", "Spatial grid data");
+    spy::WrapField::commit(mod, "Field", "Solution data");
 
     add_solver
     <

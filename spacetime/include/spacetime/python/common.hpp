@@ -94,7 +94,7 @@ protected:
 
     using base_type::base_type;
 
-    WrapElementBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
+    WrapElementBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
@@ -150,7 +150,7 @@ protected:
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
-    WrapCelmBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
+    WrapCelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         using se_getter_type = typename wrapped_type::selm_type (wrapped_type::*)();
@@ -193,7 +193,7 @@ protected:
     using wrapper_type = typename base_type::wrapper_type;
     using wrapped_type = typename base_type::wrapped_type;
 
-    WrapSelmBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
+    WrapSelmBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
         using value_type = typename wrapped_type::value_type;
@@ -310,7 +310,7 @@ public:
 
 protected:
 
-    WrapSolverBase(pybind11::module * mod, const char * pyname, const char * clsdoc)
+    WrapSolverBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
       : base_type(mod, pyname, clsdoc)
     {
 
