@@ -18,20 +18,27 @@ CMAKE_BUILD_TYPE ?= Release
 SPACETIME_ROOT ?= $(shell pwd)
 CMAKE_ARGS ?=
 VERBOSE ?=
+GDB ?=
 ifeq ($(CMAKE_BUILD_TYPE), Debug)
 	BUILD_PATH ?= build/dbg37
 else
 	BUILD_PATH ?= build/dev37
 endif
 
+PYTHON ?= $(shell which python3)
+
 PYTEST ?= $(shell which py.test-3)
 ifeq ($(PYTEST),)
-	PYTEST := $(shell which pytest)
+	PYTEST := $(PYTHON) -m pytest
 endif
 ifneq ($(VERBOSE),)
 	PYTEST_OPTS ?= -v
 else
 	PYTEST_OPTS ?=
+endif
+
+ifneq ($(GDB),)
+	PYTEST := gdb --args $(PYTEST)
 endif
 
 pyextsuffix := $(shell python3-config --extension-suffix)
