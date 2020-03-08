@@ -52,7 +52,7 @@ inline void initialize_impl(pybind11::module & mod)
 
     mod.doc() = "_libst: One-dimensional space-time CESE method code";
 
-    mpy::initialize(mod); // numpy is imported here as early as possible or it crashes.
+    pybind11::module::import("modmesh._modmesh");
 
     spy::WrapGrid::commit(mod, "Grid", "Spatial grid data");
     spy::WrapField::commit(mod, "Field", "Solution data");

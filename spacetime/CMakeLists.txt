@@ -60,6 +60,13 @@ find_package(NumPy REQUIRED)
 message(STATUS "NUMPY_INCLUDE_DIR: ${NUMPY_INCLUDE_DIR}")
 include_directories(${NUMPY_INCLUDE_DIR})
 
+if(NOT DEFINED modmesh_ROOT)
+    if(DEFINED ENV{MODMESH_ROOT})
+        set(modmesh_ROOT $ENV{MODMESH_ROOT})
+    endif()
+endif()
+message(STATUS "modmesh_ROOT: ${modmesh_ROOT}")
+
 find_package(modmesh REQUIRED)
 message(STATUS "modmesh_INCLUDE_DIR: ${modmesh_INCLUDE_DIR}")
 include_directories(${modmesh_INCLUDE_DIR})

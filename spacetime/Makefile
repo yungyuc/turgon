@@ -16,6 +16,7 @@ DEBUG_SYMBOL ?= ON
 USE_CLANG_TIDY ?= OFF
 CMAKE_BUILD_TYPE ?= Release
 SPACETIME_ROOT ?= $(shell pwd)
+MODMESH_ROOT ?= $(SPACETIME_ROOT)/build/modmesh
 CMAKE_ARGS ?=
 VERBOSE ?=
 GDB ?=
@@ -63,7 +64,7 @@ gtest: $(BUILD_PATH)/gtests/libst_gtests
 
 .PHONY: pytest
 pytest: $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix)
-	env PYTHONPATH=$(SPACETIME_ROOT) $(PYTEST) $(PYTEST_OPTS) tests/
+	env PYTHONPATH=$(SPACETIME_ROOT):$(MODMESH_ROOT) $(PYTEST) $(PYTEST_OPTS) tests/
 
 .PHONY: cmake
 cmake: $(BUILD_PATH)/Makefile

@@ -19,10 +19,10 @@ WrapGrid
   : public WrapBase< WrapGrid, Grid, std::shared_ptr<Grid> >
 {
 
-    friend base_type;
+    friend root_base_type;
 
     WrapGrid(pybind11::module & mod, const char * pyname, const char * clsdoc)
-      : base_type(mod, pyname, clsdoc)
+      : root_base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
         (*this)
@@ -69,10 +69,10 @@ WrapField
   : public WrapBase< WrapField, Field, std::shared_ptr<Field> >
 {
 
-    friend base_type;
+    friend root_base_type;
 
     WrapField(pybind11::module & mod, const char * pyname, const char * clsdoc)
-      : base_type(mod, pyname, clsdoc)
+      : root_base_type(mod, pyname, clsdoc)
     {
         namespace py = pybind11;
         (*this)

@@ -28,6 +28,7 @@ namespace spacetime
 namespace python
 {
 
+#if 1
 /**
  * Helper template for pybind11 class wrappers.
  */
@@ -43,6 +44,7 @@ public:
     using wrapped_base_type = WrappedBase;
     using holder_type = Holder;
     using base_type = WrapBase< wrapper_type, wrapped_type, holder_type, wrapped_base_type >;
+    using root_base_type = base_type;
     using class_ = typename std::conditional<
         std::is_same< Wrapped, WrappedBase >::value
       , pybind11::class_< wrapped_type, holder_type >
@@ -88,6 +90,16 @@ private:
     class_ m_cls;
 
 }; /* end class WrapBase */
+#else
+template
+<
+    class Wrapper
+  , class Wrapped
+  , class Holder = std::unique_ptr<Wrapped>
+  , class WrappedBase = Wrapped
+>
+using WrapBase = modmesh::python::WrapBase<Wrapper, Wrapped, Holder, WrappedBase>;
+#endif
 
 } /* end namespace python */
 
