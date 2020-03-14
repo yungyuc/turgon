@@ -16,22 +16,30 @@ DEBUG_SYMBOL ?= ON
 USE_CLANG_TIDY ?= OFF
 CMAKE_BUILD_TYPE ?= Release
 SPACETIME_ROOT ?= $(shell pwd)
+MODMESH_ROOT ?= $(SPACETIME_ROOT)/build/modmesh
 CMAKE_ARGS ?=
 VERBOSE ?=
+GDB ?=
 ifeq ($(CMAKE_BUILD_TYPE), Debug)
 	BUILD_PATH ?= build/dbg37
 else
 	BUILD_PATH ?= build/dev37
 endif
 
+PYTHON ?= $(shell which python3)
+
 PYTEST ?= $(shell which py.test-3)
 ifeq ($(PYTEST),)
-	PYTEST := $(shell which pytest)
+	PYTEST := $(PYTHON) -m pytest
 endif
+
+PYTEST_OPTS ?=
 ifneq ($(VERBOSE),)
-	PYTEST_OPTS ?= -v
-else
-	PYTEST_OPTS ?=
+	PYTEST_OPTS := $(PYTEST_OPTS) -v -s
+endif
+
+ifneq ($(GDB),)
+	PYTEST := gdb --args $(PYTEST)
 endif
 
 pyextsuffix := $(shell python3-config --extension-suffix)
@@ -56,7 +64,7 @@ gtest: $(BUILD_PATH)/gtests/libst_gtests
 
 .PHONY: pytest
 pytest: $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix)
-	env PYTHONPATH=$(SPACETIME_ROOT) $(PYTEST) $(PYTEST_OPTS) tests/
+	env PYTHONPATH=$(SPACETIME_ROOT):$(MODMESH_ROOT) $(PYTEST) $(PYTEST_OPTS) tests/
 
 .PHONY: cmake
 cmake: $(BUILD_PATH)/Makefile
