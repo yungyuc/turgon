@@ -32,10 +32,10 @@ PYTEST ?= $(shell which py.test-3)
 ifeq ($(PYTEST),)
 	PYTEST := $(PYTHON) -m pytest
 endif
+
+PYTEST_OPTS ?=
 ifneq ($(VERBOSE),)
-	PYTEST_OPTS ?= -v
-else
-	PYTEST_OPTS ?=
+	PYTEST_OPTS := $(PYTEST_OPTS) -v -s
 endif
 
 ifneq ($(GDB),)
