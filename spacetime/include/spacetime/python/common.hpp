@@ -32,48 +32,11 @@ template<class T> std::string to_str(T const & self) { return Formatter() << sel
 } /* end namespace detail */
 
 template <typename T>
-pybind11::array_t<typename T::value_type> make_pyarray(T const & xarr)
-{
-    namespace py = pybind11;
-    using value_type = typename T::value_type;
-    constexpr size_t itemsize = sizeof(value_type);
-
-    py::array_t<value_type> pyarr({ xarr.shape()[0] }, { itemsize });
-    auto r = pyarr.template mutable_unchecked<1>();
-
-    for (size_t it=0; it<r.shape(0); ++it)
-    {
-        r(it) = xarr(it);
-    }
-
-    return pyarr;
-}
-
-template <typename T>
-modmesh::SimpleArray<T> make_Array(pybind11::array_t<T> const & parr)
+modmesh::SimpleArray<T> make_SimpleArray(pybind11::array_t<T> const & parr)
 {
     modmesh::SimpleArray<T> sarr(modmesh::small_vector<size_t>(parr.shape(), parr.shape()+parr.ndim()));
     std::copy_n(parr.data(), sarr.size(), sarr.begin());
     return sarr;
-}
-
-template <typename T>
-pybind11::array view_pyarray(modmesh::SimpleArray<T> & arr)
-{
-    namespace py = pybind11;
-
-    std::vector<size_t> shape(arr.shape().begin(), arr.shape().end());
-    std::vector<size_t> stride(arr.stride().begin(), arr.stride().end());
-    for(size_t & v: stride) { v *= arr.itemsize(); }
-
-    return py::array
-    (
-        py::detail::npy_format_descriptor<T>::dtype()
-      , shape
-      , stride
-      , arr.data()
-      , py::cast(arr.buffer().shared_from_this())
-    );
 }
 
 template<class WT, class ET>
@@ -337,39 +300,45 @@ protected:
         using selm_getter = typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool);
 
 #define DECL_ST_WRAP_ARRAY_ACCESS_0D(NAME) \
-    .def_property_readonly(#NAME, static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME)) \
+    .def_property_readonly \
+    ( \
+        #NAME \
+      , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME) \
+      , py::return_value_policy::reference_internal \
+    ) \
     .def \
     ( \
         "get_" #NAME \
       , [](wrapped_type & self, bool odd_plane) \
-        { return make_pyarray(self.get_ ## NAME(odd_plane)); } \
+        { return self.get_ ## NAME(odd_plane); } \
       , py::arg("odd_plane")=false \
     ) \
     .def \
     ( \
         "set_" #NAME \
       , [](wrapped_type & self, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { self.set_ ## NAME(make_Array(arr), odd_plane); } \
+        { self.set_ ## NAME(make_SimpleArray(arr), odd_plane); } \
       , py::arg("arr"), py::arg("odd_plane")=false \
     )
 #define DECL_ST_WRAP_ARRAY_ACCESS_1D(NAME) \
     .def_property_readonly \
     ( \
         #NAME \
-      , [](wrapped_type & self) { return view_pyarray(self.NAME()); } \
+      , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME) \
+      , py::return_value_policy::reference_internal \
     ) \
     .def \
     ( \
         "get_" #NAME \
       , [](wrapped_type & self, size_t iv, bool odd_plane) \
-        { return make_pyarray(self.get_ ## NAME(iv, odd_plane)); } \
+        { return self.get_ ## NAME(iv, odd_plane); } \
       , py::arg("iv"), py::arg("odd_plane")=false \
     ) \
     .def \
     ( \
         "set_" #NAME \
       , [](wrapped_type & self, size_t iv, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { self.set_ ## NAME(iv, make_Array(arr), odd_plane); } \
+        { self.set_ ## NAME(iv, make_SimpleArray(arr), odd_plane); } \
       , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
     )
 #define DECL_ST_WRAP_MARCH_ALPHA(ALPHA) \

@@ -15,8 +15,8 @@ class SolverTC(unittest.TestCase):
         self.grid10 = libst.Grid(0, 10, 10)
         self.sol10 = libst.Solver(grid=self.grid10, nvar=1,
                                   time_increment=0.2)
-        self.sol10.so0.fill(-1)
-        self.sol10.so1.fill(-2)
+        self.sol10.so0.ndarray.fill(-1)
+        self.sol10.so1.ndarray.fill(-2)
 
     def test_str(self):
 
@@ -70,13 +70,13 @@ class SolverTC(unittest.TestCase):
         self.assertEqual((nx,1), self.sol10.so0.shape)
         self.assertEqual((nx,1), self.sol10.so1.shape)
         # type
-        self.assertEqual(np.float64, self.sol10.so0.dtype)
-        self.assertEqual(np.float64, self.sol10.so1.dtype)
+        self.assertEqual(np.float64, self.sol10.so0.ndarray.dtype)
+        self.assertEqual(np.float64, self.sol10.so1.ndarray.dtype)
         # content
-        self.sol10.so0.fill(0)
-        self.assertEqual([0.0]*nx, self.sol10.so0.flatten().tolist())
-        self.sol10.so1.fill(1)
-        self.assertEqual([1.0]*nx, self.sol10.so1.flatten().tolist())
+        self.sol10.so0.ndarray.fill(0)
+        self.assertEqual([0.0]*nx, self.sol10.so0.ndarray.flatten().tolist())
+        self.sol10.so1.ndarray.fill(1)
+        self.assertEqual([1.0]*nx, self.sol10.so1.ndarray.flatten().tolist())
 
     def test_celm(self):
 
