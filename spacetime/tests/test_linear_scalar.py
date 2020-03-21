@@ -62,7 +62,7 @@ class LinearScalarSolverTC(unittest.TestCase):
     def test_array_getter(self):
 
         v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=False)]
-        v2 = self.svr.get_so0(0).tolist()
+        v2 = self.svr.get_so0(0).ndarray.tolist()
         self.assertEqual(self.svr.grid.ncelm+1, len(v2))
         self.assertEqual(v1, v2)
 
@@ -72,7 +72,7 @@ class LinearScalarSolverTC(unittest.TestCase):
             self.svr.get_so0(1, odd_plane=True)
 
         v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=False)]
-        v2 = self.svr.get_so1(0).tolist()
+        v2 = self.svr.get_so1(0).ndarray.tolist()
         self.assertEqual(self.svr.grid.ncelm+1, len(v2))
         self.assertEqual(v1, v2)
 
@@ -85,20 +85,20 @@ class LinearScalarSolverTC(unittest.TestCase):
         self.svr.march_alpha2(steps=1)
 
         v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=True)]
-        v2 = self.svr.get_so0(0, odd_plane=True).tolist()
+        v2 = self.svr.get_so0(0, odd_plane=True).ndarray.tolist()
         self.assertEqual(self.svr.grid.ncelm, len(v2))
         self.assertEqual(v1, v2)
 
         v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=True)]
-        v2 = self.svr.get_so1(0, odd_plane=True).tolist()
+        v2 = self.svr.get_so1(0, odd_plane=True).ndarray.tolist()
         self.assertEqual(self.svr.grid.ncelm, len(v2))
         self.assertEqual(v1, v2)
 
     def test_initialized(self):
 
-        self.assertEqual(self.svr.get_so0(0).tolist(),
+        self.assertEqual(self.svr.get_so0(0).ndarray.tolist(),
                          np.sin(self.xcrd).tolist())
-        self.assertEqual(self.svr.get_so1(0).tolist(),
+        self.assertEqual(self.svr.get_so1(0).ndarray.tolist(),
                          np.cos(self.xcrd).tolist())
 
     def test_march(self):
@@ -130,7 +130,7 @@ class LinearScalarSolverTC(unittest.TestCase):
         for it in range(self.nstep*self.cycle):
             _march()
             svr2.march_alpha2(steps=1)
-            self.assertEqual(self.svr.get_so0(0).tolist(),
-                            svr2.get_so0(0).tolist())
+            self.assertEqual(self.svr.get_so0(0).ndarray.tolist(),
+                             svr2.get_so0(0).ndarray.tolist())
 
 # vim: set et sw=4 ts=4:
