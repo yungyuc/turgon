@@ -17,6 +17,7 @@ USE_CLANG_TIDY ?= OFF
 CMAKE_BUILD_TYPE ?= Release
 SPACETIME_ROOT ?= $(shell pwd)
 MODMESH_ROOT ?= $(SPACETIME_ROOT)/build/modmesh
+NB_ARGS ?=
 CMAKE_ARGS ?=
 VERBOSE ?=
 GDB ?=
@@ -83,6 +84,10 @@ $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix): $(BUILD_PATH)/_libst$(pyextsuffix)
 
 .PHONY: buildext
 buildext: $(SPACETIME_ROOT)/libst/_libst$(pyextsuffix)
+
+.PHONE: notebook
+notebook: buildext
+	cd .. && env PYTHONPATH=$(SPACETIME_ROOT):$(MODMESH_ROOT) jupyter notebook $(NB_ARGS)
 
 $(BUILD_PATH)/Makefile: CMakeLists.txt Makefile
 	mkdir -p $(BUILD_PATH) ; \

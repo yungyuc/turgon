@@ -144,8 +144,8 @@ class SelmTC(unittest.TestCase):
         self.se9 = self.sol10.selm(9)
         self.se10 = self.sol10.selm(10)
         # Set trivial solution.
-        self.sol10.so0.fill(1)
-        self.sol10.so1.fill(0)
+        self.sol10.so0.ndarray.fill(1)
+        self.sol10.so1.ndarray.fill(0)
 
     def test_str(self):
 

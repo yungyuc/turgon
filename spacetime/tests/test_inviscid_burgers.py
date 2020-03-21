@@ -48,7 +48,7 @@ class InviscidBurgersSolverTC(unittest.TestCase):
     def test_result_bound(self):
 
         for it in range(self.nstep*self.cycle):
-            res = self.svr.get_so0(0)
+            res = self.svr.get_so0(0).ndarray
             self.assertLessEqual(res.max(), 1)
             self.assertGreaterEqual(res.min(), -1)
 

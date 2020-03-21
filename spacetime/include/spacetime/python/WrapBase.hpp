@@ -28,69 +28,6 @@ namespace spacetime
 namespace python
 {
 
-#if 1
-/**
- * Helper template for pybind11 class wrappers.
- */
-template< class Wrapper, class Wrapped, class Holder = std::unique_ptr<Wrapped>, class WrappedBase = Wrapped >
-class
-SPACETIME_PYTHON_WRAPPER_VISIBILITY
-WrapBase {
-
-public:
-
-    using wrapper_type = Wrapper;
-    using wrapped_type = Wrapped;
-    using wrapped_base_type = WrappedBase;
-    using holder_type = Holder;
-    using base_type = WrapBase< wrapper_type, wrapped_type, holder_type, wrapped_base_type >;
-    using root_base_type = base_type;
-    using class_ = typename std::conditional<
-        std::is_same< Wrapped, WrappedBase >::value
-      , pybind11::class_< wrapped_type, holder_type >
-      , pybind11::class_< wrapped_type, wrapped_base_type, holder_type >
-    >::type;
-
-    static wrapper_type & commit(pybind11::module & mod, const char * pyname, const char * clsdoc) {
-        static wrapper_type derived(mod, pyname, clsdoc);
-        return derived;
-    }
-
-    WrapBase() = delete;
-    WrapBase(WrapBase const & ) = default;
-    WrapBase(WrapBase       &&) = delete;
-    WrapBase & operator=(WrapBase const & ) = default;
-    WrapBase & operator=(WrapBase       &&) = delete;
-    ~WrapBase() = default;
-
-#define DECL_ST_PYBIND_CLASS_METHOD(METHOD) \
-    template< class... Args > \
-    /* NOLINTNEXTLINE(bugprone-macro-parentheses) */ \
-    wrapper_type & METHOD(Args&&... args) { \
-        m_cls.METHOD(std::forward<Args>(args)...); \
-        return *static_cast<wrapper_type*>(this); \
-    }
-
-    DECL_ST_PYBIND_CLASS_METHOD(def)
-    DECL_ST_PYBIND_CLASS_METHOD(def_readwrite)
-    DECL_ST_PYBIND_CLASS_METHOD(def_property)
-    DECL_ST_PYBIND_CLASS_METHOD(def_property_readonly)
-    DECL_ST_PYBIND_CLASS_METHOD(def_property_readonly_static)
-
-#undef DECL_ST_PYBIND_CLASS_METHOD
-
-protected:
-
-    WrapBase(pybind11::module & mod, const char * pyname, const char * clsdoc)
-      : m_cls(mod, pyname, clsdoc)
-    {}
-
-private:
-
-    class_ m_cls;
-
-}; /* end class WrapBase */
-#else
 template
 <
     class Wrapper
@@ -99,7 +36,6 @@ template
   , class WrappedBase = Wrapped
 >
 using WrapBase = modmesh::python::WrapBase<Wrapper, Wrapped, Holder, WrappedBase>;
-#endif
 
 } /* end namespace python */
 

@@ -43,7 +43,7 @@ WrapGrid
                 (
                     [](py::array_t<wrapped_type::value_type> & xloc)
                     {
-                        return Grid::construct(make_Array(xloc));
+                        return Grid::construct(make_SimpleArray(xloc));
                     }
                 )
               , py::arg("xloc")
@@ -55,7 +55,8 @@ WrapGrid
             .def_property_readonly("nselm", &wrapped_type::nselm)
             .def_property_readonly
             (
-                "xcoord", [](wrapped_type & self) { return view_pyarray(self.xcoord()); }
+                "xcoord"
+              , static_cast<wrapped_type::array_type const & (wrapped_type::*)() const>(&wrapped_type::xcoord)
             )
             .def_property_readonly_static("BOUND_COUNT", [](py::object const &){ return Grid::BOUND_COUNT; })
         ;
