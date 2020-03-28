@@ -133,7 +133,7 @@ ubuntu_1804(){
      python3.7 python3.7-dev python3.7-venv
   sudo rm /usr/bin/python3
   sudo ln -s python3.7 /usr/bin/python3
-  sudo apt -y install python-pip
+  sudo apt -y install python3-pip
   sudo pip3 install -U pip
   sudo pip3 install -U numpy pytest setuptools cmake
 }
