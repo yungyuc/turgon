@@ -126,6 +126,18 @@ xtensor_python() {
 
 }
 
+ubuntu_1804(){
+
+  sudo apt-get -qy install \
+     sudo curl git build-essential make cmake libc6-dev gcc-7 g++-7 \
+     python3.7 python3.7-dev python3.7-venv
+  sudo rm /usr/bin/python3
+  sudo ln -s python3.7 /usr/bin/python3
+  sudo apt -y install python-pip
+  sudo pip3 install -U pip
+  sudo pip3 install -U numpy pytest setuptools cmake
+}
+
 if [ $1 == "pybind11" ]; then
   pybind11
 elif [ $1 == "xtl" ]; then
@@ -139,4 +151,6 @@ elif [ $1 == "xtensor-python" ]; then
 elif [ $1 == "everything" ]; then
   pybind11
   modmesh
+elif [ $1 == "ubuntu_1804" ]; then
+  ubuntu_1804
 fi
