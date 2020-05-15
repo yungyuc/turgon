@@ -16,7 +16,8 @@ Checks: >
     -llvm-include-order,
     -performance-noexcept-move-constructor,
     -readability-named-parameter,
-    -readability-magic-numbers
+    -readability-magic-numbers,
+    -readability-redundant-access-specifiers
 WarningsAsErrors: ''
 HeaderFilterRegex: 'spacetime.*'
 AnalyzeTemporaryDtors: false
