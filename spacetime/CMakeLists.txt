@@ -131,6 +131,13 @@ add_custom_target(_libst_py
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_libst> ${PYLIBST_PATH}
     DEPENDS _libst)
 
+target_compile_options(
+    _libst PRIVATE
+    #-Werror -Wall -Wextra
+    -Wno-unused-value # for PYBIND11_EXPAND_SIDE_EFFECTS in pybind11.h
+    -Wno-noexcept-type # GCC
+)
+
 if(CLANG_TIDY_EXE AND USE_CLANG_TIDY)
     set_target_properties(
         _libst PROPERTIES
