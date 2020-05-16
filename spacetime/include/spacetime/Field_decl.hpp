@@ -93,6 +93,31 @@ public:
     template< typename SE > SE const selm_at(sindex_type ielm, bool odd_plane) const;
     template< typename SE > SE       selm_at(sindex_type ielm, bool odd_plane);
 
+    using secalc_type = std::function<value_type(Selm const &, size_t)>;
+    using secfl_type = std::function<void (Selm &)>;
+
+    value_type calc_xn(Selm const & se, size_t iv) const { return m_xn_calc(se, iv); }
+    value_type calc_xp(Selm const & se, size_t iv) const { return m_xp_calc(se, iv); }
+    value_type calc_tn(Selm const & se, size_t iv) const { return m_tn_calc(se, iv); }
+    value_type calc_tp(Selm const & se, size_t iv) const { return m_tp_calc(se, iv); }
+    value_type calc_so0p(Selm const & se, size_t iv) const { return m_so0p_calc(se, iv); }
+    void update_cfl(Selm & se) { m_cfl_updater(se); }
+
+    secalc_type const & xn_calc() const { return m_xn_calc; }
+    secalc_type const & xp_calc() const { return m_xp_calc; }
+    secalc_type const & tn_calc() const { return m_tn_calc; }
+    secalc_type const & tp_calc() const { return m_tp_calc; }
+    secalc_type       & xn_calc()       { return m_xn_calc; }
+    secalc_type       & xp_calc()       { return m_xp_calc; }
+    secalc_type       & tn_calc()       { return m_tn_calc; }
+    secalc_type       & tp_calc()       { return m_tp_calc; }
+    secalc_type const & so0p_calc() const { return m_so0p_calc; }
+    secalc_type       & so0p_calc()       { return m_so0p_calc; }
+    secfl_type const & cfl_updater() const { return m_cfl_updater; }
+    secfl_type       & cfl_updater()       { return m_cfl_updater; }
+
+    void reset_calc();
+
 private:
 
     std::shared_ptr<Grid> m_grid;
@@ -105,6 +130,13 @@ private:
     // Cached value;
     real_type m_half_time_increment = 0;
     real_type m_quarter_time_increment = 0;
+
+    secalc_type m_xn_calc;
+    secalc_type m_xp_calc;
+    secalc_type m_tn_calc;
+    secalc_type m_tp_calc;
+    secalc_type m_so0p_calc;
+    secfl_type m_cfl_updater;
 
 }; /* end class Field */
 

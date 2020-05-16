@@ -67,10 +67,16 @@ template< typename ST, typename CE, typename SE >
 inline void
 SolverBase<ST,CE,SE>::set_so0(size_t iv, typename SolverBase<ST,CE,SE>::array_type const & arr, bool odd_plane)
 {
-    if (iv >= m_field.nvar()) { throw std::out_of_range("set_so0(): out of nvar range"); }
+    if (iv >= m_field.nvar())
+    {
+        throw std::out_of_range(Formatter() << "set_so0(): iv " << iv << " >= nvar " << m_field.nvar());
+    }
     if (1 != arr.shape().size()) { throw std::out_of_range("set_so0(): input not 1D"); }
     const index_type nselm = grid().nselm() - odd_plane;
-    if (nselm != arr.size()) { throw std::out_of_range("set_so0(): input wrong size"); }
+    if (nselm != arr.size())
+    {
+        throw std::out_of_range(Formatter() << "set_so0(): arr size " << arr.size() << " != nselm " << nselm);
+    }
     for (index_type it=0; it<nselm; ++it) { selm(it, odd_plane).so0(iv) = arr[it]; }
 }
 

@@ -184,4 +184,184 @@ class SolverTC(unittest.TestCase):
         gold = [sol.selm(it, odd_plane=True) for it in range(sol.grid.nselm-1)]
         self.assertEqual(gold, list(sol.selms(odd_plane=True)))
 
+
+class PythonCustomSolverTC(unittest.TestCase):
+
+    @staticmethod
+    def _build_solver(resolution):
+
+        # Build grid.
+        xcrd = np.arange(resolution+1) / resolution
+        xcrd *= 2 * np.pi
+        grid = libst.Grid(xcrd)
+        dx = (grid.xmax - grid.xmin) / grid.ncelm
+
+        # Build solver.
+        time_stop = 2*np.pi
+        cfl_max = 1.0
+        dt_max = dx * cfl_max
+        nstep = int(np.ceil(time_stop / dt_max))
+        dt = time_stop / nstep
+        svr = libst.Solver(grid=grid, time_increment=dt, nvar=1)
+
+        # Initialize.
+        svr.set_so0(0, np.sin(xcrd))
+        svr.set_so1(0, np.cos(xcrd))
+        svr.setup_march()
+
+        return nstep, xcrd, svr
+
+    def setUp(self):
+
+        self.resolution = 8
+        self.nstep, self.xcrd, self.svr = self._build_solver(self.resolution)
+        self.cycle = 10
+
+    def test_xctr(self):
+
+        # On even plane.
+        self.assertEqual(len(self.svr.xctr()), self.svr.grid.ncelm+1)
+        self.assertEqual(self.svr.xctr().tolist(), self.xcrd.tolist())
+        self.assertEqual(self.svr.xctr().tolist(),
+                         [e.xctr for e in self.svr.selms(odd_plane=False)])
+
+        # On odd plane.
+        self.assertEqual(len(self.svr.xctr(odd_plane=True)), self.svr.grid.ncelm)
+        self.assertEqual(self.svr.xctr().tolist(), self.xcrd.tolist())
+        self.assertEqual(self.svr.xctr(odd_plane=True).tolist(),
+                         [e.xctr for e in self.svr.selms(odd_plane=True)])
+
+    def test_nvar(self):
+
+        self.assertEqual(1, self.svr.nvar)
+
+    def test_array_getter(self):
+
+        v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=False)]
+        v2 = self.svr.get_so0(0).ndarray.tolist()
+        self.assertEqual(self.svr.grid.ncelm+1, len(v2))
+        self.assertEqual(v1, v2)
+
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so0(1)
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so0(1, odd_plane=True)
+
+        v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=False)]
+        v2 = self.svr.get_so1(0).ndarray.tolist()
+        self.assertEqual(self.svr.grid.ncelm+1, len(v2))
+        self.assertEqual(v1, v2)
+
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so1(1)
+        with self.assertRaisesRegex(IndexError, "out of nvar range"):
+            self.svr.get_so1(1, odd_plane=True)
+
+        # The odd-plane value is uninitialized before marching.
+        self.svr.march_alpha2(steps=1)
+
+        v1 = [e.get_so0(0) for e in self.svr.selms(odd_plane=True)]
+        v2 = self.svr.get_so0(0, odd_plane=True).ndarray.tolist()
+        self.assertEqual(self.svr.grid.ncelm, len(v2))
+        self.assertEqual(v1, v2)
+
+        v1 = [e.get_so1(0) for e in self.svr.selms(odd_plane=True)]
+        v2 = self.svr.get_so1(0, odd_plane=True).ndarray.tolist()
+        self.assertEqual(self.svr.grid.ncelm, len(v2))
+        self.assertEqual(v1, v2)
+
+    def test_initialized(self):
+
+        self.assertEqual(self.svr.get_so0(0).ndarray.tolist(),
+                         np.sin(self.xcrd).tolist())
+        self.assertEqual(self.svr.get_so1(0).ndarray.tolist(),
+                         np.cos(self.xcrd).tolist())
+
+    def test_se(self):
+
+        self.assertIsNotNone(self.svr.xn_calc)
+
+        se = self.svr.selm(0)
+        self.assertEqual(0, se.xn(0))
+
+        def _(se, iv):
+            return 1.2
+        self.svr.xn_calc = _
+        self.assertEqual(1.2, se.xn(0))
+
+    def test_march(self):
+
+        def xn(se, iv):
+            displacement = 0.5 * (se.x + se.xneg) - se.xctr
+            return se.dxneg * (se.get_so0(iv) + displacement * se.get_so1(iv))
+        self.svr.xn_calc = xn
+
+        def xp(se, iv):
+            displacement = 0.5 * (se.x + se.xpos) - se.xctr
+            return se.dxpos * (se.get_so0(iv) + displacement * se.get_so1(iv))
+        self.svr.xp_calc = xp
+
+        def tn(se, iv):
+            displacement = se.x - se.xctr
+            ret = se.get_so0(iv)  # f(u)
+            ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
+            ret += se.qdt * se.get_so1(iv)  # displacement in t
+            return se.hdt * ret
+        self.svr.tn_calc = tn
+
+        def tp(se, iv):
+            displacement = se.x - se.xctr
+            ret = se.get_so0(iv)  # f(u)
+            ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
+            ret -= se.qdt * se.get_so1(iv)  # displacement in t
+            return se.hdt * ret
+        self.svr.tp_calc = tp
+
+        def so0p(se, iv):
+            ret = se.get_so0(iv)
+            ret += (se.x-se.xctr) * se.get_so1(iv)  # displacement in x
+            ret -= se.hdt * se.get_so1(iv)  # displacement in t
+            return ret
+        self.svr.so0p_calc = so0p
+
+        def cfl(se):
+            hdx = min(se.dxneg, se.dxpos)
+            se.set_cfl(se.hdt / hdx)
+        self.svr.cfl_updater = cfl
+
+        self.svr.march_alpha2(self.nstep*self.cycle)
+        np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
+                                   rtol=0, atol=1.e-14)
+        ones = np.ones(self.svr.grid.nselm, dtype='float64')
+        np.testing.assert_allclose(self.svr.get_cfl(), ones,
+                                   rtol=0, atol=1.e-14)
+
+        self.svr.reset_calc()
+        self.svr.march_alpha2(self.nstep*self.cycle)
+        np.testing.assert_array_equal(self.svr.get_so0(0),
+                                      np.zeros_like(self.xcrd))
+
+    def test_march_fine_interface(self):
+
+        def _march():
+
+            # first half step.
+            self.svr.march_half_so0(odd_plane=False)
+            self.svr.treat_boundary_so0()
+            self.svr.update_cfl(odd_plane=True)
+            self.svr.march_half_so1_alpha2(odd_plane=False)
+            self.svr.treat_boundary_so1()
+            # second half step.
+            self.svr.march_half_so0(odd_plane=True)
+            self.svr.update_cfl(odd_plane=False)
+            self.svr.march_half_so1_alpha2(odd_plane=True)
+
+        svr2 = self._build_solver(self.resolution)[-1]
+
+        for it in range(self.nstep*self.cycle):
+            _march()
+            svr2.march_alpha2(steps=1)
+            self.assertEqual(self.svr.get_so0(0).ndarray.tolist(),
+                             svr2.get_so0(0).ndarray.tolist())
+
 # vim: set et sw=4 ts=4:

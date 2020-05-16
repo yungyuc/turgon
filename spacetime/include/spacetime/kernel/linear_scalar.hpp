@@ -88,11 +88,10 @@ LinearScalarSelm::value_type LinearScalarSelm::so0p(size_t iv) const
 }
 
 inline
-LinearScalarSelm::value_type & LinearScalarSelm::update_cfl()
+void LinearScalarSelm::update_cfl()
 {
     const value_type hdx = std::min(dxneg(), dxpos());
     this->cfl() = field().hdt() / hdx;
-    return this->cfl();
 }
 
 } /* end namespace spacetime */

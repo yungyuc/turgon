@@ -63,18 +63,14 @@ public:
     value_type const & cfl() const { return field().cfl(xindex()); }
     value_type       & cfl()       { return field().cfl(xindex()); }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type xn(size_t /*iv*/) const { return 0.0; }
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type xp(size_t /*iv*/) const { return 0.0; }
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type tn(size_t /*iv*/) const { return 0.0; }
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type tp(size_t /*iv*/) const { return 0.0; }
+    value_type xn(size_t iv) const { return field().calc_xn(*this, iv); }
+    value_type xp(size_t iv) const { return field().calc_xp(*this, iv); }
+    value_type tn(size_t iv) const { return field().calc_tn(*this, iv); }
+    value_type tp(size_t iv) const { return field().calc_tp(*this, iv); }
 
-    value_type so0p(size_t iv) const { return so0(iv); }
+    value_type so0p(size_t iv) const { return field().calc_so0p(*this, iv); }
 
-    value_type & update_cfl() { cfl() = 0.0; return cfl(); }
+    void update_cfl() { return field().update_cfl(*this); }
 
 }; /* end class Selm */
 

@@ -20,6 +20,7 @@ Field::Field(std::shared_ptr<Grid> const & grid, Field::value_type time_incremen
   , m_cfl(array_type(std::vector<size_t>{grid->xsize()}))
 {
     set_time_increment(time_increment);
+    reset_calc();
 }
 
 inline
@@ -90,6 +91,16 @@ SE Field::selm_at(sindex_type ielm, bool odd_plane)
         );
     }
     return elm;
+}
+
+inline void Field::reset_calc()
+{
+    m_xn_calc = [](Selm const &, size_t) { return 0.0; };
+    m_xp_calc = [](Selm const &, size_t) { return 0.0; };
+    m_tn_calc = [](Selm const &, size_t) { return 0.0; };
+    m_tp_calc = [](Selm const &, size_t) { return 0.0; };
+    m_so0p_calc = [](Selm const & se, size_t iv) { return se.so0(iv); };
+    m_cfl_updater = [](Selm & se) { se.cfl() = 0.0; };
 }
 
 } /* end namespace spacetime */

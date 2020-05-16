@@ -5,10 +5,11 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "pybind11/pybind11.h" // must be first
-#include "pybind11/operators.h"
-#include "pybind11/stl.h"
-#include "pybind11/numpy.h"
+#include <pybind11/pybind11.h> // must be first
+#include <pybind11/operators.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+#include <pybind11/functional.h>
 
 #include "spacetime.hpp"
 #include "spacetime/python/WrapBase.hpp"
@@ -187,6 +188,7 @@ protected:
             .def("xp", &wrapped_type::xp)
             .def("tn", &wrapped_type::tn)
             .def("tp", &wrapped_type::tp)
+            .def("so0p", &wrapped_type::so0p)
             .def("update_cfl", &wrapped_type::update_cfl)
         ;
     }
@@ -299,6 +301,13 @@ protected:
         using celm_getter = typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool);
         using selm_getter = typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool);
 
+#define DECL_ST_WRAP_CALC(NAME, TYPE) \
+    .def_property \
+    ( \
+        #NAME \
+      , [](wrapped_type & self) { return py::cpp_function(self.NAME()); } \
+      , [](wrapped_type & self, typename wrapped_type::TYPE const & f) { self.NAME() = f; } \
+    )
 #define DECL_ST_WRAP_ARRAY_ACCESS_0D(NAME) \
     .def_property_readonly \
     ( \
@@ -370,6 +379,13 @@ protected:
             .def("__str__", &detail::to_str<wrapped_type>)
             .def("clone", &wrapped_type::clone, py::arg("grid")=false)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+            DECL_ST_WRAP_CALC(xn_calc, secalc_type)
+            DECL_ST_WRAP_CALC(xp_calc, secalc_type)
+            DECL_ST_WRAP_CALC(tn_calc, secalc_type)
+            DECL_ST_WRAP_CALC(tp_calc, secalc_type)
+            DECL_ST_WRAP_CALC(so0p_calc, secalc_type)
+            DECL_ST_WRAP_CALC(cfl_updater, secfl_type)
+            .def("reset_calc", &wrapped_type::reset_calc)
             .def("x", &wrapped_type::x, py::arg("odd_plane")=false)
             .def
             (

@@ -28,24 +28,23 @@ void Celm::move_at(sindex_type offset)
 
 template< typename SE >
 inline
-typename CelmBase<SE>::value_type CelmBase<SE>::calc_so0(size_t iv) const
+typename Celm::value_type Celm::calc_so0(size_t iv) const
 {
-    const SE se_xn = selm_xn();
-    const SE se_xp = selm_xp();
+    const SE se_xn = selm_xn<SE>();
+    const SE se_xp = selm_xp<SE>();
     const value_type flux_ll = se_xn.xp(iv) + se_xn.tp(iv);
     const value_type flux_ur = se_xp.xn(iv) - se_xp.tp(iv);
-    const SE se_tp = selm_tp();
+    const SE se_tp = selm_tp<SE>();
     return (flux_ll + flux_ur) / se_tp.dx();
 }
 
-template< typename SE >
-template< size_t ALPHA >
+template< typename SE, size_t ALPHA >
 inline
-typename CelmBase<SE>::value_type CelmBase<SE>::calc_so1_alpha(size_t iv) const
+typename Celm::value_type Celm::calc_so1_alpha(size_t iv) const
 {
     // Fetch value.
-    const SE se_xn = selm_xn();
-    const SE se_xp = selm_xp();
+    const SE se_xn = selm_xn<SE>();
+    const SE se_xp = selm_xp<SE>();
     const value_type upn = se_xn.so0p(iv); // u' at left SE
     const value_type upp = se_xp.so0p(iv); // u' at right SE
     const value_type utp = selm_tp().so0(iv); // u at top SE

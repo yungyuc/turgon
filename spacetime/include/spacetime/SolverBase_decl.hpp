@@ -110,6 +110,24 @@ public:
     real_type hdt() const { return m_field.hdt(); }
     real_type qdt() const { return m_field.qdt(); }
 
+    using secalc_type = Field::secalc_type;
+    using secfl_type = Field::secfl_type;
+
+    secalc_type const & xn_calc() const { return m_field.xn_calc(); }
+    secalc_type const & xp_calc() const { return m_field.xp_calc(); }
+    secalc_type const & tn_calc() const { return m_field.tn_calc(); }
+    secalc_type const & tp_calc() const { return m_field.tp_calc(); }
+    secalc_type       & xn_calc()       { return m_field.xn_calc(); }
+    secalc_type       & xp_calc()       { return m_field.xp_calc(); }
+    secalc_type       & tn_calc()       { return m_field.tn_calc(); }
+    secalc_type       & tp_calc()       { return m_field.tp_calc(); }
+    secalc_type const & so0p_calc() const { return m_field.so0p_calc(); }
+    secalc_type       & so0p_calc()       { return m_field.so0p_calc(); }
+    secfl_type const & cfl_updater() const { return m_field.cfl_updater(); }
+    secfl_type       & cfl_updater()       { return m_field.cfl_updater(); }
+
+    void reset_calc() { m_field.reset_calc(); }
+
     // NOLINTNEXTLINE(readability-const-return-type)
     CE const celm(sindex_type ielm, bool odd_plane) const { return m_field.celm<CE>(ielm, odd_plane); }
     CE       celm(sindex_type ielm, bool odd_plane)       { return m_field.celm<CE>(ielm, odd_plane); }
@@ -152,6 +170,6 @@ public: \
     value_type tn(size_t iv) const; \
     value_type tp(size_t iv) const; \
     value_type so0p(size_t iv) const; \
-    value_type & update_cfl();
+    void update_cfl();
 
 /* vim: set et ts=4 sw=4: */
