@@ -116,7 +116,7 @@ public:
     secfl_type const & cfl_updater() const { return m_cfl_updater; }
     secfl_type       & cfl_updater()       { return m_cfl_updater; }
 
-    void reset_calc();
+    void reset_calculators();
 
 private:
 

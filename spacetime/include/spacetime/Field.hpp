@@ -20,7 +20,7 @@ Field::Field(std::shared_ptr<Grid> const & grid, Field::value_type time_incremen
   , m_cfl(array_type(std::vector<size_t>{grid->xsize()}))
 {
     set_time_increment(time_increment);
-    reset_calc();
+    reset_calculators();
 }
 
 inline
@@ -93,7 +93,7 @@ SE Field::selm_at(sindex_type ielm, bool odd_plane)
     return elm;
 }
 
-inline void Field::reset_calc()
+inline void Field::reset_calculators()
 {
     m_xn_calc = [](Selm const &, size_t) { return 0.0; };
     m_xp_calc = [](Selm const &, size_t) { return 0.0; };

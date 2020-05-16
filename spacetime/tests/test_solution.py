@@ -204,6 +204,45 @@ class PythonCustomSolverTC(unittest.TestCase):
         dt = time_stop / nstep
         svr = libst.Solver(grid=grid, time_increment=dt, nvar=1)
 
+        # Customize to linear wave solver.
+        def xn(se, iv):
+            displacement = 0.5 * (se.x + se.xneg) - se.xctr
+            return se.dxneg * (se.get_so0(iv) + displacement * se.get_so1(iv))
+        svr.xn_calc = xn
+
+        def xp(se, iv):
+            displacement = 0.5 * (se.x + se.xpos) - se.xctr
+            return se.dxpos * (se.get_so0(iv) + displacement * se.get_so1(iv))
+        svr.xp_calc = xp
+
+        def tn(se, iv):
+            displacement = se.x - se.xctr
+            ret = se.get_so0(iv)  # f(u)
+            ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
+            ret += se.qdt * se.get_so1(iv)  # displacement in t
+            return se.hdt * ret
+        svr.tn_calc = tn
+
+        def tp(se, iv):
+            displacement = se.x - se.xctr
+            ret = se.get_so0(iv)  # f(u)
+            ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
+            ret -= se.qdt * se.get_so1(iv)  # displacement in t
+            return se.hdt * ret
+        svr.tp_calc = tp
+
+        def so0p(se, iv):
+            ret = se.get_so0(iv)
+            ret += (se.x-se.xctr) * se.get_so1(iv)  # displacement in x
+            ret -= se.hdt * se.get_so1(iv)  # displacement in t
+            return ret
+        svr.so0p_calc = so0p
+
+        def cfl(se):
+            hdx = min(se.dxneg, se.dxpos)
+            se.set_cfl(se.hdt / hdx)
+        svr.cfl_updater = cfl
+
         # Initialize.
         svr.set_so0(0, np.sin(xcrd))
         svr.set_so1(0, np.cos(xcrd))
@@ -279,6 +318,7 @@ class PythonCustomSolverTC(unittest.TestCase):
 
     def test_se(self):
 
+        self.svr.reset_calculators()
         self.assertIsNotNone(self.svr.xn_calc)
 
         se = self.svr.selm(0)
@@ -291,44 +331,6 @@ class PythonCustomSolverTC(unittest.TestCase):
 
     def test_march(self):
 
-        def xn(se, iv):
-            displacement = 0.5 * (se.x + se.xneg) - se.xctr
-            return se.dxneg * (se.get_so0(iv) + displacement * se.get_so1(iv))
-        self.svr.xn_calc = xn
-
-        def xp(se, iv):
-            displacement = 0.5 * (se.x + se.xpos) - se.xctr
-            return se.dxpos * (se.get_so0(iv) + displacement * se.get_so1(iv))
-        self.svr.xp_calc = xp
-
-        def tn(se, iv):
-            displacement = se.x - se.xctr
-            ret = se.get_so0(iv)  # f(u)
-            ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
-            ret += se.qdt * se.get_so1(iv)  # displacement in t
-            return se.hdt * ret
-        self.svr.tn_calc = tn
-
-        def tp(se, iv):
-            displacement = se.x - se.xctr
-            ret = se.get_so0(iv)  # f(u)
-            ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
-            ret -= se.qdt * se.get_so1(iv)  # displacement in t
-            return se.hdt * ret
-        self.svr.tp_calc = tp
-
-        def so0p(se, iv):
-            ret = se.get_so0(iv)
-            ret += (se.x-se.xctr) * se.get_so1(iv)  # displacement in x
-            ret -= se.hdt * se.get_so1(iv)  # displacement in t
-            return ret
-        self.svr.so0p_calc = so0p
-
-        def cfl(se):
-            hdx = min(se.dxneg, se.dxpos)
-            se.set_cfl(se.hdt / hdx)
-        self.svr.cfl_updater = cfl
-
         self.svr.march_alpha2(self.nstep*self.cycle)
         np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
                                    rtol=0, atol=1.e-14)
@@ -336,7 +338,7 @@ class PythonCustomSolverTC(unittest.TestCase):
         np.testing.assert_allclose(self.svr.get_cfl(), ones,
                                    rtol=0, atol=1.e-14)
 
-        self.svr.reset_calc()
+        self.svr.reset_calculators()
         self.svr.march_alpha2(self.nstep*self.cycle)
         np.testing.assert_array_equal(self.svr.get_so0(0),
                                       np.zeros_like(self.xcrd))

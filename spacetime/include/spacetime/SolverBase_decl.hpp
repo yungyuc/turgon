@@ -126,7 +126,7 @@ public:
     secfl_type const & cfl_updater() const { return m_field.cfl_updater(); }
     secfl_type       & cfl_updater()       { return m_field.cfl_updater(); }
 
-    void reset_calc() { m_field.reset_calc(); }
+    void reset_calculators() { m_field.reset_calculators(); }
 
     // NOLINTNEXTLINE(readability-const-return-type)
     CE const celm(sindex_type ielm, bool odd_plane) const { return m_field.celm<CE>(ielm, odd_plane); }
