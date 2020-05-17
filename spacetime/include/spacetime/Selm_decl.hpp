@@ -63,20 +63,24 @@ public:
     value_type const & cfl() const { return field().cfl(xindex()); }
     value_type       & cfl()       { return field().cfl(xindex()); }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type xn(size_t /*iv*/) const { return 0.0; }
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type xp(size_t /*iv*/) const { return 0.0; }
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type tn(size_t /*iv*/) const { return 0.0; }
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type tp(size_t /*iv*/) const { return 0.0; }
-
-    value_type so0p(size_t iv) const { return so0(iv); }
-
-    value_type & update_cfl() { cfl() = 0.0; return cfl(); }
+    value_type xn(size_t iv) const { return field().kernel().calc_xn(*this, iv); }
+    value_type xp(size_t iv) const { return field().kernel().calc_xp(*this, iv); }
+    value_type tn(size_t iv) const { return field().kernel().calc_tn(*this, iv); }
+    value_type tp(size_t iv) const { return field().kernel().calc_tp(*this, iv); }
+    value_type so0p(size_t iv) const { return field().kernel().calc_so0p(*this, iv); }
+    void update_cfl() { return field().kernel().update_cfl(*this); }
 
 }; /* end class Selm */
+
+inline void Kernel::reset()
+{
+    m_xn_calc = [](Selm const &, size_t) { return 0.0; };
+    m_xp_calc = [](Selm const &, size_t) { return 0.0; };
+    m_tn_calc = [](Selm const &, size_t) { return 0.0; };
+    m_tp_calc = [](Selm const &, size_t) { return 0.0; };
+    m_so0p_calc = [](Selm const & se, size_t iv) { return se.so0(iv); };
+    m_cfl_updater = [](Selm & se) { se.cfl() = 0.0; };
+}
 
 } /* end namespace spacetime */
 

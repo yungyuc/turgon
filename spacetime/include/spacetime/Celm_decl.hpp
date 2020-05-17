@@ -64,21 +64,36 @@ public:
     value_type qdt() const { return field().qdt(); }
 
     // NOLINTNEXTLINE(readability-const-return-type)
-    Selm const selm_xn() const { return field().selm<Selm>(index(), on_odd_plane()); }
-    Selm       selm_xn()       { return field().selm<Selm>(index(), on_odd_plane()); }
+    template<typename SE> SE const selm_xn() const { return field().template selm<SE>(index(), on_odd_plane()); }
+    template<typename SE> SE       selm_xn()       { return field().template selm<SE>(index(), on_odd_plane()); }
     // NOLINTNEXTLINE(readability-const-return-type)
-    Selm const selm_xp() const { return field().selm<Selm>(index()+1, on_odd_plane()); }
-    Selm       selm_xp()       { return field().selm<Selm>(index()+1, on_odd_plane()); }
+    template<typename SE> SE const selm_xp() const { return field().template selm<SE>(index()+1, on_odd_plane()); }
+    template<typename SE> SE       selm_xp()       { return field().template selm<SE>(index()+1, on_odd_plane()); }
     // NOLINTNEXTLINE(readability-const-return-type)
-    Selm const selm_tn() const { return field().selm<Selm>(index()+(on_odd_plane()?1:0), !on_odd_plane()); }
-    Selm       selm_tn()       { return field().selm<Selm>(index()+(on_odd_plane()?1:0), !on_odd_plane()); }
+    template<typename SE> SE const selm_tn() const { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    template<typename SE> SE       selm_tn()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
     // NOLINTNEXTLINE(readability-const-return-type)
-    Selm const selm_tp() const { return field().selm<Selm>(index()+(on_odd_plane()?1:0), !on_odd_plane()); }
-    Selm       selm_tp()       { return field().selm<Selm>(index()+(on_odd_plane()?1:0), !on_odd_plane()); }
+    template<typename SE> SE const selm_tp() const { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    template<typename SE> SE       selm_tp()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
 
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    value_type calc_so0(size_t /*iv*/) const { return 0.0; }
-    template<size_t ALPHA> value_type calc_so1_alpha(size_t /*iv*/) const { return 0.0; }
+    template<typename SE> value_type calc_so0(size_t iv) const;
+    template<typename SE, size_t ALPHA> value_type calc_so1_alpha(size_t iv) const;
+
+    // NOLINTNEXTLINE(readability-const-return-type)
+    Selm const selm_xn() const { return selm_xn<Selm>(); }
+    Selm       selm_xn()       { return selm_xn<Selm>(); }
+    // NOLINTNEXTLINE(readability-const-return-type)
+    Selm const selm_xp() const { return selm_xp<Selm>(); }
+    Selm       selm_xp()       { return selm_xp<Selm>(); }
+    // NOLINTNEXTLINE(readability-const-return-type)
+    Selm const selm_tn() const { return selm_tn<Selm>(); }
+    Selm       selm_tn()       { return selm_tn<Selm>(); }
+    // NOLINTNEXTLINE(readability-const-return-type)
+    Selm const selm_tp() const { return selm_tn<Selm>(); }
+    Selm       selm_tp()       { return selm_tn<Selm>(); }
+
+    value_type calc_so0(size_t iv) const { return calc_so0<Selm>(iv); }
+    template<size_t ALPHA> value_type calc_so1_alpha(size_t iv) const { return calc_so1_alpha<Selm, ALPHA>(iv); }
 
 }; /* end class Celm */
 
@@ -94,20 +109,23 @@ public:
     using selm_type = SE;
 
     // NOLINTNEXTLINE(readability-const-return-type)
-    SE const selm_xn() const { return field().template selm<SE>(index(), on_odd_plane()); }
-    SE       selm_xn()       { return field().template selm<SE>(index(), on_odd_plane()); }
+    SE const selm_xn() const { return this->Celm::selm_xn<SE>(); }
+    SE       selm_xn()       { return this->Celm::selm_xn<SE>(); }
     // NOLINTNEXTLINE(readability-const-return-type)
-    SE const selm_xp() const { return field().template selm<SE>(index()+1, on_odd_plane()); }
-    SE       selm_xp()       { return field().template selm<SE>(index()+1, on_odd_plane()); }
+    SE const selm_xp() const { return this->Celm::selm_xp<SE>(); }
+    SE       selm_xp()       { return this->Celm::selm_xp<SE>(); }
     // NOLINTNEXTLINE(readability-const-return-type)
-    SE const selm_tn() const { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
-    SE       selm_tn()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    SE const selm_tn() const { return this->Celm::selm_tn<SE>(); }
+    SE       selm_tn()       { return this->Celm::selm_tn<SE>(); }
     // NOLINTNEXTLINE(readability-const-return-type)
-    SE const selm_tp() const { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
-    SE       selm_tp()       { return field().template selm<SE>(index()+on_odd_plane(), !on_odd_plane()); }
+    SE const selm_tp() const { return this->Celm::selm_tp<SE>(); }
+    SE       selm_tp()       { return this->Celm::selm_tp<SE>(); }
 
-    value_type calc_so0(size_t iv) const;
-    template<size_t ALPHA> value_type calc_so1_alpha(size_t iv) const;
+    value_type calc_so0(size_t iv) const { return this->Celm::calc_so0<SE>(iv); }
+    template<size_t ALPHA> value_type calc_so1_alpha(size_t iv) const
+    {
+        return this->Celm::calc_so1_alpha<SE, ALPHA>(iv);
+    }
 
 }; /* end class CelmBase */
 

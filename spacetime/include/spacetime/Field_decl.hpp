@@ -19,6 +19,62 @@ class Celm;
 class Selm;
 
 /**
+ * Calculation kernel for the physical problem to be solved.  The kernel
+ * defines how the solution elements calculate fluxes and other values.
+ */
+class Kernel
+{
+
+public:
+
+    using value_type = Grid::value_type;
+
+    using calc_type1 = std::function<value_type(Selm const &, size_t)>;
+    using calc_type2 = std::function<void (Selm &)>;
+
+    Kernel() { reset(); }
+    void reset();
+
+    Kernel(Kernel const & ) = default;
+    Kernel(Kernel       &&) = default;
+    Kernel & operator=(Kernel const & ) = default;
+    Kernel & operator=(Kernel       &&) = default;
+    ~Kernel() = default;
+
+    // Accessors.
+    calc_type1 const & xn_calc() const { return m_xn_calc; }
+    calc_type1       & xn_calc()       { return m_xn_calc; }
+    calc_type1 const & xp_calc() const { return m_xp_calc; }
+    calc_type1       & xp_calc()       { return m_xp_calc; }
+    calc_type1 const & tn_calc() const { return m_tn_calc; }
+    calc_type1       & tn_calc()       { return m_tn_calc; }
+    calc_type1 const & tp_calc() const { return m_tp_calc; }
+    calc_type1       & tp_calc()       { return m_tp_calc; }
+    calc_type1 const & so0p_calc() const { return m_so0p_calc; }
+    calc_type1       & so0p_calc()       { return m_so0p_calc; }
+    calc_type2 const & cfl_updater() const { return m_cfl_updater; }
+    calc_type2       & cfl_updater()       { return m_cfl_updater; }
+
+    // Calculating functions.
+    value_type calc_xn(Selm const & se, size_t iv) const { return m_xn_calc(se, iv); }
+    value_type calc_xp(Selm const & se, size_t iv) const { return m_xp_calc(se, iv); }
+    value_type calc_tn(Selm const & se, size_t iv) const { return m_tn_calc(se, iv); }
+    value_type calc_tp(Selm const & se, size_t iv) const { return m_tp_calc(se, iv); }
+    value_type calc_so0p(Selm const & se, size_t iv) const { return m_so0p_calc(se, iv); }
+    void update_cfl(Selm & se) { m_cfl_updater(se); }
+
+private:
+
+    calc_type1 m_xn_calc;
+    calc_type1 m_xp_calc;
+    calc_type1 m_tn_calc;
+    calc_type1 m_tp_calc;
+    calc_type1 m_so0p_calc;
+    calc_type2 m_cfl_updater;
+
+}; /* end class Kernel */
+
+/**
  * Data class for solution.  It doesn't contain type information for the CE and
  * SE.  A Field declared as const is useless.
  */
@@ -79,6 +135,9 @@ public:
     real_type hdt() const { return m_half_time_increment; }
     real_type qdt() const { return m_quarter_time_increment; }
 
+    Kernel const & kernel() const { return m_kernel; }
+    Kernel       & kernel()       { return m_kernel; }
+
     // NOLINTNEXTLINE(readability-const-return-type)
     template< typename CE > CE const celm(sindex_type ielm, bool odd_plane) const { return CE(this, ielm, odd_plane, typename CE::const_ctor_passkey()); }
     template< typename CE > CE       celm(sindex_type ielm, bool odd_plane)       { return CE(this, ielm, odd_plane); }
@@ -105,6 +164,8 @@ private:
     // Cached value;
     real_type m_half_time_increment = 0;
     real_type m_quarter_time_increment = 0;
+
+    Kernel m_kernel;
 
 }; /* end class Field */
 

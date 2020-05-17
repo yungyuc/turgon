@@ -12,7 +12,9 @@ from ._core import (
     Grid,
     Celm,
     Selm,
+    Kernel,
     Solver,
+    SolverProxy,
     InviscidBurgersSolver,
     LinearScalarSolver,
 )
@@ -27,7 +29,9 @@ __all__ = [
     'Grid',
     'Celm',
     'Selm',
+    'Kernel',
     'Solver',
+    'SolverProxy',
     'InviscidBurgersSolver',
     'LinearScalarSolver',
     # _pstcanvas

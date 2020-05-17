@@ -17,6 +17,9 @@ class CelmTC(unittest.TestCase):
                                   time_increment=0.2)
         self.ce0 = self.sol10.celm(ielm=0)
         self.ce9 = self.sol10.celm(ielm=9)
+        # Set trivial solution.
+        self.sol10.so0.ndarray.fill(1)
+        self.sol10.so1.ndarray.fill(0)
 
     def test_str(self):
 
@@ -124,10 +127,10 @@ class CelmTC(unittest.TestCase):
 
     def test_calc_so(self):
 
-        self.assertEqual(0, self.ce0.calc_so0(0))
-        self.assertEqual(0, self.ce0.calc_so1_alpha0(0))
-        self.assertEqual(0, self.ce0.calc_so1_alpha1(0))
-        self.assertEqual(0, self.ce0.calc_so1_alpha2(0))
+        self.assertAlmostEqual(0, self.ce0.calc_so0(0))
+        self.assertAlmostEqual(0, self.ce0.calc_so1_alpha0(0), places=14)
+        self.assertAlmostEqual(0, self.ce0.calc_so1_alpha1(0), places=14)
+        self.assertAlmostEqual(0, self.ce0.calc_so1_alpha2(0), places=14)
         with self.assertRaises(AttributeError):
             self.ce0.calc_so1_alpha3
 

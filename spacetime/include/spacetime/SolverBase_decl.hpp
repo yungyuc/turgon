@@ -110,6 +110,9 @@ public:
     real_type hdt() const { return m_field.hdt(); }
     real_type qdt() const { return m_field.qdt(); }
 
+    Kernel const & kernel() const { return m_field.kernel(); }
+    Kernel       & kernel()       { return m_field.kernel(); }
+
     // NOLINTNEXTLINE(readability-const-return-type)
     CE const celm(sindex_type ielm, bool odd_plane) const { return m_field.celm<CE>(ielm, odd_plane); }
     CE       celm(sindex_type ielm, bool odd_plane)       { return m_field.celm<CE>(ielm, odd_plane); }
@@ -152,6 +155,6 @@ public: \
     value_type tn(size_t iv) const; \
     value_type tp(size_t iv) const; \
     value_type so0p(size_t iv) const; \
-    value_type & update_cfl();
+    void update_cfl();
 
 /* vim: set et ts=4 sw=4: */

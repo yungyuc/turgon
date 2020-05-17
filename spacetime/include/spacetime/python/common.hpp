@@ -5,10 +5,11 @@
  * BSD 3-Clause License, see COPYING
  */
 
-#include "pybind11/pybind11.h" // must be first
-#include "pybind11/operators.h"
-#include "pybind11/stl.h"
-#include "pybind11/numpy.h"
+#include <pybind11/pybind11.h> // must be first
+#include <pybind11/operators.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+#include <pybind11/functional.h>
 
 #include "spacetime.hpp"
 #include "spacetime/python/WrapBase.hpp"
@@ -187,6 +188,7 @@ protected:
             .def("xp", &wrapped_type::xp)
             .def("tn", &wrapped_type::tn)
             .def("tp", &wrapped_type::tp)
+            .def("so0p", &wrapped_type::so0p)
             .def("update_cfl", &wrapped_type::update_cfl)
         ;
     }
@@ -299,77 +301,13 @@ protected:
         using celm_getter = typename wrapped_type::celm_type (wrapped_type::*)(sindex_type, bool);
         using selm_getter = typename wrapped_type::selm_type (wrapped_type::*)(sindex_type, bool);
 
-#define DECL_ST_WRAP_ARRAY_ACCESS_0D(NAME) \
-    .def_property_readonly \
-    ( \
-        #NAME \
-      , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME) \
-      , py::return_value_policy::reference_internal \
-    ) \
-    .def \
-    ( \
-        "get_" #NAME \
-      , [](wrapped_type & self, bool odd_plane) \
-        { return self.get_ ## NAME(odd_plane); } \
-      , py::arg("odd_plane")=false \
-    ) \
-    .def \
-    ( \
-        "set_" #NAME \
-      , [](wrapped_type & self, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { self.set_ ## NAME(make_SimpleArray(arr), odd_plane); } \
-      , py::arg("arr"), py::arg("odd_plane")=false \
-    )
-#define DECL_ST_WRAP_ARRAY_ACCESS_1D(NAME) \
-    .def_property_readonly \
-    ( \
-        #NAME \
-      , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME) \
-      , py::return_value_policy::reference_internal \
-    ) \
-    .def \
-    ( \
-        "get_" #NAME \
-      , [](wrapped_type & self, size_t iv, bool odd_plane) \
-        { return self.get_ ## NAME(iv, odd_plane); } \
-      , py::arg("iv"), py::arg("odd_plane")=false \
-    ) \
-    .def \
-    ( \
-        "set_" #NAME \
-      , [](wrapped_type & self, size_t iv, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
-        { self.set_ ## NAME(iv, make_SimpleArray(arr), odd_plane); } \
-      , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
-    )
-#define DECL_ST_WRAP_MARCH_ALPHA(ALPHA) \
-    .def \
-    ( \
-        "march_half_so1_alpha"#ALPHA \
-      , [](wrapped_type & self, bool odd_plane) \
-        { return self.template march_half_so1_alpha<ALPHA>(odd_plane); } \
-      , py::arg("odd_plane") \
-    ) \
-    .def \
-    ( \
-        "march_half1_alpha"#ALPHA \
-      , [](wrapped_type & self) { self.template march_half1_alpha<ALPHA>(); } \
-    ) \
-    .def \
-    ( \
-        "march_half2_alpha"#ALPHA \
-      , [](wrapped_type & self) { self.template march_half2_alpha<ALPHA>(); } \
-    ) \
-    .def \
-    ( \
-        "march_alpha"#ALPHA \
-      , [](wrapped_type & self, size_t steps) { self.template march_alpha<ALPHA>(steps); } \
-      , py::arg("steps") \
-    )
-
         (*this)
             .def("__str__", &detail::to_str<wrapped_type>)
             .def("clone", &wrapped_type::clone, py::arg("grid")=false)
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
+        ;
+
+        (*this)
             .def("x", &wrapped_type::x, py::arg("odd_plane")=false)
             .def
             (
@@ -415,22 +353,96 @@ protected:
               , py::arg("odd_plane")=false
             )
             .def("get_so0p", &wrapped_type::get_so0p, py::arg("iv"), py::arg("odd_plane")=false)
+        ;
+
+#define DECL_ST_WRAP_ARRAY_ACCESS_0D(NAME) \
+    .def_property_readonly \
+    ( \
+        #NAME \
+      , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME) \
+      , py::return_value_policy::reference_internal \
+    ) \
+    .def \
+    ( \
+        "get_" #NAME \
+      , [](wrapped_type & self, bool odd_plane) \
+        { return self.get_ ## NAME(odd_plane); } \
+      , py::arg("odd_plane")=false \
+    ) \
+    .def \
+    ( \
+        "set_" #NAME \
+      , [](wrapped_type & self, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
+        { self.set_ ## NAME(make_SimpleArray(arr), odd_plane); } \
+      , py::arg("arr"), py::arg("odd_plane")=false \
+    )
+#define DECL_ST_WRAP_ARRAY_ACCESS_1D(NAME) \
+    .def_property_readonly \
+    ( \
+        #NAME \
+      , static_cast<typename wrapped_type::array_type & (wrapped_type::*)()>(&wrapped_type::NAME) \
+      , py::return_value_policy::reference_internal \
+    ) \
+    .def \
+    ( \
+        "get_" #NAME \
+      , [](wrapped_type & self, size_t iv, bool odd_plane) \
+        { return self.get_ ## NAME(iv, odd_plane); } \
+      , py::arg("iv"), py::arg("odd_plane")=false \
+    ) \
+    .def \
+    ( \
+        "set_" #NAME \
+      , [](wrapped_type & self, size_t iv, py::array_t<typename wrapped_type::value_type> & arr, bool odd_plane) \
+        { self.set_ ## NAME(iv, make_SimpleArray(arr), odd_plane); } \
+      , py::arg("iv"), py::arg("arr"), py::arg("odd_plane")=false \
+    )
+        (*this)
             DECL_ST_WRAP_ARRAY_ACCESS_0D(cfl)
             DECL_ST_WRAP_ARRAY_ACCESS_1D(so0)
             DECL_ST_WRAP_ARRAY_ACCESS_1D(so1)
+        ;
+#undef DECL_ST_WRAP_ARRAY_ACCESS_0D
+#undef DECL_ST_WRAP_ARRAY_ACCESS_1D
+
+        (*this)
             .def("update_cfl", &wrapped_type::update_cfl, py::arg("odd_plane"))
             .def("march_half_so0", &wrapped_type::march_half_so0, py::arg("odd_plane"))
             .def("treat_boundary_so0", &wrapped_type::treat_boundary_so0)
             .def("treat_boundary_so1", &wrapped_type::treat_boundary_so1)
             .def("setup_march", &wrapped_type::setup_march)
+        ;
+
+#define DECL_ST_WRAP_MARCH_ALPHA(ALPHA) \
+    .def \
+    ( \
+        "march_half_so1_alpha"#ALPHA \
+      , [](wrapped_type & self, bool odd_plane) \
+        { return self.template march_half_so1_alpha<ALPHA>(odd_plane); } \
+      , py::arg("odd_plane") \
+    ) \
+    .def \
+    ( \
+        "march_half1_alpha"#ALPHA \
+      , [](wrapped_type & self) { self.template march_half1_alpha<ALPHA>(); } \
+    ) \
+    .def \
+    ( \
+        "march_half2_alpha"#ALPHA \
+      , [](wrapped_type & self) { self.template march_half2_alpha<ALPHA>(); } \
+    ) \
+    .def \
+    ( \
+        "march_alpha"#ALPHA \
+      , [](wrapped_type & self, size_t steps) { self.template march_alpha<ALPHA>(steps); } \
+      , py::arg("steps") \
+    )
+        (*this)
             DECL_ST_WRAP_MARCH_ALPHA(0)
             DECL_ST_WRAP_MARCH_ALPHA(1)
             DECL_ST_WRAP_MARCH_ALPHA(2)
         ;
-
 #undef DECL_ST_WRAP_MARCH_ALPHA
-#undef DECL_ST_WRAP_ARRAY_ACCESS_1D
-#undef DECL_ST_WRAP_ARRAY_ACCESS_0D
 
     }
 

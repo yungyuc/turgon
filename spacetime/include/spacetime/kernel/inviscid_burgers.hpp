@@ -110,11 +110,10 @@ InviscidBurgersSelm::value_type InviscidBurgersSelm::so0p(size_t iv) const
 }
 
 inline
-InviscidBurgersSelm::value_type & InviscidBurgersSelm::update_cfl()
+void InviscidBurgersSelm::update_cfl()
 {
     const value_type hdx = std::min(dxneg(), dxpos());
     this->cfl() = std::fabs(so0(0)) * field().hdt() / hdx;
-    return this->cfl();
 }
 
 } /* end namespace spacetime */

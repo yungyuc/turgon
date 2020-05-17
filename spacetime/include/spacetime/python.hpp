@@ -55,6 +55,7 @@ inline void initialize_impl(pybind11::module & mod)
     pybind11::module::import("modmesh._modmesh");
 
     spy::WrapGrid::commit(mod, "Grid", "Spatial grid data");
+    spy::WrapKernel::commit(mod, "Kernel", "Solution element calculation hooks");
     spy::WrapField::commit(mod, "Field", "Solution data");
 
     add_solver

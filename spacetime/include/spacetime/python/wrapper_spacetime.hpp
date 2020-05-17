@@ -66,6 +66,42 @@ WrapGrid
 
 class
 SPACETIME_PYTHON_WRAPPER_VISIBILITY
+WrapKernel
+  : public WrapBase< WrapKernel, Kernel >
+{
+
+    friend root_base_type;
+
+    WrapKernel(pybind11::module & mod, const char * pyname, const char * clsdoc)
+      : root_base_type(mod, pyname, clsdoc)
+    {
+
+        namespace py = pybind11;
+
+#define DECL_ST_WRAP_CALCULATORS(NAME, TYPE) \
+    .def_property \
+    ( \
+        #NAME \
+      , [](wrapped_type & self) { return py::cpp_function(self.NAME()); } \
+      , [](wrapped_type & self, typename wrapped_type::TYPE const & f) { self.NAME() = f; } \
+    )
+        (*this)
+            DECL_ST_WRAP_CALCULATORS(xn_calc, calc_type1)
+            DECL_ST_WRAP_CALCULATORS(xp_calc, calc_type1)
+            DECL_ST_WRAP_CALCULATORS(tn_calc, calc_type1)
+            DECL_ST_WRAP_CALCULATORS(tp_calc, calc_type1)
+            DECL_ST_WRAP_CALCULATORS(so0p_calc, calc_type1)
+            DECL_ST_WRAP_CALCULATORS(cfl_updater, calc_type2)
+            .def("reset", &wrapped_type::reset)
+        ;
+#undef DECL_ST_WRAP_CALCULATORS
+
+    }
+
+}; /* end class WrapKernel */
+
+class
+SPACETIME_PYTHON_WRAPPER_VISIBILITY
 WrapField
   : public WrapBase< WrapField, Field, std::shared_ptr<Field> >
 {
@@ -130,6 +166,14 @@ WrapSolver
                     std::shared_ptr<Grid> const &, typename wrapped_type::value_type, size_t
                 )>(&wrapped_type::construct))
               , py::arg("grid"), py::arg("time_increment"), py::arg("nvar")
+            )
+            // The kernel should only be exposed on the generic solver object.
+            // C++-derived classes may use inline to avoid unnecessary function
+            // calls.
+            .def_property_readonly
+            (
+                "kernel"
+              , [](wrapped_type & self) -> Kernel & { return self.kernel(); }
             )
         ;
     }
