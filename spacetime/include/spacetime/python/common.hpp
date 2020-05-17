@@ -307,24 +307,6 @@ protected:
             .def_property_readonly("grid", [](wrapped_type & self){ return self.grid().shared_from_this(); })
         ;
 
-#define DECL_ST_WRAP_CALCULATORS(NAME, TYPE) \
-    .def_property \
-    ( \
-        #NAME \
-      , [](wrapped_type & self) { return py::cpp_function(self.NAME()); } \
-      , [](wrapped_type & self, typename wrapped_type::TYPE const & f) { self.NAME() = f; } \
-    )
-        (*this)
-            DECL_ST_WRAP_CALCULATORS(xn_calc, secalc_type)
-            DECL_ST_WRAP_CALCULATORS(xp_calc, secalc_type)
-            DECL_ST_WRAP_CALCULATORS(tn_calc, secalc_type)
-            DECL_ST_WRAP_CALCULATORS(tp_calc, secalc_type)
-            DECL_ST_WRAP_CALCULATORS(so0p_calc, secalc_type)
-            DECL_ST_WRAP_CALCULATORS(cfl_updater, secfl_type)
-            .def("reset_calculators", &wrapped_type::reset_calculators)
-        ;
-#undef DECL_ST_WRAP_CALCULATORS
-
         (*this)
             .def("x", &wrapped_type::x, py::arg("odd_plane")=false)
             .def

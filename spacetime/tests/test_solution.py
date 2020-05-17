@@ -208,12 +208,12 @@ class PythonCustomSolverTC(unittest.TestCase):
         def xn(se, iv):
             displacement = 0.5 * (se.x + se.xneg) - se.xctr
             return se.dxneg * (se.get_so0(iv) + displacement * se.get_so1(iv))
-        svr.xn_calc = xn
+        svr.kernel.xn_calc = xn
 
         def xp(se, iv):
             displacement = 0.5 * (se.x + se.xpos) - se.xctr
             return se.dxpos * (se.get_so0(iv) + displacement * se.get_so1(iv))
-        svr.xp_calc = xp
+        svr.kernel.xp_calc = xp
 
         def tn(se, iv):
             displacement = se.x - se.xctr
@@ -221,7 +221,7 @@ class PythonCustomSolverTC(unittest.TestCase):
             ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
             ret += se.qdt * se.get_so1(iv)  # displacement in t
             return se.hdt * ret
-        svr.tn_calc = tn
+        svr.kernel.tn_calc = tn
 
         def tp(se, iv):
             displacement = se.x - se.xctr
@@ -229,19 +229,19 @@ class PythonCustomSolverTC(unittest.TestCase):
             ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
             ret -= se.qdt * se.get_so1(iv)  # displacement in t
             return se.hdt * ret
-        svr.tp_calc = tp
+        svr.kernel.tp_calc = tp
 
         def so0p(se, iv):
             ret = se.get_so0(iv)
             ret += (se.x-se.xctr) * se.get_so1(iv)  # displacement in x
             ret -= se.hdt * se.get_so1(iv)  # displacement in t
             return ret
-        svr.so0p_calc = so0p
+        svr.kernel.so0p_calc = so0p
 
         def cfl(se):
             hdx = min(se.dxneg, se.dxpos)
             se.set_cfl(se.hdt / hdx)
-        svr.cfl_updater = cfl
+        svr.kernel.cfl_updater = cfl
 
         # Initialize.
         svr.set_so0(0, np.sin(xcrd))
@@ -318,15 +318,15 @@ class PythonCustomSolverTC(unittest.TestCase):
 
     def test_se(self):
 
-        self.svr.reset_calculators()
-        self.assertIsNotNone(self.svr.xn_calc)
+        self.svr.kernel.reset()
+        self.assertIsNotNone(self.svr.kernel.xn_calc)
 
         se = self.svr.selm(0)
         self.assertEqual(0, se.xn(0))
 
         def _(se, iv):
             return 1.2
-        self.svr.xn_calc = _
+        self.svr.kernel.xn_calc = _
         self.assertEqual(1.2, se.xn(0))
 
     def test_march(self):
@@ -338,7 +338,7 @@ class PythonCustomSolverTC(unittest.TestCase):
         np.testing.assert_allclose(self.svr.get_cfl(), ones,
                                    rtol=0, atol=1.e-14)
 
-        self.svr.reset_calculators()
+        self.svr.kernel.reset()
         self.svr.march_alpha2(self.nstep*self.cycle)
         np.testing.assert_array_equal(self.svr.get_so0(0),
                                       np.zeros_like(self.xcrd))
@@ -354,6 +354,110 @@ class PythonCustomSolverTC(unittest.TestCase):
             self.svr.march_half_so1_alpha2(odd_plane=False)
             self.svr.treat_boundary_so1()
             # second half step.
+            self.svr.march_half_so0(odd_plane=True)
+            self.svr.update_cfl(odd_plane=False)
+            self.svr.march_half_so1_alpha2(odd_plane=True)
+
+        svr2 = self._build_solver(self.resolution)[-1]
+
+        for it in range(self.nstep*self.cycle):
+            _march()
+            svr2.march_alpha2(steps=1)
+            self.assertEqual(self.svr.get_so0(0).ndarray.tolist(),
+                             svr2.get_so0(0).ndarray.tolist())
+
+
+class LinearProxy(libst.SolverProxy):
+
+    def _xn_calc(self, se, iv):
+        displacement = 0.5 * (se.x + se.xneg) - se.xctr
+        return se.dxneg * (se.get_so0(iv) + displacement * se.get_so1(iv))
+
+    def _xp_calc(self, se, iv):
+        displacement = 0.5 * (se.x + se.xpos) - se.xctr
+        return se.dxpos * (se.get_so0(iv) + displacement * se.get_so1(iv))
+
+    def _tn_calc(self, se, iv):
+        displacement = se.x - se.xctr
+        ret = se.get_so0(iv)  # f(u)
+        ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
+        ret += se.qdt * se.get_so1(iv)  # displacement in t
+        return se.hdt * ret
+
+    def _tp_calc(self, se, iv):
+        displacement = se.x - se.xctr
+        ret = se.get_so0(iv)  # f(u)
+        ret += displacement * se.get_so1(iv)  # displacement in x; f_u == 1
+        ret -= se.qdt * se.get_so1(iv)  # displacement in t
+        return se.hdt * ret
+
+    def _so0p_calc(self, se, iv):
+        ret = se.get_so0(iv)
+        ret += (se.x-se.xctr) * se.get_so1(iv)  # displacement in x
+        ret -= se.hdt * se.get_so1(iv)  # displacement in t
+        return ret
+
+    def _cfl_updater(self, se):
+        hdx = min(se.dxneg, se.dxpos)
+        se.set_cfl(se.hdt / hdx)
+
+class SolverProxyTC(unittest.TestCase):
+
+    @staticmethod
+    def _build_solver(resolution):
+
+        # Build grid.
+        xcrd = np.arange(resolution+1) / resolution
+        xcrd *= 2 * np.pi
+        grid = libst.Grid(xcrd)
+        dx = (grid.xmax - grid.xmin) / grid.ncelm
+
+        # Build solver.
+        time_stop = 2*np.pi
+        cfl_max = 1.0
+        dt_max = dx * cfl_max
+        nstep = int(np.ceil(time_stop / dt_max))
+        dt = time_stop / nstep
+        svr = LinearProxy(grid=grid, time_increment=dt, nvar=1)
+
+        # Initialize.
+        svr.set_so0(0, np.sin(xcrd))
+        svr.set_so1(0, np.cos(xcrd))
+        svr.setup_march()
+
+        return nstep, xcrd, svr
+
+    def setUp(self):
+
+        self.resolution = 8
+        self.nstep, self.xcrd, self.svr = self._build_solver(self.resolution)
+        self.cycle = 10
+
+    def test_march(self):
+
+        self.svr.march_alpha2(self.nstep*self.cycle)
+        np.testing.assert_allclose(self.svr.get_so0(0), np.sin(self.xcrd),
+                                   rtol=0, atol=1.e-14)
+        ones = np.ones(self.svr.grid.nselm, dtype='float64')
+        np.testing.assert_allclose(self.svr.get_cfl(), ones,
+                                   rtol=0, atol=1.e-14)
+
+        self.svr.kernel.reset()
+        self.svr.march_alpha2(self.nstep*self.cycle)
+        np.testing.assert_array_equal(self.svr.get_so0(0),
+                                      np.zeros_like(self.xcrd))
+
+    def test_march_fine_interface(self):
+
+        def _march():
+
+            # first half step.
+            self.svr.march_half_so0(odd_plane=False)
+            self.svr.treat_boundary_so0()
+            self.svr.update_cfl(odd_plane=True)
+            self.svr.march_half_so1_alpha2(odd_plane=False)
+            self.svr.treat_boundary_so1()
+            # second half st
             self.svr.march_half_so0(odd_plane=True)
             self.svr.update_cfl(odd_plane=False)
             self.svr.march_half_so1_alpha2(odd_plane=True)
