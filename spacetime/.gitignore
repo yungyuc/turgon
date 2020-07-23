@@ -1,5 +1,7 @@
 __pycache__
 .pytest_cache/
 /build/
+*.pyc
+*.pyo
 *.so
 *.dylib
