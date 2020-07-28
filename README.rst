@@ -10,39 +10,40 @@ The conservation element and solution element (CESE) method
 ====================
 
 Clone from https://github.com/yungyuc/turgon.git
- 
- .. code-block:: bash  
+
+.. code-block:: bash
 
   $ git clone https://github.com/yungyuc/turgon.git
 
-Turgon needs following packages
- 1. C++14
- 2. Python3.7
- 3. Cmake 3.15.4+
- 4. numpy
- 5. **pybind11** (recommended build and install locally, otherwise cmake may not find pybind11)
- 6. `modmesh <https://github.com/solvcon/modmesh>`__
+Turgon needs following packages:
+
+1. C++14
+2. Python3.7
+3. Cmake 3.15.4+
+4. numpy
+5. **pybind11** (recommended build and install locally, otherwise cmake may not find pybind11)
+6. `modmesh <https://github.com/solvcon/modmesh>`_
 
 Make sure all dependencies have been installed.
 
 Now change the current directory to `turgon/spacetime`
- 
- .. code-block:: bash  
+
+.. code-block:: bash
 
   $ cd turgon/spacetime
 
 Run make
- 
- .. code-block:: bash 
- 
+
+.. code-block:: bash
+
    $ make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include
 
 **Test**
 
 ====
 
-Using gtest to test if turgon is installed properly
-  
- .. code-block:: bash  
+Using gtest to test if turgon is installed properly
+
+.. code-block:: bash
 
    $ make test
