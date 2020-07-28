@@ -5,8 +5,7 @@ The conservation element and solution element (CESE) method
 .. image:: https://mybinder.org/badge_logo.svg
   :target: https://mybinder.org/v2/gh/yungyuc/turgon/master?filepath=notebook
 
-**Build Turgon on OS X**
-
+Build Turgon on OS X
 ====================
 
 Clone from https://github.com/yungyuc/turgon.git
@@ -32,17 +31,16 @@ Now change the current directory to `turgon/spacetime`
 
   $ cd turgon/spacetime
 
-Run make
+Run make:
 
 .. code-block:: bash
 
    $ make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include
 
-**Test**
-
+Test
 ====
 
-Using gtest to test if turgon is installed properly
+Using gtest to test if turgon is installed properly.
 
 .. code-block:: bash
 
