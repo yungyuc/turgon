@@ -7,10 +7,10 @@ The conservation element and solution element (CESE) method
 
 Build Turgon on OS X
 ====================
-Clone from https://github.com/yungyuc/turgon.git:
- `$ git clone https://github.com/yungyuc/turgon.git`
+Clone from https://github.com/yungyuc/turgon.git
+  ``$ git clone https://github.com/yungyuc/turgon.git``
 
-Turgon needs following packages:
+Turgon needs following packages::
  1. C++14
  2. Python3.7
  3. Cmake 3.15.4+
@@ -20,13 +20,13 @@ Turgon needs following packages:
 
 Make sure all dependencies have been installed.
 
-Now change the current directory to `turgon/spacetime`:
- `$ cd turgon/spacetime`
+Now change the current directory to `turgon/spacetime`
+ ``$ cd turgon/spacetime``
 
 Run make:
- `$make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include`
+ ``$ make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include``
 
 Test
 ====
-Using gtest to test if turgon is installed properly:
- `$make test`
+Using gtest to test if turgon is installed properly
+ ``$ make test``
