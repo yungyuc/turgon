@@ -35,7 +35,7 @@ Run make:
 
 .. code-block:: bash
 
-   $ make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include
+  $ make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include
 
 Test
 ====
@@ -44,4 +44,4 @@ Using gtest to test if turgon is installed properly.
 
 .. code-block:: bash
 
-   $ make test
+  $ make test
