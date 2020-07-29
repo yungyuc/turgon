@@ -34,14 +34,16 @@ jobs:
         sudo rm /usr/bin/python3
         sudo ln -s python3.7 /usr/bin/python3
         sudo pip3 install -U pip
-        sudo pip3 install -U numpy pytest setuptools cmake
+        sudo pip3 install -U setuptools
+        sudo pip3 install -U numpy pytest cmake
 
     - name: dependency (macos)
       if: matrix.os == 'macos-latest'
       run: |
         brew install python3
         pip3 install -U pip
-        pip3 install -U numpy pytest setuptools cmake
+        pip3 install -U setuptools
+        pip3 install -U numpy pytest cmake
 
     - name: dependency (manual)
       run: sudo ${GITHUB_WORKSPACE}/contrib/depend/install.sh everything
