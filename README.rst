@@ -51,13 +51,13 @@ How to get development note
 
 Turgon have some development note, in order to get these note, the `Latex <http://www.tug.org/>`_ is needed to install.
 
-If you use Mac OS, you can check the `MacTEX <http://www.tug.org/mactex/>`_ or:
+If you use **Mac OS**, you can check the `MacTEX <http://www.tug.org/mactex/>`_ or:
 
 .. code-block:: bash
 
-  $ brew brew cask install mactex
+  $ brew cask install mactex
 
-If you use Linux, you can check the `texlive <https://www.tug.org/texlive/>`_ or:
+If you use **Linux**, you can check the `texlive <https://www.tug.org/texlive/>`_ or:
 
 .. code-block:: bash
 
