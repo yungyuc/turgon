@@ -45,3 +45,33 @@ Using gtest to test if turgon is installed properly.
 .. code-block:: bash
 
   $ make test
+
+How to get development note
+===========================
+
+Turgon have some development note, in order to get these note, the `Latex <http://www.tug.org/>`_ is needed to install.
+
+If you use Mac OS, you can check the `MacTEX <http://www.tug.org/mactex/>`_ or:
+
+.. code-block:: bash
+
+  $ brew brew cask install mactex
+
+If you use Linux, you can check the `texlive <https://www.tug.org/texlive/>`_ or:
+
+.. code-block:: bash
+
+  $ sudo apt-get install texlive-full
+
+Now change you current directory to ``writing``
+
+.. code-block:: bash
+
+  $ cd writing
+
+then build the note:
+
+.. code-block:: bash
+
+  $ make note
+
