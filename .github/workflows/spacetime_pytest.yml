@@ -41,9 +41,10 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         brew install python3
+        brew install cmake
         pip3 install -U pip
         pip3 install -U setuptools
-        pip3 install -U numpy pytest cmake
+        pip3 install -U numpy pytest
 
     - name: dependency (manual)
       run: sudo ${GITHUB_WORKSPACE}/contrib/depend/install.sh everything
