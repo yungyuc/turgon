@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
 
 #include "spacetime/system.hpp"
 #include "spacetime/type.hpp"
