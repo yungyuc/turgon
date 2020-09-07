@@ -68,18 +68,18 @@ jobs:
           CMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
           CMAKE_ARGS="-DPYTHON_EXECUTABLE=$(which python3)"
 
-    - name: pytest
-      run: |
-        cd ${GITHUB_WORKSPACE}/spacetime
-        make pytest \
-          VERBOSE=1 \
-          CMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
-          CMAKE_ARGS="-DPYTHON_EXECUTABLE=$(which python3)"
-    
     - name: gtest
       run: |
         cd ${GITHUB_WORKSPACE}/spacetime
         make gtest \
+          VERBOSE=1 \
+          CMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+          CMAKE_ARGS="-DPYTHON_EXECUTABLE=$(which python3)"
+
+    - name: pytest
+      run: |
+        cd ${GITHUB_WORKSPACE}/spacetime
+        make pytest \
           VERBOSE=1 \
           CMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
           CMAKE_ARGS="-DPYTHON_EXECUTABLE=$(which python3)"
