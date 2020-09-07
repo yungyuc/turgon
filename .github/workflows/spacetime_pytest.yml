@@ -1,4 +1,4 @@
-name: spacetime_pytest
+name: spacetime_test
 
 on:
   push:
