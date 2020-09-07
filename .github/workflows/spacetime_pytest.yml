@@ -1,4 +1,4 @@
-name: spacetime_pytest
+name: spacetime_test
 
 on:
   push:
@@ -64,6 +64,14 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/spacetime
         make buildext \
+          VERBOSE=1 \
+          CMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+          CMAKE_ARGS="-DPYTHON_EXECUTABLE=$(which python3)"
+
+    - name: gtest
+      run: |
+        cd ${GITHUB_WORKSPACE}/spacetime
+        make gtest \
           VERBOSE=1 \
           CMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
           CMAKE_ARGS="-DPYTHON_EXECUTABLE=$(which python3)"
