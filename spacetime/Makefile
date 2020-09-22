@@ -21,13 +21,15 @@ NB_ARGS ?=
 CMAKE_ARGS ?=
 VERBOSE ?=
 GDB ?=
-ifeq ($(CMAKE_BUILD_TYPE), Debug)
-	BUILD_PATH ?= build/dbg37
-else
-	BUILD_PATH ?= build/dev37
-endif
 
 PYTHON ?= $(shell which python3)
+PYTHON_VERSION ?= $(shell $(PYTHON) -c 'import sys; print("%d%d" % (sys.version_info.major, sys.version_info.minor))')
+
+ifeq ($(CMAKE_BUILD_TYPE), Debug)
+	BUILD_PATH ?= build/dbg$(PYTHON_VERSION)
+else
+	BUILD_PATH ?= build/dev$(PYTHON_VERSION)
+endif
 
 PYTEST ?= $(shell which py.test-3)
 ifeq ($(PYTEST),)
