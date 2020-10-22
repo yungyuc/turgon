@@ -289,16 +289,16 @@ class LinearScalarErrorTC(unittest.TestCase):
              Return:
                 A ndarray which content current time step solution
         """
-        v = np.array([])
+        v = []
         for e in svr.selms(odd_plane=False):
             x = (
                 e.xctr - iter_num * svr.dt
             ) % svr.grid.xmax  # dealt with boundary treatment
             if x < 2 * np.pi or x > 4 * np.pi:
-                v = np.append(v, 0)
+                v.append(0)
             else:
-                v = np.append(v, gfun(x))
-        return v
+                v.append(gfun(x))
+        return np.array(v)
 
     @staticmethod
     def _norm(vec, ord=1):
