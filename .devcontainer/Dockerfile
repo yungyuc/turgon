@@ -49,4 +49,9 @@ RUN \
 RUN bash /tmp/library-scripts/install.sh everything && \
   rm -rf /var/lib/apt/lists/* /tmp/library-scripts
 
+# Set up user and environment.
+RUN echo 'turgon	ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER turgon
+ENV HOME="/home/turgon"
+
 # vim: set ff=unix ft=dockerfile et sw=2 ts=2 sts=2:
