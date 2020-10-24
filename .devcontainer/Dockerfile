@@ -11,8 +11,8 @@ RUN \
     python3 python3-dev python3-venv
 
 # Install pip3 pacakges.
-RUN \
-  pip3 install setuptools && \
-  pip3 install numpy pytest flake8
+#RUN \
+#  pip3 install setuptools && \
+#  pip3 install numpy pytest flake8
 
 # vim: set ff=unix ft=dockerfile et sw=2 ts=2 sts=2:
