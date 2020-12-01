@@ -238,7 +238,7 @@ class NormTC(unittest.TestCase):
             )  # FIX ME: I don't know how to determine assert condition
 
 
-class LinearScalarErrorTC(unittest.TestCase):
+class LinearScalarGridTestTC(unittest.TestCase):
     """
     Compare linear solver's solution wtih exact solution, because solutions of computation field is a vector,
     therefore compared the norm of difference bewteen solver's solution and exact solution.
@@ -320,7 +320,7 @@ class LinearScalarErrorTC(unittest.TestCase):
     def setUp(self):
 
         self.resolution = 256
-        self.svr = LinearScalarErrorTC._build_solver(self.resolution)
+        self.svr = LinearScalarGridTestTC._build_solver(self.resolution)
         self.cycle = range(1001)
 
     def test_grid_test(self):
@@ -330,11 +330,11 @@ class LinearScalarErrorTC(unittest.TestCase):
         err = []
         it_num = 20
         for grid in grid_num:
-            svr = LinearScalarErrorTC._build_solver(grid)
+            svr = LinearScalarGridTestTC._build_solver(grid)
             svr.march_alpha2(it_num)
-            exact_sol = LinearScalarErrorTC._exact_solution(svr, it_num, np.sin)
+            exact_sol = LinearScalarGridTestTC._exact_solution(svr, it_num, np.sin)
             dx.append(svr.grid.ncelm)
-            err.append(LinearScalarErrorTC._norm(
+            err.append(LinearScalarGridTestTC._norm(
                 svr.get_so0(0).ndarray - exact_sol, 1))
 
         idx = range(2, len(err))
