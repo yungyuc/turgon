@@ -7,6 +7,7 @@ import numpy as np
 
 import libst
 
+import math
 
 class LinearScalarSolverTC(unittest.TestCase):
     @staticmethod
@@ -256,7 +257,7 @@ class LinearScalarErrorTC(unittest.TestCase):
                 A well set linear solver object
         """
         grid = libst.Grid(0, 4 * 2 * np.pi, resolution)
-        cfl = 1
+        cfl = 0.99
         dx = (grid.xmax - grid.xmin) / grid.ncelm
         dt = dx * cfl
         svr = libst.LinearScalarSolver(grid=grid, time_increment=dt)
@@ -322,17 +323,24 @@ class LinearScalarErrorTC(unittest.TestCase):
         self.svr = LinearScalarErrorTC._build_solver(self.resolution)
         self.cycle = range(1001)
 
-    def test_norm_error(self):
+    def test_grid_test(self):
+        
+        grid_num = [320, 640, 1280, 2560, 5120, 10240, 20480, 40960, 81920, 163840, 327680]
+        dx = []
+        err = []
+        it_num = 20
+        for grid in grid_num:
+            svr = LinearScalarErrorTC._build_solver(grid)
+            svr.march_alpha2(it_num)
+            exact_sol = LinearScalarErrorTC._exact_solution(svr, it_num, np.sin)
+            dx.append(svr.grid.ncelm)
+            err.append(LinearScalarErrorTC._norm(
+                svr.get_so0(0).ndarray - exact_sol, 1))
 
-        for i in self.cycle:
-            self.svr.march_alpha2(1)
-            error_norm = LinearScalarErrorTC._norm(
-                LinearScalarErrorTC._exact_solution(self.svr, i + 1, np.sin)
-                - self.svr.get_so0(0).ndarray,
-                1,
-            )
-            self.assertLessEqual(
-                error_norm, 1e-11
-            )  # FIX ME: I don't know how to determine assert condition
+        idx = range(2, len(err))
+        tmp = 0.0
+        for i in idx:
+            tmp = abs(math.log(abs(err[i - 1] / err[i])) / math.log(abs(dx[i - 1] / dx[i])))
+            self.assertTrue(tmp > 0.8 and tmp < 1.2)
 
 # vim: set et sw=4 ts=4:
