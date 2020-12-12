@@ -146,13 +146,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
 
     @staticmethod
     def _build_solver(resolution):
-        """ Create linear solver object for norm test
-            Args:
-              resolution:
-                Grid number
-            Return:
-                A well set linear solver object
-        """
         grid = libst.Grid(0, 4 * 2 * np.pi, resolution)
         cfl = 0.99
         dx = (grid.xmax - grid.xmin) / grid.ncelm
@@ -176,17 +169,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
 
     @staticmethod
     def _exact_solution(svr, iter_num, gfun):
-        """ Calculate exact solution of the 1D advection equation
-            Args:
-              svr:
-                Linear wave solver
-              iter_num:
-                How many step will be executed
-              gfun:
-                System function
-             Return:
-                A ndarray which content current time step solution
-        """
         v = []
         for e in svr.selms(odd_plane=False):
             x = (
@@ -200,15 +182,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
 
     @staticmethod
     def _norm(vec, ord=1):
-        """ Calculate the vector norm
-            Args:
-              vec:
-                Vector for norm calculation
-              ord:
-                Norm order
-            Return:
-                A double number, vector norm
-        """
         res = 0
         for ele in vec:
             res += abs(ele) ** ord
