@@ -200,7 +200,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
                 svr.get_so0(0).ndarray - exact_sol, 1))
 
         idx = range(2, len(err))
-        tmp = 0.0
         for i in idx:
             tmp = abs(math.log(abs(err[i - 1] / err[i])) / math.log(abs(dx[i - 1] / dx[i])))
             self.assertTrue(tmp > 0.8 and tmp < 1.2)
