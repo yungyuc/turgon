@@ -180,21 +180,13 @@ class LinearScalarGridTestTC(unittest.TestCase):
                 v.append(gfun(x))
         return np.array(v)
 
-    @staticmethod
-    def _norm(vec, ord=1):
-        res = 0
-        for ele in vec:
-            res += abs(ele) ** ord
-        return res ** (1 / ord)
-
     def setUp(self):
-
         self.resolution = 256
         self.svr = self._build_solver(self.resolution)
         self.cycle = range(1001)
 
     def test_grid_test(self):
-        
+        _norm = lambda vec, ord: sum(np.abs(vec) ** ord) ** (1 / ord)
         grid_num = [320, 640, 1280, 2560, 5120, 10240, 20480, 40960, 81920, 163840, 327680]
         dx = []
         err = []
@@ -204,7 +196,7 @@ class LinearScalarGridTestTC(unittest.TestCase):
             svr.march_alpha2(it_num)
             exact_sol = self._exact_solution(svr, it_num, np.sin)
             dx.append(svr.grid.ncelm)
-            err.append(self._norm(
+            err.append(_norm(
                 svr.get_so0(0).ndarray - exact_sol, 1))
 
         idx = range(2, len(err))
