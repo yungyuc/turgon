@@ -190,7 +190,7 @@ class LinearScalarGridTestTC(unittest.TestCase):
     def setUp(self):
 
         self.resolution = 256
-        self.svr = LinearScalarGridTestTC._build_solver(self.resolution)
+        self.svr = self._build_solver(self.resolution)
         self.cycle = range(1001)
 
     def test_grid_test(self):
@@ -200,11 +200,11 @@ class LinearScalarGridTestTC(unittest.TestCase):
         err = []
         it_num = 20
         for grid in grid_num:
-            svr = LinearScalarGridTestTC._build_solver(grid)
+            svr = self._build_solver(grid)
             svr.march_alpha2(it_num)
-            exact_sol = LinearScalarGridTestTC._exact_solution(svr, it_num, np.sin)
+            exact_sol = self._exact_solution(svr, it_num, np.sin)
             dx.append(svr.grid.ncelm)
-            err.append(LinearScalarGridTestTC._norm(
+            err.append(self._norm(
                 svr.get_so0(0).ndarray - exact_sol, 1))
 
         idx = range(2, len(err))
