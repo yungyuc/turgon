@@ -3,15 +3,11 @@
 
 import unittest
 
-import logging
-
 import numpy as np
 
 import libst
 
 import math
-
-import sys
 
 class LinearScalarSolverTC(unittest.TestCase):
 
@@ -148,11 +144,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
     or check if the solver's mathematical model is correct.
     """
     
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    stream_handler = logging.StreamHandler(sys.stdout)
-    logger.addHandler(stream_handler)
-    
     @staticmethod
     def _build_solver(resolution):
         grid = libst.Grid(0, 4 * 2 * np.pi, resolution)
@@ -195,8 +186,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
         self.cycle = range(1001)
 
     def test_grid_test(self):
-        log_format = '{:^20}|{:^30}|{:^20}|'
-        self.logger.debug(('\n'+log_format).format('Grid number', 'Error', 'Ratio'))
         _norm = lambda vec, ord: sum(np.abs(vec) ** ord) ** (1 / ord)
 
         grid_num = [320, 640, 1280, 2560, 5120, 10240, 20480, 40960, 81920, 163840, 327680]
@@ -211,11 +200,14 @@ class LinearScalarGridTestTC(unittest.TestCase):
             err.append(_norm(
                 svr.get_so0(0).ndarray - exact_sol, 1))
         
-        self.logger.debug(log_format.format(grid_num[0], err[-1], 0))
-        for i in range(1, len(err)):
-            tmp = err[i - 1] / err[i]
-            self.logger.debug(log_format.format(grid_num[i], err[i], tmp))
-            tmp = abs(math.log(abs(tmp)) / math.log(abs(dx[i - 1] / dx[i])))
-            self.assertTrue(tmp > 0.8 and tmp < 1.2)
-
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[0] / err[1])) / math.log(abs(dx[0] / dx[1]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[1] / err[2])) / math.log(abs(dx[1] / dx[2]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[2] / err[3])) / math.log(abs(dx[2] / dx[3]))), places=0)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[3] / err[4])) / math.log(abs(dx[3] / dx[4]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[4] / err[5])) / math.log(abs(dx[4] / dx[5]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[5] / err[6])) / math.log(abs(dx[5] / dx[6]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[6] / err[7])) / math.log(abs(dx[6] / dx[7]))), places=0)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[7] / err[8])) / math.log(abs(dx[7] / dx[8]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[8] / err[9])) / math.log(abs(dx[8] / dx[9]))), places=1)
+        self.assertAlmostEqual(1.0, abs(math.log(abs(err[9] / err[10])) / math.log(abs(dx[9] / dx[10]))), places=1)
 # vim: set et sw=4 ts=4:
