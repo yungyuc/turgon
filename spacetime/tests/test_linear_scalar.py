@@ -220,7 +220,7 @@ class LinearScalarGridTestTC(unittest.TestCase):
                                places=1)
         self.assertAlmostEqual(0.87,
                                abs(math.log(abs(err[6] / err[7])) / math.log(abs(dx[6] / dx[7]))),
-                               places=1)
+                               places=2)
         self.assertAlmostEqual(1.0,
                                abs(math.log(abs(err[7] / err[8])) / math.log(abs(dx[7] / dx[8]))),
                                places=1)
