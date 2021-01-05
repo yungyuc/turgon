@@ -137,10 +137,13 @@ class LinearScalarSolverTC(unittest.TestCase):
 
 class LinearScalarGridTestTC(unittest.TestCase):
     """
-    Compare linear solver's solution wtih exact solution, because solutions of computation field is a vector,
-    therefore compared the norm of difference bewteen solver's solution and exact solution.
+    Compare linear solver's solution wtih exact solution,
+    because solutions of computation field is a vector,
+    therefore compared the norm of difference bewteen solver's solution
+    and exact solution.
 
-    By comparing norm of difference bewteen solver's solution and exact solution we can check if the linear solver is work properly
+    By comparing norm of difference bewteen solver's solution and exact 
+    solution we can check if the linear solver is work properly
     or check if the solver's mathematical model is correct.
     """
     
