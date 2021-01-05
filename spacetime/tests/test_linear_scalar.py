@@ -203,34 +203,16 @@ class LinearScalarGridTestTC(unittest.TestCase):
             dx.append(svr.grid.ncelm)
             err.append(_norm(svr.get_so0(0).ndarray - exact_sol, 1))
         
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[0] / err[1])) / math.log(abs(dx[0] / dx[1]))),
-                               places=1)
-        self.assertAlmostEqual(1.0, 
-                               abs(math.log(abs(err[1] / err[2])) / math.log(abs(dx[1] / dx[2]))),
-                               places=1)
-        self.assertAlmostEqual(1.1,
-                               abs(math.log(abs(err[2] / err[3])) / math.log(abs(dx[2] / dx[3]))),
-                               places=1)
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[3] / err[4])) / math.log(abs(dx[3] / dx[4]))),
-                               places=1)
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[4] / err[5])) / math.log(abs(dx[4] / dx[5]))),
-                               places=1)
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[5] / err[6])) / math.log(abs(dx[5] / dx[6]))),
-                               places=1)
-        self.assertAlmostEqual(0.87,
-                               abs(math.log(abs(err[6] / err[7])) / math.log(abs(dx[6] / dx[7]))),
-                               places=2)
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[7] / err[8])) / math.log(abs(dx[7] / dx[8]))),
-                               places=1)
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[8] / err[9])) / math.log(abs(dx[8] / dx[9]))),
-                               places=1)
-        self.assertAlmostEqual(1.0,
-                               abs(math.log(abs(err[9] / err[10])) / math.log(abs(dx[9] / dx[10]))),
-                               places=1)
+        _rate = lambda err, dx_rate: abs(math.log(abs(err)) / math.log(abs(dx_rate)))
+        
+        self.assertAlmostEqual(1.0, _rate(err[0]/err[1], dx[0]/dx[1]),places=1)
+        self.assertAlmostEqual(1.0, _rate(err[1]/err[2], dx[1]/dx[2]),places=1)
+        self.assertAlmostEqual(1.1, _rate(err[2]/err[3], dx[2]/dx[3]),places=1)
+        self.assertAlmostEqual(1.0, _rate(err[3]/err[4], dx[3]/dx[4]),places=1)
+        self.assertAlmostEqual(1.0, _rate(err[4]/err[5], dx[4]/dx[5]),places=1)
+        self.assertAlmostEqual(1.0, _rate(err[5]/err[6], dx[5]/dx[6]),places=1)
+        self.assertAlmostEqual(0.87, _rate(err[6]/err[7], dx[6]/dx[7]),places=2)
+        self.assertAlmostEqual(1.0, _rate(err[7]/err[8], dx[7]/dx[8]),places=1)
+        self.assertAlmostEqual(1.0, _rate(err[8]/err[9], dx[8]/dx[9]),places=1)
+        self.assertAlmostEqual(1.0, _rate(err[9]/err[10], dx[9]/dx[10]),places=1)
 # vim: set et sw=4 ts=4:
