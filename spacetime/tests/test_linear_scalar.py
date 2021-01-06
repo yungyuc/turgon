@@ -183,11 +183,6 @@ class LinearScalarGridTestTC(unittest.TestCase):
                 v.append(gfun(x))
         return np.array(v)
 
-    def setUp(self):
-        self.resolution = 256
-        self.svr = self._build_solver(self.resolution)
-        self.cycle = range(1001)
-
     def test_grid_test(self):
         _norm = lambda vec, ord: sum(np.abs(vec) ** ord) ** (1 / ord)
 
