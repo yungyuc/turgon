@@ -49,7 +49,9 @@ Using gtest to test if turgon is installed properly.
 How to get development note
 ===========================
 
-Turgon have some development note, in order to get these note, the `Latex <http://www.tug.org/>`_ is needed to install.
+Turgon have some development note, in order to get these note, the `TeX
+<http://www.tug.org/>`_ and `LaTeX <https://www.latex-project.org>`__ need to
+be installed.
 
 If you use **Mac OS**, you can check the `MacTEX <http://www.tug.org/mactex/>`_ or:
 
