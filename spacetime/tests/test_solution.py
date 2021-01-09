@@ -82,8 +82,8 @@ class SolverTC(unittest.TestCase):
 
         with self.assertRaisesRegex(
             IndexError,
-            "Field::celm_at\(ielm=-1, odd_plane=0\): xindex = 1 "
-            "outside the interval \[2, 23\)",
+            r"Field::celm_at\(ielm=-1, odd_plane=0\): xindex = 1 "
+            r"outside the interval \[2, 23\)",
         ):
             self.sol10.celm(-1, odd_plane=False)
 
@@ -114,8 +114,8 @@ class SolverTC(unittest.TestCase):
 
         with self.assertRaisesRegex(
             IndexError,
-            "Field::celm_at\(ielm=10, odd_plane=0\): xindex = 23 "
-            "outside the interval \[2, 23\)",
+            r"Field::celm_at\(ielm=10, odd_plane=0\): xindex = 23 "
+            r"outside the interval \[2, 23\)",
         ):
             self.sol10.celm(10)
 
@@ -123,8 +123,8 @@ class SolverTC(unittest.TestCase):
 
         with self.assertRaisesRegex(
             IndexError,
-            "Field::selm_at\(ielm=-1, odd_plane=0\): xindex = 0 "
-            "outside the interval \[1, 24\)",
+            r"Field::selm_at\(ielm=-1, odd_plane=0\): xindex = 0 "
+            r"outside the interval \[1, 24\)",
         ):
             self.sol10.selm(-1, odd_plane=False)
 
@@ -155,8 +155,8 @@ class SolverTC(unittest.TestCase):
 
         with self.assertRaisesRegex(
             IndexError,
-            "Field::selm_at\(ielm=11, odd_plane=0\): xindex = 24 "
-            "outside the interval \[1, 24\)",
+            r"Field::selm_at\(ielm=11, odd_plane=0\): xindex = 24 "
+            r"outside the interval \[1, 24\)",
         ):
             self.sol10.selm(11)
 
