@@ -101,16 +101,16 @@ class CelmTC(unittest.TestCase):
         ce0d.move_neg()
         with self.assertRaisesRegex(
             IndexError,
-            "Celm\(xindex=2\)::move_at\(offset=-1\): xindex = 1 "
-            "outside the interval \[2, 23\)",
+            r"Celm\(xindex=2\)::move_at\(offset=-1\): xindex = 1 "
+            r"outside the interval \[2, 23\)",
         ):
             ce0d.move_neg()
         ce9d = self.ce9.dup
         ce9d.move_pos()
         with self.assertRaisesRegex(
             IndexError,
-            "Celm\(xindex=22\)::move_at\(offset=1\): xindex = 23 "
-            "outside the interval \[2, 23\)",
+            r"Celm\(xindex=22\)::move_at\(offset=1\): xindex = 23 "
+            r"outside the interval \[2, 23\)",
         ):
             ce9d.move_pos()
 
@@ -244,16 +244,16 @@ class SelmTC(unittest.TestCase):
         se0d.move_neg()
         with self.assertRaisesRegex(
             IndexError,
-            "Selm\(xindex=1\)::move_at\(offset=-1\): xindex = 0 "
-            "outside the interval \[1, 24\)",
+            r"Selm\(xindex=1\)::move_at\(offset=-1\): xindex = 0 "
+            r"outside the interval \[1, 24\)",
         ):
             se0d.move_neg()
         se10d = self.se10.dup
         se10d.move_pos()
         with self.assertRaisesRegex(
             IndexError,
-            "Selm\(xindex=23\)::move_at\(offset=1\): xindex = 24 "
-            "outside the interval \[1, 24\)",
+            r"Selm\(xindex=23\)::move_at\(offset=1\): xindex = 24 "
+            r"outside the interval \[1, 24\)",
         ):
             se10d.move_pos()
 

@@ -18,22 +18,22 @@ class GridTC(unittest.TestCase):
 
         with self.assertRaisesRegex(
             ValueError,
-            "Grid::Grid\(xmin=0, xmax=10, ncelm=0\) invalid argument: "
-            "ncelm smaller than 1",
+            r"Grid::Grid\(xmin=0, xmax=10, ncelm=0\) invalid argument: "
+            r"ncelm smaller than 1",
         ):
             libst.Grid(0, 10, 0)
 
         with self.assertRaisesRegex(
             ValueError,
-            "Grid::Grid\(xmin=10, xmax=10, ncelm=10\) invalid arguments: "
-            "xmin >= xmax",
+            r"Grid::Grid\(xmin=10, xmax=10, ncelm=10\) invalid arguments: "
+            r"xmin >= xmax",
         ):
             libst.Grid(10, 10, 10)
 
         with self.assertRaisesRegex(
             ValueError,
-            "Grid::Grid\(xmin=11, xmax=10, ncelm=10\) invalid arguments: "
-            "xmin >= xmax",
+            r"Grid::Grid\(xmin=11, xmax=10, ncelm=10\) invalid arguments: "
+            r"xmin >= xmax",
         ):
             libst.Grid(11, 10, 10)
 
@@ -43,15 +43,15 @@ class GridTC(unittest.TestCase):
         for s in [0, 1]:
             with self.assertRaisesRegex(
                 ValueError,
-                "Grid::init_from_array\(xloc\) invalid arguments: "
-                "xloc.size\(\)=%d smaller than 2" % s
+                r"Grid::init_from_array\(xloc\) invalid arguments: "
+                r"xloc.size\(\)=%d smaller than 2" % s
             ):
                 libst.Grid(xloc=np.arange(s) * 0.1)
 
         with self.assertRaisesRegex(
             ValueError,
-            "Grid::init_from_array\(xloc\) invalid arguments: "
-            "xloc\[0\]=1 >= xloc\[1\]=0.9"
+            r"Grid::init_from_array\(xloc\) invalid arguments: "
+            r"xloc\[0\]=1 >= xloc\[1\]=0.9"
         ):
             libst.Grid(xloc=np.arange(10, -1, -1) * 0.1)
 
