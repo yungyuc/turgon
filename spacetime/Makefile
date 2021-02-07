@@ -22,6 +22,7 @@ CMAKE_ARGS ?=
 VERBOSE ?=
 GDB ?=
 
+SKIP_PYTHON_EXECUTABLE ?= OFF
 PYTHON ?= $(shell which python3)
 PYTHON_VERSION ?= $(shell $(PYTHON) -c 'import sys; print("%d%d" % (sys.version_info.major, sys.version_info.minor))')
 
@@ -97,6 +98,7 @@ $(BUILD_PATH)/Makefile: CMakeLists.txt Makefile
 	cmake $(SPACETIME_ROOT) \
 		-DCMAKE_INSTALL_PREFIX=$(SPACETIME_ROOT) \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) \
+		-DSKIP_PYTHON_EXECUTABLE=$(SKIP_PYTHON_EXECUTABLE) \
 		-DHIDE_SYMBOL=$(HIDE_SYMBOL) \
 		-DDEBUG_SYMBOL=$(DEBUG_SYMBOL) \
 		-DUSE_CLANG_TIDY=$(USE_CLANG_TIDY) \
