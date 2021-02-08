@@ -33,9 +33,19 @@ Now change the current directory to `turgon/spacetime`
 
 Run make:
 
+Turgon have two **build type**:
+
+1. Debug
+
 .. code-block:: bash
 
-  $ make CMAKE_ARGS=-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include
+  $ make CMAKE_ARGS="-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include/" CMAKE_BUILD_TYPE=Debug
+
+2. Release
+
+.. code-block:: bash
+
+  $ make CMAKE_ARGS="-Dmodmesh_INCLUDE_DIR=path_to/modmesh/include/" CMAKE_BUILD_TYPE=Release
 
 Test
 ====
@@ -76,4 +86,3 @@ then build the note:
 .. code-block:: bash
 
   $ make note
-
